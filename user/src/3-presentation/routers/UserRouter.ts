@@ -25,5 +25,6 @@ router.get("/", userController.getAllUsers);
 router.post("/register", userController.registerUser);
 router.post("/set-password", userController.setPasswordAndVerify);
 router.post("/resend-verification-link", userController.resendVerifyLink);
+router.post("/login", userController.login);
 
 export default router;

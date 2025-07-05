@@ -12,29 +12,52 @@ import { EmailVerificationJwtVerifyError } from "../../2-infrastructure/errors/J
 export const errorHandler = (
   err: Error,
   _req: Request,
-  res: Response,
+  res: Response<{
+    success: boolean;
+    error: string;
+    message: string;
+    errors?: { error: string; field?: string }[];
+  }>,
   _next: NextFunction,
 ) => {
   console.log(err);
   if (err instanceof DomainError) {
-    res.status(400).json({ error: "validation_error", message: err.message });
+    res.status(400).json({
+      success: false,
+      error: "validation_error",
+      message: err.message,
+    });
   } else if (err instanceof ApplicationError) {
   } else if (err instanceof InfrastructureError) {
     if (err instanceof EmailVerificationJwtVerifyError) {
-      res.status(400).json({ error: err.name, message: "Token has expired" });
+      res.status(400).json({
+        success: false,
+        error: err.name,
+        message: "Token has expired",
+      });
       return;
     }
     res.status(500).json({
+      success: false,
       error: "SERVER_ERROR",
       message: PresentationErrorCodes.SERVER_ERROR,
     });
   } else if (err instanceof PresentationError) {
   } else if (err instanceof ZodError) {
-    res.json({ error: "validation_error", errors: err.format() });
+    res.json({
+      success: false,
+      error: "validation_error",
+      message: "Invalid Input",
+      errors: err.issues.map((issue) => ({
+        field: issue.path.join("."),
+        error: issue.message,
+      })),
+    });
   } else {
     res.json({
       success: false,
-      error: "Something went wrong",
+      error: "unexpected_error",
+      message: "Something unexpected happened",
     });
   }
 };

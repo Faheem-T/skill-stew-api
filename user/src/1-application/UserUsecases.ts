@@ -4,6 +4,8 @@ import { IUserRepository } from "../0-domain/repositories/IUserRepository";
 import { IEmailService } from "./ports/IEmailService";
 import { IJwtService } from "./ports/IJwtService";
 import { IHasherService } from "./ports/IHasherService";
+import { WrongPasswordError } from "../0-domain/errors/WrongPasswordError";
+import { UserNotVerifiedError } from "../0-domain/errors/UserNotVerifiedError";
 
 export class UserUsecases {
   constructor(
@@ -31,7 +33,7 @@ export class UserUsecases {
   };
 
   sendVerificationLinkToEmail = async (email: string) => {
-    const jwt = this._jwtService.generateEmailVerificationJwt(email);
+    const jwt = this._jwtService.generateEmailVerificationJwt({ email });
     await this._emailService.sendVerificationLinkToEmail(email, jwt);
   };
 
@@ -69,5 +71,28 @@ export class UserUsecases {
   }: {
     email: string;
     password: string;
-  }) => {};
+  }) => {
+    const user = await this._userRepo.getUserByEmail(email);
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+    if (!user.isVerified() || !user.passwordHash) {
+      throw new UserNotVerifiedError();
+    }
+    if (!this._hasherService.compare(password, user.passwordHash)) {
+      throw new WrongPasswordError();
+    }
+
+    const refreshToken = this._jwtService.generateRefreshToken({
+      email,
+      role: user.getRole(),
+      userId: user.id as number,
+    });
+    const accessToken = this._jwtService.generateAccessToken({
+      email,
+      role: user.getRole(),
+      userId: user.id as number,
+    });
+    return { refreshToken, accessToken };
+  };
 }
