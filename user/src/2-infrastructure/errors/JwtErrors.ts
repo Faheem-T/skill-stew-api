@@ -15,3 +15,15 @@ export class EmailVerificationJwtVerifyError extends JwtError {
     super("EMAIL_VERIFICATION_JWT_VERIFY_ERROR");
   }
 }
+
+export class RefreshTokenVerifyError extends JwtError {
+  constructor() {
+    super("REFRESH_TOKEN_VERIFY_ERROR");
+  }
+}
+
+export class AccessTokenVerifyError extends JwtError {
+  constructor() {
+    super("ACCESS_TOKEN_VERIFY_ERROR");
+  }
+}

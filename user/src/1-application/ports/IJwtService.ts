@@ -1,19 +1,33 @@
 import { User, UserRoles } from "../../0-domain/entities/User";
 
-export interface JWTPayload {
-  userId: Pick<User, "id">;
+export interface generateTokenDto {
+  userId: number;
+  email: string;
   role: UserRoles | "ADMIN";
 }
 
-export interface EmailVerificationJWTPayload {
+export interface JWTPayload extends generateTokenDto {
+  iat: number;
+  exp: number;
+}
+
+export interface generateEmailVerificationJwtDto {
   email: string;
 }
 
+export interface EmailVerificationJWTPayload
+  extends generateEmailVerificationJwtDto {
+  iat: number;
+  exp: number;
+}
+
 export interface IJwtService {
-  generateEmailVerificationJwt(email: string): string;
-  verifyEmailVerificationJwt(jwt: string): EmailVerificationJWTPayload | never;
-  // generateAccessToken(user: User): string;
-  // generateRefreshToken(user: User): string;
-  // verifyAccessToken(jwt: string): JWTPayload;
-  // verifyRefreshToken(jwt: string): JWTPayload;
+  generateEmailVerificationJwt(input: generateEmailVerificationJwtDto): string;
+  verifyEmailVerificationJwt(
+    jwtToken: string,
+  ): EmailVerificationJWTPayload | never;
+  generateAccessToken(input: generateTokenDto): string;
+  generateRefreshToken(input: generateTokenDto): string;
+  verifyAccessToken(jwtToken: string): JWTPayload;
+  verifyRefreshToken(jwtToken: string): JWTPayload;
 }

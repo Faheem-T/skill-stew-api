@@ -53,7 +53,24 @@ export class UserController {
 
   login = async (...[req, res, next]: routeHandlerParams) => {
     try {
-      const { password, email } = loginSchema.parse(req.body);
+      const result = loginSchema.parse(req.body);
+      const { refreshToken, accessToken } =
+        await this._userUsecases.loginUser(result);
+
+      res
+        .status(200)
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+        })
+        .json({
+          success: true,
+          data: {
+            accessToken,
+          },
+        });
     } catch (err) {
       next(err);
     }

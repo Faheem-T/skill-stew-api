@@ -4,4 +4,6 @@ export enum DomainErrorCodes {
   USER_ALREADY_VERIFIED = "User is already verified",
   USER_ALREADY_EXISTS = "User with this email already exists",
   USER_NOT_FOUND = "User not found",
+  WRONG_PASSWORD = "Incorrect password",
+  USER_NOT_VERIFIED = "User has not been verified",
 }
