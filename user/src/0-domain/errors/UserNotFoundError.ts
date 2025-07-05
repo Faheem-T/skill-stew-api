@@ -1,9 +1,9 @@
 import { DomainError } from "../../core/errors/AppError";
 import { DomainErrorCodes } from "./DomainErrorEnum";
 
-export class DomainValidationError extends DomainError {
-  constructor(code: keyof typeof DomainErrorCodes) {
-    super(DomainErrorCodes[code], code);
+export class UserNotFoundError extends DomainError {
+  constructor() {
+    super(DomainErrorCodes.USER_NOT_FOUND, "USER_NOT_FOUND");
   }
   toJSON(): object {
     return { error: this.name, message: this.message, code: this.code };

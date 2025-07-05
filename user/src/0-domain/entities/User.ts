@@ -46,6 +46,8 @@ export class User {
   }
 
   verify() {
+    if (this._isVerified)
+      throw new DomainValidationError("USER_ALREADY_VERIFIED");
     this._isVerified = true;
   }
 

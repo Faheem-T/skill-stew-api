@@ -1,10 +1,8 @@
+import { ENV } from "./config/dotenv";
 import { app } from "./app";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
-import { generateEnvVars } from "./config/dotenv";
 import { userSchema } from "./2-infrastructure/db/schemas/userSchema";
-
-export const ENV = generateEnvVars();
 
 const { Pool } = pg;
 
