@@ -1,4 +1,14 @@
-const envVars = ["PORT", "DATABASE_URL"] as const;
+const envVars = [
+  "PORT",
+  "DATABASE_URL",
+  "EMAIL_VERIFICATON_JWT_SECRET",
+  "NODE_MAILER_HOST",
+  "NODE_MAILER_PORT",
+  "NODE_MAILER_GMAIL",
+  "NODE_MAILER_GMAIL_APP_PASSWORD",
+  "BASE_SERVER_URL",
+  "BASE_FRONTEND_URL",
+] as const;
 
 export function generateEnvVars() {
   return envVars.reduce(
@@ -13,3 +23,5 @@ export function generateEnvVars() {
     {} as Record<(typeof envVars)[number], string>,
   );
 }
+
+export const ENV = generateEnvVars();
