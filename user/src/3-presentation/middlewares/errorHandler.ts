@@ -7,6 +7,7 @@ import {
 } from "../../core/errors/AppError";
 import { PresentationErrorCodes } from "../errors/PresentationErrorCodes";
 import { ZodError } from "zod";
+import { EmailVerificationJwtVerifyError } from "../../2-infrastructure/errors/JwtErrors";
 
 export const errorHandler = (
   err: Error,
@@ -19,6 +20,10 @@ export const errorHandler = (
     res.status(400).json({ error: "validation_error", message: err.message });
   } else if (err instanceof ApplicationError) {
   } else if (err instanceof InfrastructureError) {
+    if (err instanceof EmailVerificationJwtVerifyError) {
+      res.status(400).json({ error: err.name, message: "Token has expired" });
+      return;
+    }
     res.status(500).json({
       error: "SERVER_ERROR",
       message: PresentationErrorCodes.SERVER_ERROR,

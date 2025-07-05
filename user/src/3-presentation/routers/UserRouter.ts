@@ -12,8 +12,13 @@ const emailService = new EmailService();
 const jwtService = new JwtService();
 const hasherService = new BcryptHasher();
 const userRepo = new UserRepository();
-const userUsecases = new UserUsecases(userRepo, emailService, jwtService);
-const userController = new UserController(userUsecases, hasherService);
+const userUsecases = new UserUsecases(
+  userRepo,
+  emailService,
+  jwtService,
+  hasherService,
+);
+const userController = new UserController(userUsecases);
 
 // /api/users
 router.get("/", userController.getAllUsers);
