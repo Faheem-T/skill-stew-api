@@ -1,0 +1,26 @@
+{
+  "name": "user",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx tsx watch --include './src/**/*.ts' ./src/start.ts",
+    "syncDb": "drizzle-kit push --config=./src/config/drizzleConfig.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/pg": "^8.15.4",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.3"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.3",
+    "drizzle-orm": "^0.44.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "zod": "^3.25.67"
+  }
+}
