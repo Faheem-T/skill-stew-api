@@ -6,4 +6,5 @@ export enum DomainErrorCodes {
   USER_NOT_FOUND = "User not found",
   WRONG_PASSWORD = "Incorrect password",
   USER_NOT_VERIFIED = "User has not been verified",
+  UNAUTHORIZED = "You are not authorized",
 }

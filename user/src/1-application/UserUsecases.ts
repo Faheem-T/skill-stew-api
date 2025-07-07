@@ -63,8 +63,6 @@ export class UserUsecases {
     this._userRepo.save(user);
   };
 
-  updateUserDetails = async (user: User) => {};
-
   loginUser = async ({
     email,
     password,
@@ -83,16 +81,30 @@ export class UserUsecases {
       throw new WrongPasswordError();
     }
 
-    const refreshToken = this._jwtService.generateRefreshToken({
-      email,
-      role: user.getRole(),
-      userId: user.id as number,
-    });
-    const accessToken = this._jwtService.generateAccessToken({
-      email,
-      role: user.getRole(),
-      userId: user.id as number,
-    });
+    const role = user.getRole();
+    const userId = user.id as number;
+
+    const refreshToken = this._jwtService.generateRefreshToken(
+      {
+        email,
+        role: role,
+        userId: userId,
+      },
+      role,
+    );
+    const accessToken = this._jwtService.generateAccessToken(
+      {
+        email,
+        role: role,
+        userId: userId,
+      },
+      role,
+    );
     return { refreshToken, accessToken };
+  };
+
+  refresh = async ({ refreshToken }: { refreshToken: string }) => {
+    const decoded = this._jwtService.verifyRefreshToken(refreshToken);
+    return this._jwtService.generateAccessToken(decoded, decoded.role);
   };
 }

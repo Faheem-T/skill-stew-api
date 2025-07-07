@@ -1,10 +1,10 @@
 import { DomainValidationError } from "../errors/DomainValidationError";
+import { UserRoles } from "./UserRoles";
 
-export type UserRoles = "USER" | "EXPERT";
 export class User {
   id?: number;
   private _email: string;
-  private _role: UserRoles;
+  private _role: Omit<UserRoles, "ADMIN">;
   name?: string;
   username?: string;
   passwordHash?: string;

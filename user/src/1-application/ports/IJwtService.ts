@@ -26,8 +26,8 @@ export interface IJwtService {
   verifyEmailVerificationJwt(
     jwtToken: string,
   ): EmailVerificationJWTPayload | never;
-  generateAccessToken(input: generateTokenDto): string;
-  generateRefreshToken(input: generateTokenDto): string;
+  generateAccessToken(payload: generateTokenDto, role: UserRoles): string;
+  generateRefreshToken(payload: generateTokenDto, role: UserRoles): string;
   verifyAccessToken(jwtToken: string): JWTPayload;
   verifyRefreshToken(jwtToken: string): JWTPayload;
 }

@@ -8,6 +8,7 @@ import {
 import { PresentationErrorCodes } from "../errors/PresentationErrorCodes";
 import { ZodError } from "zod";
 import { EmailVerificationJwtVerifyError } from "../../2-infrastructure/errors/JwtErrors";
+import { UnauthorizedError } from "../../0-domain/errors/UnauthorizedError";
 
 export const errorHandler = (
   err: Error,
@@ -22,6 +23,13 @@ export const errorHandler = (
 ) => {
   console.log(err);
   if (err instanceof DomainError) {
+    if (err instanceof UnauthorizedError) {
+      res.status(401).json({
+        success: false,
+        error: err.code,
+        message: err.message,
+      });
+    }
     res.status(400).json({
       success: false,
       error: "validation_error",
