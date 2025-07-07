@@ -5,11 +5,20 @@ import { UserRepository } from "../../2-infrastructure/db/UserRepository";
 import { EmailService } from "../../2-infrastructure/services/EmailService";
 import { JwtService } from "../../2-infrastructure/services/JwtService";
 import { BcryptHasher } from "../../2-infrastructure/services/HashService";
+import { ENV } from "../../config/dotenv";
 
 const router = Router();
 
 const emailService = new EmailService();
-const jwtService = new JwtService();
+const jwtService = new JwtService({
+  adminAccessTokenSecret: "",
+  adminRefreshTokenSecret: "",
+  expertAccessTokenSecret: "",
+  expertRefreshTokenSecret: "",
+  userAccessTokenSecret: "",
+  userRefreshTokenSecret: "",
+  emailJwtSecret: ENV.EMAIL_VERIFICATON_JWT_SECRET,
+});
 const hasherService = new BcryptHasher();
 const userRepo = new UserRepository();
 const userUsecases = new UserUsecases(
@@ -26,5 +35,6 @@ router.post("/register", userController.registerUser);
 router.post("/set-password", userController.setPasswordAndVerify);
 router.post("/resend-verification-link", userController.resendVerifyLink);
 router.post("/login", userController.login);
+router.post("/refresh", userController.refresh);
 
 export default router;

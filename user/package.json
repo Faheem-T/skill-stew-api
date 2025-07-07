@@ -4,16 +4,21 @@
   "main": "index.js",
   "scripts": {
     "start": "npx tsx watch --include './src/**/*.ts' ./src/start.ts",
-    "syncDb": "drizzle-kit push --config=./src/config/drizzleConfig.ts"
+    "syncDb": "drizzle-kit push --config=./src/config/drizzleConfig.ts",
+    "test": "jest ./src/__tests__"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/pg": "^8.15.4",
     "drizzle-kit": "^0.31.4",
-    "tsx": "^4.20.3"
+    "jest": "^30.0.4",
+    "ts-jest": "^29.4.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",

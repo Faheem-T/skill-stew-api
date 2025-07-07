@@ -7,6 +7,7 @@ import {
   verifyEmailSchema,
 } from "../validators/UserValidator";
 import { IHasherService } from "../../1-application/ports/IHasherService";
+import { UnauthorizedError } from "../../0-domain/errors/UnauthorizedError";
 
 type routeHandlerParams = [Request, Response, NextFunction];
 
@@ -74,5 +75,13 @@ export class UserController {
     } catch (err) {
       next(err);
     }
+  };
+
+  refresh = async (...[req, res, next]: routeHandlerParams) => {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      throw new UnauthorizedError();
+    }
+    this._userUsecases.refresh({ refreshToken });
   };
 }

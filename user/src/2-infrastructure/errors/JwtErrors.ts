@@ -27,3 +27,21 @@ export class AccessTokenVerifyError extends JwtError {
     super("ACCESS_TOKEN_VERIFY_ERROR");
   }
 }
+
+export class InvalidTokenError extends JwtError {
+  constructor() {
+    super("INVALID_TOKEN_ERROR");
+  }
+}
+
+export class InvalidTokenRoleError extends JwtError {
+  constructor() {
+    super("INVALID_TOKEN_ROLE_ERROR");
+  }
+}
+
+export class TokenRoleMismatchError extends JwtError {
+  constructor() {
+    super("TOKEN_ROLE_MISMATCH_ERROR");
+  }
+}

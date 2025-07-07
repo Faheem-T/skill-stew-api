@@ -5,24 +5,59 @@ import {
   IJwtService,
   JWTPayload,
 } from "../../1-application/ports/IJwtService";
-import { ENV } from "../../config/dotenv";
-import jwt from "jsonwebtoken";
+import jwt, { JwtHeader } from "jsonwebtoken";
 import {
   AccessTokenVerifyError,
   EmailVerificationJwtVerifyError,
+  InvalidTokenError,
+  InvalidTokenRoleError,
   RefreshTokenVerifyError,
+  TokenRoleMismatchError,
 } from "../errors/JwtErrors";
+import { USER_ROLES, UserRoles } from "../../0-domain/entities/UserRoles";
+
+// type guard for user roles
+function isUserRole(role: string): role is UserRoles {
+  return ["ADMIN", "EXPERT", "USER"].includes(role);
+}
 
 export class JwtService implements IJwtService {
   EMAIL_SECRET: string;
-  REFRESH_TOKEN_SECRET: string;
-  ACCESS_TOKEN_SECRET: string;
+  SECRETS: Record<UserRoles, { refresh: string; access: string }>;
+  // REFRESH_TOKEN_SECRET: string;
+  // ACCESS_TOKEN_SECRET: string;
   REFRESH_EXPIRY_IN_SECONDS: number = 60 * 60 * 24 * 15; // 15 days
   ACCESS_EXPIRY_IN_SECONDS: number = 60 * 10; // 10 minutes
-  constructor() {
-    this.EMAIL_SECRET = ENV.EMAIL_VERIFICATON_JWT_SECRET;
-    this.REFRESH_TOKEN_SECRET = ENV.REFRESH_TOKEN_SECRET;
-    this.ACCESS_TOKEN_SECRET = ENV.ACCESS_TOKEN_SECRET;
+  constructor({
+    emailJwtSecret,
+    userAccessTokenSecret,
+    userRefreshTokenSecret,
+    expertAccessTokenSecret,
+    expertRefreshTokenSecret,
+    adminRefreshTokenSecret,
+    adminAccessTokenSecret,
+  }: {
+    emailJwtSecret: string;
+    userRefreshTokenSecret: string;
+    userAccessTokenSecret: string;
+    expertRefreshTokenSecret: string;
+    expertAccessTokenSecret: string;
+    adminRefreshTokenSecret: string;
+    adminAccessTokenSecret: string;
+  }) {
+    this.EMAIL_SECRET = emailJwtSecret;
+    this.SECRETS = {
+      USER: { access: userAccessTokenSecret, refresh: userRefreshTokenSecret },
+      EXPERT: {
+        access: expertAccessTokenSecret,
+        refresh: expertRefreshTokenSecret,
+      },
+      ADMIN: {
+        access: adminAccessTokenSecret,
+        refresh: adminRefreshTokenSecret,
+      },
+    };
+    // this.SECRETS.USER = {}
   }
   generateEmailVerificationJwt(input: generateEmailVerificationJwtDto): string {
     return jwt.sign({ email: input.email }, this.EMAIL_SECRET, {
@@ -43,39 +78,83 @@ export class JwtService implements IJwtService {
     }
   }
 
-  generateRefreshToken = (input: generateTokenDto): string => {
-    const { userId, email, role } = input;
-    return jwt.sign({ userId, email, role }, this.REFRESH_TOKEN_SECRET, {
+  generateRefreshToken = (
+    payload: generateTokenDto,
+    role: UserRoles,
+  ): string => {
+    return jwt.sign(payload, this.SECRETS[role].refresh, {
       expiresIn: this.REFRESH_EXPIRY_IN_SECONDS,
+      header: {
+        alg: "HS256",
+        kid: role,
+      },
     });
   };
 
-  generateAccessToken = (input: generateTokenDto): string => {
-    const { userId, email, role } = input;
-    return jwt.sign({ userId, email, role }, this.ACCESS_TOKEN_SECRET, {
+  generateAccessToken = (
+    payload: generateTokenDto,
+    role: UserRoles,
+  ): string => {
+    return jwt.sign(payload, this.SECRETS[role].access, {
       expiresIn: this.ACCESS_EXPIRY_IN_SECONDS,
+      header: {
+        alg: "HS256",
+        kid: role,
+      },
     });
   };
 
   verifyRefreshToken = (jwtToken: string): JWTPayload => {
+    const decoded = jwt.decode(jwtToken, { complete: true }) as any;
+
+    if (!decoded || !decoded.header) {
+      throw new InvalidTokenError();
+    }
+
+    const header = decoded.header as JwtHeader & { kid?: string };
+    const role = header.kid as UserRoles | undefined;
+
+    if (!role || !isUserRole(role)) {
+      throw new InvalidTokenRoleError();
+    }
+
+    let payload: JWTPayload;
     try {
-      const decoded = <JWTPayload>(
-        jwt.verify(jwtToken, this.REFRESH_TOKEN_SECRET)
-      );
-      return decoded;
+      payload = <JWTPayload>jwt.verify(jwtToken, this.SECRETS[role].refresh);
     } catch (err) {
       throw new RefreshTokenVerifyError();
     }
+
+    if (!(role === payload.role)) {
+      throw new TokenRoleMismatchError();
+    }
+
+    return payload;
   };
 
   verifyAccessToken = (jwtToken: string): JWTPayload => {
+    const decoded = jwt.decode(jwtToken, { complete: true }) as any;
+    if (!decoded || !decoded.header) {
+      throw new InvalidTokenError();
+    }
+
+    const header = decoded.header as JwtHeader & { kid?: string };
+    const role = header.kid as UserRoles | undefined;
+
+    if (!role || !isUserRole(role)) {
+      throw new InvalidTokenRoleError();
+    }
+    let payload: JWTPayload;
     try {
-      const decoded = <JWTPayload>(
-        jwt.verify(jwtToken, this.REFRESH_TOKEN_SECRET)
-      );
-      return decoded;
+      payload = <JWTPayload>jwt.verify(jwtToken, this.SECRETS[role].access);
     } catch (err) {
       throw new AccessTokenVerifyError();
     }
+
+    if (!(role === payload.role)) {
+      throw new TokenRoleMismatchError();
+    }
+
+    return payload;
   };
 }
