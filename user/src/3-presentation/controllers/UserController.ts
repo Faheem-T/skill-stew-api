@@ -9,13 +9,17 @@ import {
 import { IHasherService } from "../../1-application/ports/IHasherService";
 import { UnauthorizedError } from "../../0-domain/errors/UnauthorizedError";
 
-type routeHandlerParams = [Request, Response, NextFunction];
+type routeHandlerParams = [
+  Request,
+  Response<{ success: true; data?: Record<string, any>; message?: string }>,
+  NextFunction,
+];
 
 export class UserController {
   constructor(private _userUsecases: UserUsecases) {}
   getAllUsers = async (...[req, res, next]: routeHandlerParams) => {
     const users = await this._userUsecases.getAllUsers();
-    res.json({ data: users });
+    res.json({ success: true, data: users });
   };
 
   registerUser = async (...[req, res, next]: routeHandlerParams) => {
@@ -23,7 +27,9 @@ export class UserController {
       const { email } = registerSchema.parse(req.body);
       await this._userUsecases.registerUser(email);
       await this._userUsecases.sendVerificationLinkToEmail(email);
-      res.status(201).json({ message: "Link has been sent to email" });
+      res
+        .status(201)
+        .json({ success: true, message: "Link has been sent to email" });
     } catch (err) {
       next(err);
     }
@@ -35,7 +41,10 @@ export class UserController {
       await this._userUsecases.verifyUserAndSetPassword(result);
       res
         .status(200)
-        .json({ message: "User has been verified and password has been set" });
+        .json({
+          success: true,
+          message: "User has been verified and password has been set",
+        });
     } catch (err) {
       next(err);
     }
@@ -46,7 +55,7 @@ export class UserController {
       const { email } = resendVerifyEmailSchema.parse(req.body);
 
       await this._userUsecases.sendVerificationLinkToEmail(email);
-      res.status(200).json({ message: "Email has been resent" });
+      res.status(200).json({ success: true, message: "Email has been resent" });
     } catch (err) {
       next(err);
     }
@@ -78,10 +87,15 @@ export class UserController {
   };
 
   refresh = async (...[req, res, next]: routeHandlerParams) => {
-    const refreshToken = req.cookies?.refreshToken;
-    if (!refreshToken) {
-      throw new UnauthorizedError();
+    try {
+      const refreshToken = req.cookies?.refreshToken;
+      if (!refreshToken) {
+        throw new UnauthorizedError();
+      }
+      const accessToken = this._userUsecases.refresh({ refreshToken });
+      res.status(200).json({ success: true, data: { accessToken } });
+    } catch (err) {
+      next(err);
     }
-    this._userUsecases.refresh({ refreshToken });
   };
 }
