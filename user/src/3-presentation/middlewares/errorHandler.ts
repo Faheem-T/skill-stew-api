@@ -3,8 +3,8 @@ import {
   ApplicationError,
   DomainError,
   InfrastructureError,
-  PresentationError,
 } from "../../core/errors/AppError";
+import { PresentationError } from "../errors/PresentationError";
 import { PresentationErrorCodes } from "../errors/PresentationErrorCodes";
 import { ZodError } from "zod";
 import { EmailVerificationJwtVerifyError } from "../../2-infrastructure/errors/JwtErrors";
@@ -14,7 +14,7 @@ export const errorHandler = (
   err: Error,
   _req: Request,
   res: Response<{
-    success: boolean;
+    success: false;
     error: string;
     message: string;
     errors?: { error: string; field?: string }[];
@@ -51,6 +51,7 @@ export const errorHandler = (
       message: PresentationErrorCodes.SERVER_ERROR,
     });
   } else if (err instanceof PresentationError) {
+    res.status(err.statusCode).json({ success: false, ...err.toJSON() });
   } else if (err instanceof ZodError) {
     res.json({
       success: false,

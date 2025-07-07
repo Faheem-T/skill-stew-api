@@ -14,7 +14,7 @@ import {
   RefreshTokenVerifyError,
   TokenRoleMismatchError,
 } from "../errors/JwtErrors";
-import { USER_ROLES, UserRoles } from "../../0-domain/entities/UserRoles";
+import { UserRoles } from "../../0-domain/entities/UserRoles";
 
 // type guard for user roles
 function isUserRole(role: string): role is UserRoles {

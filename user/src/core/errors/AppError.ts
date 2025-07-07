@@ -18,11 +18,3 @@ export abstract class DomainError extends AppError {}
 export abstract class InfrastructureError extends AppError {}
 
 export abstract class ApplicationError extends AppError {}
-
-export abstract class PresentationError extends AppError {
-  abstract toJSON(): {
-    message: string;
-    error: string;
-    errors: { code: string; field: string; message: string }[];
-  };
-}
