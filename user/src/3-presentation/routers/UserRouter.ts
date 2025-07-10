@@ -11,12 +11,12 @@ const router = Router();
 
 const emailService = new EmailService();
 const jwtService = new JwtService({
-  adminAccessTokenSecret: "",
-  adminRefreshTokenSecret: "",
-  expertAccessTokenSecret: "",
-  expertRefreshTokenSecret: "",
-  userAccessTokenSecret: "",
-  userRefreshTokenSecret: "",
+  adminAccessTokenSecret: ENV.ADMIN_ACCESS_TOKEN_SECRET,
+  adminRefreshTokenSecret: ENV.ADMIN_REFRESH_TOKEN_SECRET,
+  expertAccessTokenSecret: ENV.EXPERT_REFRESH_TOKEN_SECRET,
+  expertRefreshTokenSecret: ENV.EXPERT_REFRESH_TOKEN_SECRET,
+  userAccessTokenSecret: ENV.USER_ACCESS_TOKEN_SECRET,
+  userRefreshTokenSecret: ENV.USER_REFRESH_TOKEN_SECRET,
   emailJwtSecret: ENV.EMAIL_VERIFICATON_JWT_SECRET,
 });
 const hasherService = new BcryptHasher();

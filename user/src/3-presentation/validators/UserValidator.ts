@@ -6,9 +6,12 @@ export const verifyEmailSchema = z.object({
   password: z
     .string()
     .min(8, "Password has to be 8 characters")
+    .regex(/[a-z]/, "Password must include at least one lowercase letter")
+    .regex(/[A-Z]/, "Password must include at least one uppercase letter")
+    .regex(/\d/, "Password must include at least one number")
     .regex(
-      /^(?=(.*[a-z]){3,})(?=(.*[A-Z]){2,})(?=(.*[0-9]){2,})(?=(.*[!@#$%^&*()\-__+.]){1,}).{8,}$/,
-      "Password has to have atleast the following: 1 upper case letter, 1 lower case letter, 1 number, 1 special character",
+      /[@$!%*?&]/,
+      "Password must include at least one special character (@$!%*?&)",
     ),
 });
 
