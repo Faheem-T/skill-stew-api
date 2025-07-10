@@ -35,7 +35,7 @@ export class EmailService implements IEmailService {
       from: this._user,
       to: email,
       subject: "Account creation | SkillStew",
-      text: `Click on this link to continue with your account creation: ${this._baseFrontendUrl}/verify?code=${jwt}`,
+      text: `Click on this link to continue with your account creation: ${this._baseFrontendUrl}/set-password?token=${jwt}`,
     };
     try {
       const info = await this._transporter.sendMail(mailOptions);
