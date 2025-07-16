@@ -2,9 +2,9 @@ import { DomainValidationError } from "../errors/DomainValidationError";
 import { UserRoles } from "./UserRoles";
 
 export class User {
-  id?: number;
+  id?: string;
   private _email: string;
-  private _role: Omit<UserRoles, "ADMIN">;
+  private _role: Extract<UserRoles, "USER" | "EXPERT">;
   name?: string;
   username?: string;
   passwordHash?: string;
@@ -22,7 +22,7 @@ export class User {
   private _isSubscribed?: boolean; // only for users
   private _yearsOfExperience?: number; // only for experts
 
-  constructor(email: string, id?: number) {
+  constructor(email: string, id?: string) {
     if (id) {
       this.id = id;
     }
