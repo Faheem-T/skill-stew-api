@@ -1,7 +1,7 @@
-import { User, UserRoles } from "../../0-domain/entities/User";
+import { UserRoles } from "../../0-domain/entities/UserRoles";
 
 export interface generateTokenDto {
-  userId: number;
+  userId: string;
   email: string;
   role: UserRoles | "ADMIN";
 }

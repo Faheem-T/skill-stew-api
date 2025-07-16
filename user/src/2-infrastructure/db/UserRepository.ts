@@ -38,7 +38,7 @@ export class UserRepository implements IUserRepository {
     }
   };
 
-  getUserById = async (id: number): Promise<User | null> => {
+  getUserById = async (id:string): Promise<User | null> => {
     try {
       const [user] = await db
         .select()

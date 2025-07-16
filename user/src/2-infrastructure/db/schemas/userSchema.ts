@@ -1,9 +1,12 @@
-import { pgTable, serial, text, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, boolean, uuid } from "drizzle-orm/pg-core";
 import { InferSelectModel, sql } from "drizzle-orm";
+import { randomUUID } from "crypto";
 
 
 export const userSchema = pgTable("users", {
-  id: serial().primaryKey(),
+  id: uuid()
+      .primaryKey()
+    .$default(() => randomUUID()),
   role: text({ enum: ["USER", "EXPERT"] })
     .default("USER")
     .notNull(),

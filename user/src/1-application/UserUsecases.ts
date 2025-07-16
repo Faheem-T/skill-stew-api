@@ -19,7 +19,7 @@ export class UserUsecases {
     return this._userRepo.getAllUsers();
   };
 
-  getUserById = async (id: number) => {
+  getUserById = async (id: string) => {
     return this._userRepo.getUserById(id);
   };
 
@@ -82,7 +82,7 @@ export class UserUsecases {
     }
 
     const role = user.getRole();
-    const userId = user.id as number;
+    const userId = user.id as string;
 
     const refreshToken = this._jwtService.generateRefreshToken(
       {
