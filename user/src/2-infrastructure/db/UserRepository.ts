@@ -38,7 +38,7 @@ export class UserRepository implements IUserRepository {
     }
   };
 
-  getUserById = async (id:string): Promise<User | null> => {
+  getUserById = async (id: string): Promise<User | null> => {
     try {
       const [user] = await db
         .select()
@@ -57,6 +57,33 @@ export class UserRepository implements IUserRepository {
         .select()
         .from(userSchema)
         .where(eq(userSchema.email, email));
+      if (!user) return null;
+      return UserMapper.toDomain(user);
+    } catch (err) {
+      throw new DatabaseError(err);
+    }
+  };
+
+  blockUser = async (userId: string): Promise<User | null> => {
+    try {
+      const [user] = await db
+        .update(userSchema)
+        .set({ is_blocked: true })
+        .where(eq(userSchema.id, userId))
+        .returning();
+      if (!user) return null;
+      return UserMapper.toDomain(user);
+    } catch (err) {
+      throw new DatabaseError(err);
+    }
+  };
+  unblockUser = async (userId: string): Promise<User | null> => {
+    try {
+      const [user] = await db
+        .update(userSchema)
+        .set({ is_blocked: false })
+        .where(eq(userSchema.id, userId))
+        .returning();
       if (!user) return null;
       return UserMapper.toDomain(user);
     } catch (err) {

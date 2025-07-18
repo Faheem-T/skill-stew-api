@@ -21,6 +21,7 @@ export class User {
 
   private _isSubscribed?: boolean; // only for users
   private _yearsOfExperience?: number; // only for experts
+  isBlocked: boolean;
 
   constructor(email: string, id?: string) {
     if (id) {
@@ -32,6 +33,7 @@ export class User {
     this._isSubscribed = false;
     this.socialLinks = [];
     this.languages = [];
+    this.isBlocked = false;
   }
 
   setExpert() {

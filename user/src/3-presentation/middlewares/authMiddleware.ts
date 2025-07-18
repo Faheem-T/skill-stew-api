@@ -14,9 +14,12 @@ export class AuthMiddleware {
       const payload = this._jwtService.verifyAccessToken(token);
       req.user = {
         id: payload.userId,
-        email: payload.email,
+        ...(payload.role === "ADMIN"
+          ? { userame: payload.username }
+          : { email: payload.email }),
         role: payload.role,
       };
+      next();
     } catch (err) {
       next(err);
     }

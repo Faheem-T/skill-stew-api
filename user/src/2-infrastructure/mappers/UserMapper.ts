@@ -19,6 +19,7 @@ export class UserMapper {
       is_subscribed,
       avatar_url,
       about,
+      is_blocked,
     } = raw;
     const user = new User(email, id);
     if (role === "EXPERT") {
@@ -42,6 +43,7 @@ export class UserMapper {
     }
     if (avatar_url) user.avatarUrl = avatar_url;
     if (about) user.about = about;
+    if (is_blocked) user.isBlocked = true;
 
     return user;
   }
@@ -63,6 +65,7 @@ export class UserMapper {
       role: user.getRole(),
       social_links: user.socialLinks,
       timezone: user.timezone ?? null,
+      is_blocked: user.isBlocked,
     };
     if (user.id) {
       return Object.assign({ id: user.id }, result);

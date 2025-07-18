@@ -7,4 +7,8 @@ export enum DomainErrorCodes {
   WRONG_PASSWORD = "Incorrect password",
   USER_NOT_VERIFIED = "User has not been verified",
   UNAUTHORIZED = "You are not authorized",
+  USER_BLOCKED = "You cannot continue as you have been blocked",
+
+  // Admin related
+  WRONG_ADMIN_USERNAME = "Incorrect username",
 }
