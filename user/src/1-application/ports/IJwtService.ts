@@ -1,15 +1,21 @@
 import { UserRoles } from "../../0-domain/entities/UserRoles";
 
-export interface generateTokenDto {
-  userId: string;
-  email: string;
-  role: UserRoles | "ADMIN";
-}
+export type generateTokenDto =
+  | {
+      userId: string;
+      email: string;
+      role: Exclude<UserRoles, "ADMIN">;
+    }
+  | {
+      userId: string;
+      username: string;
+      role: "ADMIN";
+    };
 
-export interface JWTPayload extends generateTokenDto {
+export type JWTPayload = generateTokenDto & {
   iat: number;
   exp: number;
-}
+};
 
 export interface generateEmailVerificationJwtDto {
   email: string;

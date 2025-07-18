@@ -1,11 +1,10 @@
-import { pgTable, serial, text, integer, boolean, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, boolean, uuid } from "drizzle-orm/pg-core";
 import { InferSelectModel, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
-
 export const userSchema = pgTable("users", {
   id: uuid()
-      .primaryKey()
+    .primaryKey()
     .$default(() => randomUUID()),
   role: text({ enum: ["USER", "EXPERT"] })
     .default("USER")
@@ -18,11 +17,18 @@ export const userSchema = pgTable("users", {
   avatar_url: text(),
   timezone: text(),
   about: text(),
-  social_links: text().array().notNull().default(sql`ARRAY[]::text[]`),
-  languages: text().array().notNull().default(sql`ARRAY[]::text[]`),
+  social_links: text()
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
+  languages: text()
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
   is_subscribed: boolean(),
   years_of_experience: integer(),
   is_verified: boolean().default(false).notNull(),
+  is_blocked: boolean().default(false).notNull(),
 });
 
 export type UserSchemaType = InferSelectModel<typeof userSchema>;

@@ -5,4 +5,6 @@ export interface IUserRepository {
   getAllUsers(): Promise<User[]>;
   save(user: User): Promise<void>;
   getUserByEmail(email: string): Promise<User | null>;
+  blockUser(userId: string): Promise<User | null>;
+  unblockUser(userId: string): Promise<User | null>;
 }
