@@ -1,7 +1,7 @@
 import {
   EmailVerificationJWTPayload,
   generateEmailVerificationJwtDto,
-  generateTokenDto,
+  tokenBody,
   IJwtService,
   JWTPayload,
 } from "../../1-application/ports/IJwtService";
@@ -78,10 +78,7 @@ export class JwtService implements IJwtService {
     }
   }
 
-  generateRefreshToken = (
-    payload: generateTokenDto,
-    role: UserRoles,
-  ): string => {
+  generateRefreshToken = (payload: tokenBody, role: UserRoles): string => {
     return jwt.sign(payload, this.SECRETS[role].refresh, {
       expiresIn: this.REFRESH_EXPIRY_IN_SECONDS,
       header: {
@@ -91,10 +88,7 @@ export class JwtService implements IJwtService {
     });
   };
 
-  generateAccessToken = (
-    payload: generateTokenDto,
-    role: UserRoles,
-  ): string => {
+  generateAccessToken = (payload: tokenBody, role: UserRoles): string => {
     return jwt.sign(payload, this.SECRETS[role].access, {
       expiresIn: this.ACCESS_EXPIRY_IN_SECONDS,
       header: {

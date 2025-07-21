@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express-serve-static-core";
 import { UserUsecases } from "../../1-application/UserUsecases";
-import { HttpStatus } from "../../constants/HttpStatus";
+import { HttpStatus } from "@skillstew/common";
 import { IDSchema } from "../validators/IdValidator";
 
 export class UserController {
