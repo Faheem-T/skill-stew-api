@@ -5,3 +5,4 @@ export * from "./errors/codes/JwtErrorCodes";
 export * from "./jwt-utils/JwtHelper";
 export * from "./middlewares/authMiddleware";
 export * from "./types/UserRoles";
+export * from "./middlewares/requireRole";

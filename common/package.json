@@ -1,12 +1,12 @@
 {
   "name": "@skillstew/common",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "scripts": {
     "del": "del ./build/*",
     "build": "npm run del && tsc",
-    "pub": "git add . && git commit -m \"Updates to common\" && npm version patch && npm run build && npm publish"
+    "pub": "npm version patch && git add . && git commit -m \"Updates to common\" &&  npm run build && npm publish"
   },
   "keywords": [],
   "author": "",
