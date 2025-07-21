@@ -3,12 +3,13 @@ import { app } from "./app";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import { userSchema } from "./2-infrastructure/db/schemas/userSchema";
+import amqp from "amqplib/callback_api";
 
 const { Pool } = pg;
 
 export const db = drizzle({
   client: new Pool({ connectionString: ENV.DATABASE_URL }),
-  schema: { userSchema },
+  // schema: { userSchema },
 });
 
 async function start() {
@@ -24,6 +25,38 @@ async function start() {
   app.listen(ENV.PORT, () => {
     console.log(`Listening on port ${ENV.PORT}`);
   });
+
+  amqp.connect(
+    `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
+    function (err, connection) {
+      if (err) {
+        throw err;
+      }
+      connection.createChannel(function (error1, channel) {
+        if (error1) {
+          throw error1;
+        }
+        var queue = "hello";
+        var msg = "Hello world";
+
+        channel.assertQueue(queue, {
+          durable: false,
+        });
+
+        channel.sendToQueue(queue, Buffer.from(msg));
+        console.log(" [x] Sent %s", msg);
+        channel.consume(
+          queue,
+          function (msg) {
+            console.log(" [x] Received %s", msg?.content.toString());
+          },
+          {
+            noAck: true,
+          },
+        );
+      });
+    },
+  );
 }
 start();
 

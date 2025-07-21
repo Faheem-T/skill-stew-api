@@ -14,6 +14,8 @@ const envVars = [
   "NODE_MAILER_GMAIL_APP_PASSWORD",
   "BASE_SERVER_URL",
   "BASE_FRONTEND_URL",
+  "RABBITMQ_USER",
+  "RABBITMQ_PASSWORD",
 ] as const;
 
 export function generateEnvVars() {

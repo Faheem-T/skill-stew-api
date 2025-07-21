@@ -21,6 +21,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@types/amqplib": "^0.10.7",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
@@ -28,6 +29,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/nodemailer": "^6.4.17",
+    "amqplib": "^0.10.8",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
