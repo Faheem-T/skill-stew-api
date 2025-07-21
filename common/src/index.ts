@@ -9,3 +9,5 @@ export * from "./middlewares/authMiddleware";
 export * from "./types/UserRoles";
 
 export * from "./middlewares/requireRole";
+
+export * from "./constants/HttpStatus";
