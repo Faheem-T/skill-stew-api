@@ -1,4 +1,10 @@
-const envVars = ["DATABASE_URL", "PORT"] as const;
+const envVars = [
+  "DATABASE_URL",
+  "PORT",
+  "USER_ACCESS_TOKEN_SECRET",
+  "EXPERT_ACCESS_TOKEN_SECRET",
+  "ADMIN_ACCESS_TOKEN_SECRET",
+] as const;
 
 export function generateEnvVars() {
   return envVars.reduce(

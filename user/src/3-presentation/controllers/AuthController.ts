@@ -12,7 +12,7 @@ import {
   adminLoginSchema,
   createAdminSchema,
 } from "../validators/AdminValidator";
-import { HttpStatus } from "../../constants/HttpStatus";
+import { HttpStatus } from "@skillstew/common";
 
 type routeHandlerParams = [
   Request,

@@ -1,6 +1,6 @@
 import { UserRoles } from "../../0-domain/entities/UserRoles";
 
-export type generateTokenDto =
+export type tokenBody =
   | {
       userId: string;
       email: string;
@@ -12,7 +12,7 @@ export type generateTokenDto =
       role: "ADMIN";
     };
 
-export type JWTPayload = generateTokenDto & {
+export type JWTPayload = tokenBody & {
   iat: number;
   exp: number;
 };
@@ -32,8 +32,8 @@ export interface IJwtService {
   verifyEmailVerificationJwt(
     jwtToken: string,
   ): EmailVerificationJWTPayload | never;
-  generateAccessToken(payload: generateTokenDto, role: UserRoles): string;
-  generateRefreshToken(payload: generateTokenDto, role: UserRoles): string;
+  generateAccessToken(payload: tokenBody, role: UserRoles): string;
+  generateRefreshToken(payload: tokenBody, role: UserRoles): string;
   verifyAccessToken(jwtToken: string): JWTPayload;
   verifyRefreshToken(jwtToken: string): JWTPayload;
 }
