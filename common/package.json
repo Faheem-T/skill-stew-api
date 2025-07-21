@@ -1,10 +1,22 @@
 {
-  "name": "payments",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {},
+  "name": "@skillstew/common",
+  "version": "1.0.1",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "scripts": {
+    "del": "del ./build/*",
+    "build": "npm run del && tsc",
+    "pub": "git add . && git commit -m \"Updates to common\" && npm version patch && npm run build && npm publish"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "del-cli": "^6.0.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  }
 }
