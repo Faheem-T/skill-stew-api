@@ -13,13 +13,13 @@ spec:
         app: user
     spec:
       initContainers:
-        - name: wait-for-db
+        - name: wait-for-dependencies
           image: busybox
           command:
             [
               "sh",
               "-c",
-              "until nc -z user-pg-srv 5432; do echo waiting for db; sleep 2; done;",
+              "timeout 60 sh -c 'until nc -z user-pg-srv 5432; do echo waiting for db; sleep 2; done && until nc -z my-rabbit 5672; do echo waiting for rabbitmq; sleep 2; done'",
             ]
       containers:
         - name: user

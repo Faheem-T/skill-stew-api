@@ -13,10 +13,11 @@ import {
   createAdminSchema,
 } from "../validators/AdminValidator";
 import { HttpStatus } from "@skillstew/common";
+import { DomainValidationError } from "../../0-domain/errors/DomainValidationError";
 
 type routeHandlerParams = [
   Request,
-  Response<{ success: true; data?: Record<string, any>; message?: string }>,
+  Response<{ success: boolean; data?: Record<string, any>; message?: string }>,
   NextFunction,
 ];
 
@@ -45,6 +46,12 @@ export class AuthController {
         message: "User has been verified and password has been set",
       });
     } catch (err) {
+      if (err instanceof DomainValidationError) {
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, message: "User is already verified" });
+        return;
+      }
       next(err);
     }
   };
@@ -63,8 +70,16 @@ export class AuthController {
   login = async (...[req, res, next]: routeHandlerParams) => {
     try {
       const result = loginSchema.parse(req.body);
-      const { refreshToken, accessToken } =
-        await this._authUsecases.loginUser(result);
+      const tokens = await this._authUsecases.loginUser(result);
+
+      if (!tokens) {
+        res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ success: false, message: "User not found" });
+        return;
+      }
+
+      const { refreshToken, accessToken } = tokens;
 
       res
         .status(200)
@@ -109,7 +124,7 @@ export class AuthController {
   ) => {
     try {
       const adminInfo = createAdminSchema.parse(req.body);
-      this._authUsecases.createAdmin(adminInfo);
+      await this._authUsecases.createAdmin(adminInfo);
       res
         .status(HttpStatus.OK)
         .json({ success: true, message: "Admin has been created" });

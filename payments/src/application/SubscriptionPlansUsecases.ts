@@ -1,6 +1,9 @@
 import { SubscriptionPlan } from "../domain/entities/SubscriptionPlan";
 import { ISubscriptionPlansRepository } from "../domain/repositories/ISubscriptionPlansRepository";
-import { CreateSubscriptionPlanDto } from "./dtos/SubscriptionPlansDtos";
+import {
+  CreateSubscriptionPlanDto,
+  EditSubscriptionPlanDto,
+} from "./dtos/SubscriptionPlansDtos";
 
 export class SubscriptionPlansUsecases {
   constructor(private _plansRepo: ISubscriptionPlansRepository) {}
@@ -14,5 +17,13 @@ export class SubscriptionPlansUsecases {
     });
 
     await this._plansRepo.save(plan);
+  };
+
+  getPlans = async () => {
+    return this._plansRepo.getAllPlans();
+  };
+
+  editPlan = async (id: string, dto: EditSubscriptionPlanDto) => {
+    return this._plansRepo.update(id, dto);
   };
 }

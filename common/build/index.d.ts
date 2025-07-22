@@ -3,6 +3,7 @@ export * from "./errors/JwtErrors";
 export * from "./errors/UnauthenticatedError";
 export * from "./errors/UnauthorizedError";
 export * from "./errors/codes/JwtErrorCodes";
+export * from "./errors/ForbiddenError";
 export * from "./jwt-utils/JwtHelper";
 export * from "./middlewares/authMiddleware";
 export * from "./middlewares/requireRole";

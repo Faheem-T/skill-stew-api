@@ -10,6 +10,7 @@ import { IAdminRepository } from "../0-domain/repositories/IAdminRepository";
 import { Admin } from "../0-domain/entities/Admin";
 import { WrongAdminUsernameError } from "../0-domain/errors/WrongAdminUsernameError";
 import { UserBlockedError } from "../0-domain/errors/UserBlockedError";
+import { DomainValidationError } from "../0-domain/errors/DomainValidationError";
 
 export class AuthUsecases {
   constructor(
@@ -73,7 +74,7 @@ export class AuthUsecases {
   }) => {
     const user = await this._userRepo.getUserByEmail(email);
     if (!user) {
-      throw new UserNotFoundError();
+      return null;
     }
     if (!user.isVerified() || !user.passwordHash) {
       throw new UserNotVerifiedError();
