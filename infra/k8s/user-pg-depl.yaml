@@ -18,6 +18,14 @@ spec:
           env:
             - name: POSTGRES_PASSWORD
               value: "password"
+          volumeMounts:
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+      volumes:
+        - name: init-script
+          configMap:
+            name: pg-init-script
 ---
 apiVersion: v1
 kind: Service

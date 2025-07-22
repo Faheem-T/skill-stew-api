@@ -20,6 +20,7 @@ __exportStar(require("./errors/JwtErrors"), exports);
 __exportStar(require("./errors/UnauthenticatedError"), exports);
 __exportStar(require("./errors/UnauthorizedError"), exports);
 __exportStar(require("./errors/codes/JwtErrorCodes"), exports);
+__exportStar(require("./errors/ForbiddenError"), exports);
 // Helpers
 __exportStar(require("./jwt-utils/JwtHelper"), exports);
 // Middlewares

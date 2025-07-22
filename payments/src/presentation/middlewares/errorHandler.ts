@@ -1,16 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import { PresentationError } from "../errors/PresentationError";
-import { PresentationErrorCodes } from "../errors/PresentationErrorCodes";
 import { ZodError } from "zod";
-import { EmailVerificationJwtVerifyError } from "../../2-infrastructure/errors/JwtErrors";
-import { UnauthorizedError } from "../../0-domain/errors/UnauthorizedError";
-import { UserAlreadyExistsError } from "../../0-domain/errors/UserAlreadyExistsError";
 import {
   HttpStatus,
   DomainError,
   InfrastructureError,
+  UnauthorizedError,
+  AccessTokenVerifyError,
+  ForbiddenError,
+  ApplicationError,
 } from "@skillstew/common";
-import { UserBlockedError } from "../../0-domain/errors/UserBlockedError";
 
 export const errorHandler = (
   err: Error,
@@ -33,42 +31,39 @@ export const errorHandler = (
       });
       return;
     }
-    if (err instanceof UserAlreadyExistsError) {
-      res.status(HttpStatus.CONFLICT).json({
-        success: false,
-        error: err.code,
-        message: err.message,
-      });
-      return;
-    }
-    if (err instanceof UserBlockedError) {
-      res
-        .status(HttpStatus.FORBIDDEN)
-        .json({ success: false, error: err.code, message: err.message });
-      return;
-    }
     res.status(HttpStatus.BAD_REQUEST).json({
       success: false,
       error: "validation_error",
       message: err.message,
     });
-    // } else if (err instanceof ApplicationError) {
-  } else if (err instanceof InfrastructureError) {
-    if (err instanceof EmailVerificationJwtVerifyError) {
-      res.status(HttpStatus.BAD_REQUEST).json({
+  } else if (err instanceof ApplicationError) {
+    if (err instanceof ForbiddenError) {
+      res.status(HttpStatus.FORBIDDEN).json({
         success: false,
-        error: err.name,
-        message: "Token has expired",
+        message: "Forbidden",
+        error: "FORBIDDEN_ERROR",
+      });
+      return;
+    }
+    res.status(HttpStatus.BAD_REQUEST).json({
+      success: false,
+      message: "Application error",
+      error: "APPLICATION_ERROR",
+    });
+  } else if (err instanceof InfrastructureError) {
+    if (err instanceof AccessTokenVerifyError) {
+      res.status(HttpStatus.UNAUTHORIZED).json({
+        success: false,
+        error: "AUTHORIZATION_ERROR",
+        message: "Unauthorized",
       });
       return;
     }
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       error: "SERVER_ERROR",
-      message: PresentationErrorCodes.SERVER_ERROR,
+      message: "Internal server error",
     });
-  } else if (err instanceof PresentationError) {
-    res.status(err.statusCode).json({ success: false, ...err.toJSON() });
   } else if (err instanceof ZodError) {
     res.status(HttpStatus.BAD_REQUEST).json({
       success: false,

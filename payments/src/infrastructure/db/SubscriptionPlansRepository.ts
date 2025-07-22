@@ -3,7 +3,10 @@ import { SubscriptionPlan } from "../../domain/entities/SubscriptionPlan";
 import { ISubscriptionPlansRepository } from "../../domain/repositories/ISubscriptionPlansRepository";
 import { db } from "../../start";
 import { PlansMapper } from "../mappers/PlansMapper";
-import { subscriptionPlansSchema } from "./schemas/subscriptionPlansSchema";
+import {
+  subscriptionPlansSchema,
+  SubscriptionPlansSchemaType,
+} from "./schemas/subscriptionPlansSchema";
 
 export class SubscriptionPlansRepository
   implements ISubscriptionPlansRepository
@@ -18,5 +21,22 @@ export class SubscriptionPlansRepository
     } else {
       await db.insert(subscriptionPlansSchema).values(pPlan);
     }
+  };
+
+  getAllPlans = async (): Promise<SubscriptionPlan[]> => {
+    const rows = await db.select().from(subscriptionPlansSchema);
+    return rows.map(PlansMapper.toDomain);
+  };
+
+  update = async (
+    id: string,
+    data: Partial<SubscriptionPlansSchemaType>,
+  ): Promise<SubscriptionPlan> => {
+    const [plan] = await db
+      .update(subscriptionPlansSchema)
+      .set(data)
+      .where(eq(subscriptionPlansSchema.id, id))
+      .returning();
+    return PlansMapper.toDomain(plan);
   };
 }
