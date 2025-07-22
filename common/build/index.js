@@ -14,12 +14,18 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// Errors
 __exportStar(require("./errors/AppError"), exports);
 __exportStar(require("./errors/JwtErrors"), exports);
 __exportStar(require("./errors/UnauthenticatedError"), exports);
+__exportStar(require("./errors/UnauthorizedError"), exports);
 __exportStar(require("./errors/codes/JwtErrorCodes"), exports);
+// Helpers
 __exportStar(require("./jwt-utils/JwtHelper"), exports);
+// Middlewares
 __exportStar(require("./middlewares/authMiddleware"), exports);
-__exportStar(require("./types/UserRoles"), exports);
 __exportStar(require("./middlewares/requireRole"), exports);
+// Types
+__exportStar(require("./types/UserRoles"), exports);
+// Constants
 __exportStar(require("./constants/HttpStatus"), exports);
