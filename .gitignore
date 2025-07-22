@@ -2,3 +2,4 @@
 node_modules
 *.yaml.bak
 base service setup
+build
