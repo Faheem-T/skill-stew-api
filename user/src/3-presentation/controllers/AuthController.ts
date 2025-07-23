@@ -6,7 +6,6 @@ import {
   resendVerifyEmailSchema,
   verifyEmailSchema,
 } from "../validators/UserValidator";
-import { IHasherService } from "../../1-application/ports/IHasherService";
 import { UnauthorizedError } from "../../0-domain/errors/UnauthorizedError";
 import {
   adminLoginSchema,
@@ -160,6 +159,13 @@ export class AuthController {
             accessToken,
           },
         });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  googleLogin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
     } catch (err) {
       next(err);
     }
