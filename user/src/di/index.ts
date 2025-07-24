@@ -9,6 +9,7 @@ import { AdminRepository } from "../2-infrastructure/db/AdminRepository";
 import { UserUsecases } from "../1-application/UserUsecases";
 import { UserController } from "../3-presentation/controllers/UserController";
 import { AuthMiddleware } from "../3-presentation/middlewares/authMiddleware";
+import { RabbitMQService } from "../2-infrastructure/services/RabbitMQService";
 const emailService = new EmailService();
 const jwtService = new JwtService({
   adminAccessTokenSecret: ENV.ADMIN_ACCESS_TOKEN_SECRET,
@@ -35,3 +36,8 @@ const userUsecases = new UserUsecases(userRepo);
 export const userController = new UserController(userUsecases);
 
 export const authMiddleware = new AuthMiddleware(jwtService);
+
+// rabbitmq
+export const rabbit = new RabbitMQService(
+  `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
+);
