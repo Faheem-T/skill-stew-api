@@ -30,3 +30,6 @@ __exportStar(require("./middlewares/requireRole"), exports);
 __exportStar(require("./types/UserRoles"), exports);
 // Constants
 __exportStar(require("./constants/HttpStatus"), exports);
+// Events
+__exportStar(require("./events/AppEvent"), exports);
+__exportStar(require("./events/schemas/userEventsSchema"), exports);
