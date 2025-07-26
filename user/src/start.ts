@@ -26,7 +26,7 @@ async function start() {
   }
   console.log("Connected to database");
 
-  await initalizeMessageQueue();
+  await initializeMessageQueue();
 
   app.listen(ENV.PORT, () => {
     console.log(`Listening on port ${ENV.PORT}`);
@@ -40,7 +40,7 @@ process.on("exit", async () => {
   console.log("Disconnected from database");
 });
 
-async function initalizeMessageQueue() {
+async function initializeMessageQueue() {
   const connection = await amqp.connect(
     `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
   );
