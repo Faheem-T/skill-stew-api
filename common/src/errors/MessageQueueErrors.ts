@@ -5,7 +5,7 @@ import { MessageQueueErrorCodes } from "./codes/MessageQueueErrorCodes";
 export class InvalidEventPayloadError extends InfrastructureError {
   constructor(eventName: EventName, errorString: string) {
     super(
-      MessageQueueErrorCodes.INVALID_EVENT_PAYLOAD + `for ${eventName}`,
+      MessageQueueErrorCodes.INVALID_EVENT_PAYLOAD + ` for ${eventName}`,
       "INVALID_EVENT_PAYLOAD",
       { zodErrorString: errorString },
     );
@@ -14,7 +14,7 @@ export class InvalidEventPayloadError extends InfrastructureError {
     return {
       message: this.message,
       code: this.code,
-      error: this.context!.zodErrorStrings,
+      error: this.context!.zodErrorString,
     };
   }
 }

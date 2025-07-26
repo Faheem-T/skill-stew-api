@@ -8,13 +8,15 @@ import {
 } from "../errors/MessageQueueErrors";
 import z from "zod";
 
+type EventHandler<T extends EventName> = (event: AppEvent<T>) => Promise<HandlerResult>;
+
 export class Consumer {
   private _channel!: Channel;
   private _exchange!: string;
   private _initialized: boolean = false;
   private _handlers = new Map<
     EventName,
-    (event: any) => Promise<HandlerResult>
+  EventHandler<EventName>
   >();
   constructor() {}
 
@@ -93,12 +95,12 @@ export class Consumer {
 
   registerHandler = <T extends EventName>(
     eventName: T,
-    handler: (event: AppEvent<T>) => Promise<HandlerResult>,
+    handler: EventHandler<T>,
   ) => {
     if (!this._initialized) {
       throw new ConsumerUsedBeforeInitializationError();
     }
-    this._handlers.set(eventName, handler);
+    this._handlers.set(eventName, handler as EventHandler<EventName>);
   };
 }
 
