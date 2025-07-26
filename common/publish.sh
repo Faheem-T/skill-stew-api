@@ -21,9 +21,7 @@ read COMMIT_MESSAGE
 git commit -m "[common] $COMMIT_MESSAGE"
 
 # Step 5: Push to GitHub
-echo "Enter remote branch to push to:"
-read REMOTE_BRANCH
-git push -u origin "$REMOTE_BRANCH"
+git push
 
 # Step 6: Publish to npm
 npm publish

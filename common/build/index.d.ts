@@ -11,3 +11,6 @@ export * from "./types/UserRoles";
 export * from "./constants/HttpStatus";
 export * from "./events/AppEvent";
 export * from "./events/schemas/userEventsSchema";
+export * from "./events/CreateEvent";
+export * from "./events/Consumer";
+export * from "./events/Producer";
