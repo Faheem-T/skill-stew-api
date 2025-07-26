@@ -21,10 +21,15 @@ export class UserRepository implements IUserRepository {
     }
   };
 
-  save = async (user: User): Promise<void> => {
+  save = async (user: User): Promise<User> => {
     const pUser = UserMapper.toPersistence(user);
     if ("id" in pUser) {
-      await db.update(userSchema).set(pUser).where(eq(userSchema.id, pUser.id));
+      const [user] = await db
+        .update(userSchema)
+        .set(pUser)
+        .where(eq(userSchema.id, pUser.id))
+        .returning();
+      return UserMapper.toDomain(user);
     } else {
       const foundUser = await db
         .select()
@@ -34,7 +39,8 @@ export class UserRepository implements IUserRepository {
         throw new UserAlreadyExistsError(pUser.email);
       }
 
-      await db.insert(userSchema).values(pUser);
+      const [user] = await db.insert(userSchema).values(pUser).returning();
+      return UserMapper.toDomain(user);
     }
   };
 
