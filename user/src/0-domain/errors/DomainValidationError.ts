@@ -1,4 +1,4 @@
-import { DomainError } from "../../core/errors/AppError";
+import { DomainError } from "@skillstew/common";
 import { DomainErrorCodes } from "./DomainErrorEnum";
 
 export class DomainValidationError extends DomainError {

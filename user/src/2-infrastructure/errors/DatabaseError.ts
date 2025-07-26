@@ -1,4 +1,4 @@
-import { InfrastructureError } from "../../core/errors/AppError";
+import { InfrastructureError } from "@skillstew/common";
 import { DatabaseErrorCodes } from "./DatabaseErrorCodes";
 
 export class DatabaseError extends InfrastructureError {
