@@ -40,7 +40,7 @@ export class Consumer {
       ),
     );
 
-    this._channel.consume(queue.queue, this.handleEvent, { noAck: true });
+    this._channel.consume(queue.queue, this.handleEvent, { noAck: false });
 
     this._initialized = true;
   };
