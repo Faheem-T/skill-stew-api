@@ -14,6 +14,8 @@ import {
 } from "../validators/AdminValidator";
 import { HttpStatus } from "@skillstew/common";
 import { DomainValidationError } from "../../0-domain/errors/DomainValidationError";
+import { WrongAdminUsernameError } from "../../0-domain/errors/WrongAdminUsernameError";
+import { WrongPasswordError } from "../../0-domain/errors/WrongPasswordError";
 
 type routeHandlerParams = [
   Request,
@@ -136,7 +138,7 @@ export class AuthController {
   adminLogin = async (
     req: Request,
     res: Response<{
-      success: true;
+      success: boolean;
       data?: Record<string, any>;
       message?: string;
     }>,
@@ -144,8 +146,10 @@ export class AuthController {
   ) => {
     try {
       const details = adminLoginSchema.parse(req.body);
+
       const { refreshToken, accessToken } =
         await this._authUsecases.loginAdmin(details);
+
       res
         .status(200)
         .cookie("refreshToken", refreshToken, {
@@ -161,6 +165,13 @@ export class AuthController {
           },
         });
     } catch (err) {
+      if (err instanceof WrongAdminUsernameError) {
+        // res
+        //   .status(HttpStatus.BAD_REQUEST)
+        //   .json({ success: false, message: err.message });
+        // return;
+      } else if (err instanceof WrongPasswordError) {
+      }
       next(err);
     }
   };

@@ -1,4 +1,4 @@
-import { InfrastructureError } from "../../core/errors/AppError";
+import { InfrastructureError } from "@skillstew/common";
 import { JwtErrorCodes } from "./JwtErrorCodes";
 
 export class JwtError extends InfrastructureError {
