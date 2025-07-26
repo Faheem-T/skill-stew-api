@@ -47,6 +47,8 @@ export const errorHandler = (
         .json({ success: false, error: err.code, message: err.message });
       return;
     }
+
+    // For all domain errors
     res.status(HttpStatus.BAD_REQUEST).json({
       success: false,
       error: "validation_error",

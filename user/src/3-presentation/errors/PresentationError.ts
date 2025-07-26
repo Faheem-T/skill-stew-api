@@ -1,4 +1,4 @@
-import { AppError } from "../../core/errors/AppError";
+import { AppError } from "@skillstew/common";
 import { PresentationErrorCodes } from "./PresentationErrorCodes";
 
 export class PresentationError extends AppError {
