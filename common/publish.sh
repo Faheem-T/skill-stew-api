@@ -18,7 +18,7 @@ git add .
 # Step 4: Prompt for a commit message
 echo "Enter commit message:"
 read COMMIT_MESSAGE
-git commit -m "$COMMIT_MESSAGE"
+git commit -m "[common] $COMMIT_MESSAGE"
 
 # Step 5: Push to GitHub
 echo "Enter remote branch to push to:"
