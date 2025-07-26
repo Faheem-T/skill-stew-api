@@ -3,6 +3,9 @@
 # Exit immediately on error
 set -e
 
+# Change to correct dir
+cd "/home/fahi/dev/brototype/skillStew/skill-stew-api/common/"
+
 # Step 1: Bump patch version
 npm version patch
 
