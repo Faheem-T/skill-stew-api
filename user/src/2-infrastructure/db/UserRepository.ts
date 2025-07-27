@@ -4,18 +4,14 @@ import { IUserRepository } from "../../0-domain/repositories/IUserRepository";
 import { db } from "../../start";
 import { DatabaseError } from "../errors/DatabaseError";
 import { UserMapper } from "../mappers/UserMapper";
-import { userSchema } from "./schemas/userSchema";
+import { userSchema, UserSchemaType } from "./schemas/userSchema";
 import { eq } from "drizzle-orm";
 
 export class UserRepository implements IUserRepository {
-  getAllUsers = async (): Promise<User[]> => {
+  getAllUsers = async (): Promise<UserSchemaType[]> => {
     try {
       const result = await db.select().from(userSchema);
-      const users = [];
-      for (const user of result) {
-        users.push(UserMapper.toDomain(user));
-      }
-      return users;
+      return result;
     } catch (err) {
       throw new DatabaseError(err);
     }
