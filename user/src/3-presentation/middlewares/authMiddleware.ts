@@ -1,11 +1,13 @@
 import { RequestHandler } from "express";
 import { UnauthenticatedError } from "../errors/UnauthenticatedError";
 import { IJwtService } from "../../1-application/ports/IJwtService";
+import { AccessTokenVerifyError } from "@skillstew/common";
+import { HttpStatus } from "@skillstew/common";
 
 export class AuthMiddleware {
   constructor(private _jwtService: IJwtService) {}
 
-  verify: RequestHandler = (req, _res, next) => {
+  verify: RequestHandler = (req, res, next) => {
     try {
       const token = req.headers["authorization"]?.split(" ")[1];
       if (!token) {
@@ -21,6 +23,12 @@ export class AuthMiddleware {
       };
       next();
     } catch (err) {
+      if (err instanceof AccessTokenVerifyError) {
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, message: err.message, code: err.code });
+        return;
+      }
       next(err);
     }
   };
