@@ -6,7 +6,6 @@ import {
   resendVerifyEmailSchema,
   verifyEmailSchema,
 } from "../validators/UserValidator";
-import { IHasherService } from "../../1-application/ports/IHasherService";
 import { UnauthorizedError } from "../../0-domain/errors/UnauthorizedError";
 import {
   adminLoginSchema,
@@ -14,8 +13,7 @@ import {
 } from "../validators/AdminValidator";
 import { HttpStatus } from "@skillstew/common";
 import { DomainValidationError } from "../../0-domain/errors/DomainValidationError";
-import { WrongAdminUsernameError } from "../../0-domain/errors/WrongAdminUsernameError";
-import { WrongPasswordError } from "../../0-domain/errors/WrongPasswordError";
+import { ENV } from "../../config/dotenv";
 
 type routeHandlerParams = [
   Request,
@@ -87,9 +85,8 @@ export class AuthController {
         .status(200)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          path: "/",
+          secure: ENV.NODE_ENV === "production",
+          sameSite: "none",
         })
         .json({
           success: true,
@@ -154,9 +151,8 @@ export class AuthController {
         .status(200)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          path: "/",
+          secure: ENV.NODE_ENV === "production",
+          sameSite: "none",
         })
         .json({
           success: true,
@@ -165,13 +161,6 @@ export class AuthController {
           },
         });
     } catch (err) {
-      if (err instanceof WrongAdminUsernameError) {
-        // res
-        //   .status(HttpStatus.BAD_REQUEST)
-        //   .json({ success: false, message: err.message });
-        // return;
-      } else if (err instanceof WrongPasswordError) {
-      }
       next(err);
     }
   };

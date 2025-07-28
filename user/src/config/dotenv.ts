@@ -16,6 +16,7 @@ const envVars = [
   "BASE_FRONTEND_URL",
   "RABBITMQ_USER",
   "RABBITMQ_PASSWORD",
+  "NODE_ENV",
 ] as const;
 
 export function generateEnvVars() {

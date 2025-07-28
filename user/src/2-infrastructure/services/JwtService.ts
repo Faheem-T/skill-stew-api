@@ -13,7 +13,7 @@ import {
   InvalidTokenRoleError,
   RefreshTokenVerifyError,
   TokenRoleMismatchError,
-} from "../errors/JwtErrors";
+} from "@skillstew/common";
 import { UserRoles } from "../../0-domain/entities/UserRoles";
 
 // type guard for user roles
