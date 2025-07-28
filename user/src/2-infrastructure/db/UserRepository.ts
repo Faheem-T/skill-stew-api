@@ -8,10 +8,10 @@ import { userSchema, UserSchemaType } from "./schemas/userSchema";
 import { eq } from "drizzle-orm";
 
 export class UserRepository implements IUserRepository {
-  getAllUsers = async (): Promise<UserSchemaType[]> => {
+  getAllUsers = async (): Promise<Omit<UserSchemaType, "password_hash">[]> => {
     try {
       const result = await db.select().from(userSchema);
-      return result;
+      return result.map(UserMapper.toPresentation);
     } catch (err) {
       throw new DatabaseError(err);
     }
