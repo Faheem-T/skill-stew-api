@@ -1,4 +1,4 @@
-*ConfigMap.yaml
+*configmap.yaml
 node_modules
 *.yaml.bak
 base service setup
