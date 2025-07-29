@@ -38,7 +38,7 @@ export class AuthMiddleware {
     } catch (err) {
       if (err instanceof AccessTokenVerifyError) {
         res
-          .status(HttpStatus.BAD_REQUEST)
+          .status(HttpStatus.UNAUTHORIZED)
           .json({ success: false, message: err.message, code: err.code });
         return;
       } else if (err instanceof InvalidTokenError) {
