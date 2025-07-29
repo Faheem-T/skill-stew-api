@@ -31,12 +31,15 @@ export class SubscriptionPlansRepository
   update = async (
     id: string,
     data: Partial<SubscriptionPlansSchemaType>,
-  ): Promise<SubscriptionPlan> => {
+  ): Promise<SubscriptionPlan | null> => {
     const [plan] = await db
       .update(subscriptionPlansSchema)
       .set(data)
       .where(eq(subscriptionPlansSchema.id, id))
       .returning();
+    if (!plan) {
+      return null;
+    }
     return PlansMapper.toDomain(plan);
   };
 }

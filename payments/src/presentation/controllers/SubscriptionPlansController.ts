@@ -21,7 +21,7 @@ export class SubscriptionPlansController {
     }
   };
 
-  getPlans = async (req: Request, res: Response, next: NextFunction) => {
+  getPlans = async (_req: Request, res: Response, next: NextFunction) => {
     try {
       const plans = await this._plansUsecases.getPlans();
       res.status(HttpStatus.OK).json({ success: true, data: plans });
@@ -37,6 +37,7 @@ export class SubscriptionPlansController {
   ) => {
     try {
       const dto = editSubscriptionPlanSchema.parse(req.body);
+      console.log(req.params.id);
       const id = req.params.id?.trim();
       if (!id) {
         res
@@ -45,6 +46,12 @@ export class SubscriptionPlansController {
         return;
       }
       const updatedPlan = await this._plansUsecases.editPlan(id, dto);
+      if (!updatedPlan) {
+        res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ success: false, message: "Plan not found" });
+        return;
+      }
       res.status(HttpStatus.OK).json({ success: true, data: updatedPlan });
     } catch (err) {
       next(err);

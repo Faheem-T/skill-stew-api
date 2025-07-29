@@ -8,12 +8,21 @@ import {
 export class SubscriptionPlansUsecases {
   constructor(private _plansRepo: ISubscriptionPlansRepository) {}
   createPlan = async (dto: CreateSubscriptionPlanDto) => {
-    const { name, yearlyPrice, monthlyPrice, currency, freeWorkshopHours } =
-      dto;
+    const {
+      name,
+      yearlyPrice,
+      monthlyPrice,
+      currency,
+      freeWorkshopHours,
+      description,
+      features,
+    } = dto;
     const plan = new SubscriptionPlan({
       name,
+      description,
       price: { monthly: monthlyPrice, yearly: yearlyPrice, currency },
       freeWorkshopHours,
+      features,
     });
 
     await this._plansRepo.save(plan);

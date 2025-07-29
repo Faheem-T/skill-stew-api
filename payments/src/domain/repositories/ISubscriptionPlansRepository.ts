@@ -7,5 +7,5 @@ export interface ISubscriptionPlansRepository {
   update(
     id: string,
     data: Partial<SubscriptionPlansSchemaType>,
-  ): Promise<SubscriptionPlan>;
+  ): Promise<SubscriptionPlan | null>;
 }
