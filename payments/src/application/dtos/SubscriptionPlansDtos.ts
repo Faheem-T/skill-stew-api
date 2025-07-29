@@ -17,17 +17,8 @@ export type CreateSubscriptionPlanDto = z.infer<
 >;
 
 // edit
-export const editSubscriptionPlanSchema = z.object({
-  name: z.string().optional(),
-  description: z.string().optional(),
-  active: z.boolean().optional(),
-  monthlyPrice: z.number().optional(),
-  yearlyPrice: z.number().optional(),
-  freeWorkshopHours: z.number().optional(),
-  currency: z.string().optional(),
-  features: z.string().array().optional(),
-});
-
+export const editSubscriptionPlanSchema =
+  createSubscriptionPlanSchema.partial();
 export type EditSubscriptionPlanDto = z.infer<
   typeof editSubscriptionPlanSchema
 >;

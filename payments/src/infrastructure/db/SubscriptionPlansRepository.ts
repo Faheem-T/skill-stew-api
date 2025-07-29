@@ -11,15 +11,24 @@ import {
 export class SubscriptionPlansRepository
   implements ISubscriptionPlansRepository
 {
-  save = async (plan: SubscriptionPlan): Promise<void> => {
+  save = async (plan: SubscriptionPlan): Promise<SubscriptionPlan | null> => {
     const pPlan = PlansMapper.toPersistence(plan);
     if (plan.id) {
-      await db
+      const [updatedPlan] = await db
         .update(subscriptionPlansSchema)
         .set(pPlan)
-        .where(eq(subscriptionPlansSchema.id, plan.id));
+        .where(eq(subscriptionPlansSchema.id, plan.id))
+        .returning();
+      if (!updatedPlan) {
+        return null;
+      }
+      return PlansMapper.toDomain(updatedPlan);
     } else {
-      await db.insert(subscriptionPlansSchema).values(pPlan);
+      const [newPlan] = await db
+        .insert(subscriptionPlansSchema)
+        .values(pPlan)
+        .returning();
+      return PlansMapper.toDomain(newPlan);
     }
   };
 
@@ -35,6 +44,17 @@ export class SubscriptionPlansRepository
     const [plan] = await db
       .update(subscriptionPlansSchema)
       .set(data)
+      .where(eq(subscriptionPlansSchema.id, id))
+      .returning();
+    if (!plan) {
+      return null;
+    }
+    return PlansMapper.toDomain(plan);
+  };
+
+  delete = async (id: string): Promise<SubscriptionPlan | null> => {
+    const [plan] = await db
+      .delete(subscriptionPlansSchema)
       .where(eq(subscriptionPlansSchema.id, id))
       .returning();
     if (!plan) {
