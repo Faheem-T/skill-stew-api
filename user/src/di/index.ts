@@ -10,6 +10,7 @@ import { UserUsecases } from "../1-application/UserUsecases";
 import { UserController } from "../3-presentation/controllers/UserController";
 import { AuthMiddleware } from "../3-presentation/middlewares/authMiddleware";
 import { Consumer, Producer } from "@skillstew/common";
+import { OAuth2Client } from "google-auth-library";
 
 // Services
 const emailService = new EmailService();
@@ -23,6 +24,9 @@ const jwtService = new JwtService({
   emailJwtSecret: ENV.EMAIL_VERIFICATON_JWT_SECRET,
 });
 const hasherService = new BcryptHasher();
+
+// OAuthClient
+const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 
 // Repositories
 const userRepo = new UserRepository();
@@ -40,6 +44,7 @@ const authUsecases = new AuthUsecases(
   hasherService,
   adminRepo,
   producer,
+  oAuthClient,
 );
 const userUsecases = new UserUsecases(userRepo);
 

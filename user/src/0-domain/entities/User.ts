@@ -23,17 +23,30 @@ export class User {
   private _yearsOfExperience?: number; // only for experts
   isBlocked: boolean;
 
-  constructor(email: string, id?: string) {
+  isGoogleLogin: boolean;
+
+  constructor({
+    email,
+    id,
+    isGoogleLogin,
+    role,
+  }: {
+    email: string;
+    id?: string;
+    isGoogleLogin: boolean;
+    role: Extract<UserRoles, "USER" | "EXPERT">;
+  }) {
     if (id) {
       this.id = id;
     }
     this._email = email;
-    this._role = "USER";
+    this._role = role;
     this._isVerified = false;
     this._isSubscribed = false;
     this.socialLinks = [];
     this.languages = [];
     this.isBlocked = false;
+    this.isGoogleLogin = isGoogleLogin;
   }
 
   setExpert() {

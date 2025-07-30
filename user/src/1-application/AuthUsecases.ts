@@ -12,6 +12,9 @@ import { WrongAdminUsernameError } from "../0-domain/errors/WrongAdminUsernameEr
 import { UserBlockedError } from "../0-domain/errors/UserBlockedError";
 import { IProducer } from "./ports/IProducer";
 import { CreateEvent } from "@skillstew/common";
+import { OAuth2Client } from "google-auth-library";
+import { GoogleAuthError } from "./errors/GoogleAuthErrors";
+import { ENV } from "../config/dotenv";
 
 export class AuthUsecases {
   constructor(
@@ -21,6 +24,7 @@ export class AuthUsecases {
     private _hasherService: IHasherService,
     private _adminRepo: IAdminRepository,
     private _messageProducer: IProducer,
+    private _OAuthClient: OAuth2Client,
   ) {}
 
   getUserById = async (id: string) => {
@@ -32,7 +36,7 @@ export class AuthUsecases {
   };
 
   registerUser = async (email: string) => {
-    const user = new User(email);
+    const user = new User({ email, role: "USER", isGoogleLogin: false });
     const savedUser = await this._userRepo.save(user);
     const event = CreateEvent(
       "user.registered",
@@ -86,6 +90,9 @@ export class AuthUsecases {
     const user = await this._userRepo.getUserByEmail(email);
     if (!user) {
       return null;
+    }
+    if (user.isGoogleLogin) {
+      throw new GoogleAuthError("GOOGLE_ACCOUNT_EXISTS");
     }
     if (!user.isVerified() || !user.passwordHash) {
       throw new UserNotVerifiedError();
@@ -178,5 +185,49 @@ export class AuthUsecases {
     );
 
     return { accessToken, refreshToken };
+  };
+
+  googleAuth = async (credential: string) => {
+    const ticket = await this._OAuthClient.verifyIdToken({
+      idToken: credential,
+      audience: ENV.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload || !payload["email"]) {
+      throw new GoogleAuthError("INVALID_GOOGLE_AUTH_CREDENTIAL");
+    }
+
+    const email = payload["email"];
+
+    let user = await this._userRepo.getUserByEmail(email);
+
+    if (!user) {
+      // Handle new user
+      const { name, picture } = payload;
+      const newUser = new User({ email, isGoogleLogin: true, role: "USER" });
+      newUser.avatarUrl = picture;
+      newUser.name = name;
+      newUser.verify();
+
+      user = await this._userRepo.save(newUser);
+    } else {
+      if (!user.isGoogleLogin) {
+        throw new GoogleAuthError("LOCAL_ACCOUNT_EXISTS");
+      }
+      if (user.isBlocked) {
+        throw new UserBlockedError();
+      }
+    }
+
+    const tokenPayload = { email, role: user.getRole(), userId: user.id! };
+    const refreshToken = this._jwtService.generateRefreshToken(
+      tokenPayload,
+      user.getRole(),
+    );
+    const accessToken = this._jwtService.generateAccessToken(
+      tokenPayload,
+      user.getRole(),
+    );
+    return { refreshToken, accessToken };
   };
 }
