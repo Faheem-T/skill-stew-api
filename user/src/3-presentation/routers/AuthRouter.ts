@@ -9,7 +9,7 @@ router.post("/set-password", authController.setPasswordAndVerify);
 router.post("/resend-verification-link", authController.resendVerifyLink);
 router.post("/login", authController.login);
 router.post("/refresh", authController.refresh);
-router.post("/google-login", authController.googleLogin);
+router.post("/google-auth", authController.googleAuth);
 
 // admin auth routes
 router.post("/admin/create", authController.createAdmin);

@@ -14,6 +14,8 @@ import {
 import { HttpStatus } from "@skillstew/common";
 import { DomainValidationError } from "../../0-domain/errors/DomainValidationError";
 import { ENV } from "../../config/dotenv";
+import { OAuth2Client } from "google-auth-library";
+import { GoogleAuthError } from "../../1-application/errors/GoogleAuthErrors";
 
 type routeHandlerParams = [
   Request,
@@ -148,7 +150,7 @@ export class AuthController {
         await this._authUsecases.loginAdmin(details);
 
       res
-        .status(200)
+        .status(HttpStatus.OK)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
@@ -165,9 +167,44 @@ export class AuthController {
     }
   };
 
-  googleLogin = async (req: Request, res: Response, next: NextFunction) => {
+  googleAuth = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const credential = req.body.credential;
+
+      if (!credential) {
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, message: "" });
+        return;
+      }
+
+      const { accessToken, refreshToken } =
+        await this._authUsecases.googleAuth(credential);
+
+      res
+        .status(HttpStatus.OK)
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: ENV.NODE_ENV === "production",
+          sameSite: "none",
+        })
+        .json({
+          success: true,
+          data: {
+            accessToken,
+          },
+        });
     } catch (err) {
+      if (err instanceof GoogleAuthError) {
+        const status =
+          err.code === "LOCAL_ACCOUNT_EXISTS"
+            ? HttpStatus.CONFLICT
+            : HttpStatus.BAD_REQUEST;
+        res
+          .status(status)
+          .json({ success: false, message: err.message, error: err.code });
+        return;
+      }
       next(err);
     }
   };

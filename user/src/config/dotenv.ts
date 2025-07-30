@@ -17,6 +17,7 @@ const envVars = [
   "RABBITMQ_USER",
   "RABBITMQ_PASSWORD",
   "NODE_ENV",
+  "GOOGLE_CLIENT_ID",
 ] as const;
 
 export function generateEnvVars() {
