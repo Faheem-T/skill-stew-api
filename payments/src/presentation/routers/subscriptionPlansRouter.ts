@@ -18,6 +18,11 @@ router.patch(
   requireRole("ADMIN"),
   subscriptionPlansController.editPlan,
 );
-router.delete("/:id", authMiddleware.verify, requireRole("ADMIN"));
+router.delete(
+  "/:id",
+  authMiddleware.verify,
+  requireRole("ADMIN"),
+  subscriptionPlansController.deletePlan,
+);
 
 export default router;
