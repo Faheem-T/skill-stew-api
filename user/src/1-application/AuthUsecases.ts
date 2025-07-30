@@ -91,6 +91,9 @@ export class AuthUsecases {
     if (!user) {
       return null;
     }
+    if (user.isGoogleLogin) {
+      throw new GoogleAuthError("GOOGLE_ACCOUNT_EXISTS");
+    }
     if (!user.isVerified() || !user.passwordHash) {
       throw new UserNotVerifiedError();
     }
@@ -210,6 +213,9 @@ export class AuthUsecases {
     } else {
       if (!user.isGoogleLogin) {
         throw new GoogleAuthError("LOCAL_ACCOUNT_EXISTS");
+      }
+      if (user.isBlocked) {
+        throw new UserBlockedError();
       }
     }
 
