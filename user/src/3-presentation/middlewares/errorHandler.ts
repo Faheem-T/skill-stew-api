@@ -2,10 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import { PresentationError } from "../errors/PresentationError";
 import { PresentationErrorCodes } from "../errors/PresentationErrorCodes";
 import { ZodError } from "zod";
-import { EmailVerificationJwtVerifyError } from "../../2-infrastructure/errors/JwtErrors";
 import { UnauthorizedError } from "../../0-domain/errors/UnauthorizedError";
 import { UserAlreadyExistsError } from "../../0-domain/errors/UserAlreadyExistsError";
 import {
+  EmailVerificationJwtVerifyError,
   HttpStatus,
   DomainError,
   InfrastructureError,
@@ -47,6 +47,8 @@ export const errorHandler = (
         .json({ success: false, error: err.code, message: err.message });
       return;
     }
+
+    // For all domain errors
     res.status(HttpStatus.BAD_REQUEST).json({
       success: false,
       error: "validation_error",

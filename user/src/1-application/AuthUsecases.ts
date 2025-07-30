@@ -10,7 +10,8 @@ import { IAdminRepository } from "../0-domain/repositories/IAdminRepository";
 import { Admin } from "../0-domain/entities/Admin";
 import { WrongAdminUsernameError } from "../0-domain/errors/WrongAdminUsernameError";
 import { UserBlockedError } from "../0-domain/errors/UserBlockedError";
-import { DomainValidationError } from "../0-domain/errors/DomainValidationError";
+import { IProducer } from "./ports/IProducer";
+import { CreateEvent } from "@skillstew/common";
 
 export class AuthUsecases {
   constructor(
@@ -19,6 +20,7 @@ export class AuthUsecases {
     private _jwtService: IJwtService,
     private _hasherService: IHasherService,
     private _adminRepo: IAdminRepository,
+    private _messageProducer: IProducer,
   ) {}
 
   getUserById = async (id: string) => {
@@ -31,7 +33,16 @@ export class AuthUsecases {
 
   registerUser = async (email: string) => {
     const user = new User(email);
-    await this._userRepo.save(user);
+    const savedUser = await this._userRepo.save(user);
+    const event = CreateEvent(
+      "user.registered",
+      {
+        id: savedUser.id!,
+        email: savedUser.getEmail(),
+      },
+      "user",
+    );
+    this._messageProducer.publish(event);
   };
 
   sendVerificationLinkToEmail = async (email: string) => {

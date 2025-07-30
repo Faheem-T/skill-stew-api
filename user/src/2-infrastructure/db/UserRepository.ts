@@ -4,27 +4,28 @@ import { IUserRepository } from "../../0-domain/repositories/IUserRepository";
 import { db } from "../../start";
 import { DatabaseError } from "../errors/DatabaseError";
 import { UserMapper } from "../mappers/UserMapper";
-import { userSchema } from "./schemas/userSchema";
+import { userSchema, UserSchemaType } from "./schemas/userSchema";
 import { eq } from "drizzle-orm";
 
 export class UserRepository implements IUserRepository {
-  getAllUsers = async (): Promise<User[]> => {
+  getAllUsers = async (): Promise<Omit<UserSchemaType, "password_hash">[]> => {
     try {
       const result = await db.select().from(userSchema);
-      const users = [];
-      for (const user of result) {
-        users.push(UserMapper.toDomain(user));
-      }
-      return users;
+      return result.map(UserMapper.toPresentation);
     } catch (err) {
       throw new DatabaseError(err);
     }
   };
 
-  save = async (user: User): Promise<void> => {
+  save = async (user: User): Promise<User> => {
     const pUser = UserMapper.toPersistence(user);
     if ("id" in pUser) {
-      await db.update(userSchema).set(pUser).where(eq(userSchema.id, pUser.id));
+      const [user] = await db
+        .update(userSchema)
+        .set(pUser)
+        .where(eq(userSchema.id, pUser.id))
+        .returning();
+      return UserMapper.toDomain(user);
     } else {
       const foundUser = await db
         .select()
@@ -34,7 +35,8 @@ export class UserRepository implements IUserRepository {
         throw new UserAlreadyExistsError(pUser.email);
       }
 
-      await db.insert(userSchema).values(pUser);
+      const [user] = await db.insert(userSchema).values(pUser).returning();
+      return UserMapper.toDomain(user);
     }
   };
 

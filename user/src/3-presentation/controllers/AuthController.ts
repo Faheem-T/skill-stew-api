@@ -13,6 +13,7 @@ import {
 } from "../validators/AdminValidator";
 import { HttpStatus } from "@skillstew/common";
 import { DomainValidationError } from "../../0-domain/errors/DomainValidationError";
+import { ENV } from "../../config/dotenv";
 
 type routeHandlerParams = [
   Request,
@@ -84,9 +85,8 @@ export class AuthController {
         .status(200)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          path: "/",
+          secure: ENV.NODE_ENV === "production",
+          sameSite: "none",
         })
         .json({
           success: true,
@@ -135,7 +135,7 @@ export class AuthController {
   adminLogin = async (
     req: Request,
     res: Response<{
-      success: true;
+      success: boolean;
       data?: Record<string, any>;
       message?: string;
     }>,
@@ -143,15 +143,16 @@ export class AuthController {
   ) => {
     try {
       const details = adminLoginSchema.parse(req.body);
+
       const { refreshToken, accessToken } =
         await this._authUsecases.loginAdmin(details);
+
       res
         .status(200)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          path: "/",
+          secure: ENV.NODE_ENV === "production",
+          sameSite: "none",
         })
         .json({
           success: true,

@@ -8,15 +8,26 @@ import {
 export class SubscriptionPlansUsecases {
   constructor(private _plansRepo: ISubscriptionPlansRepository) {}
   createPlan = async (dto: CreateSubscriptionPlanDto) => {
-    const { name, yearlyPrice, monthlyPrice, currency, freeWorkshopHours } =
-      dto;
+    const {
+      name,
+      yearlyPrice,
+      monthlyPrice,
+      currency,
+      freeWorkshopHours,
+      description,
+      features,
+      active,
+    } = dto;
     const plan = new SubscriptionPlan({
       name,
+      description,
       price: { monthly: monthlyPrice, yearly: yearlyPrice, currency },
       freeWorkshopHours,
+      features,
+      active,
     });
 
-    await this._plansRepo.save(plan);
+    return this._plansRepo.save(plan);
   };
 
   getPlans = async () => {
@@ -25,5 +36,9 @@ export class SubscriptionPlansUsecases {
 
   editPlan = async (id: string, dto: EditSubscriptionPlanDto) => {
     return this._plansRepo.update(id, dto);
+  };
+
+  deletePlan = async (id: string) => {
+    return this._plansRepo.delete(id);
   };
 }

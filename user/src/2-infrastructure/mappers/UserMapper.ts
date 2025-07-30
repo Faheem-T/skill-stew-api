@@ -72,4 +72,15 @@ export class UserMapper {
     }
     return result;
   }
+  static toPresentation(
+    raw: UserSchemaType,
+  ): Omit<UserSchemaType, "password_hash"> {
+    const nonNullObject = Object.fromEntries(
+      Object.entries(raw).filter(
+        ([key, value]) => value !== null || key === "password_hash",
+      ),
+    ) as Omit<UserSchemaType, "password_hash">;
+
+    return nonNullObject;
+  }
 }

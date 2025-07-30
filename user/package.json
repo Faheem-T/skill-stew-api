@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "npx tsx watch --clear-screen=false --include './src/**/*.ts' ./src/start.ts",
+    "start": "tsx watch --clear-screen=false --include './src/**/*.ts' ./src/start.ts",
     "syncDb": "drizzle-kit push --config=./src/config/drizzleConfig.ts",
     "test": "jest ./src/__tests__"
   },
@@ -21,7 +21,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@skillstew/common": "^1.0.8",
+    "@skillstew/common": "^1.0.18",
     "@types/amqplib": "^0.10.7",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.9",
