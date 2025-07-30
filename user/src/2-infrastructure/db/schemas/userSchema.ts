@@ -29,6 +29,7 @@ export const userSchema = pgTable("users", {
   years_of_experience: integer(),
   is_verified: boolean().default(false).notNull(),
   is_blocked: boolean().default(false).notNull(),
+  is_google_login: boolean().default(false).notNull(),
 });
 
 export type UserSchemaType = InferSelectModel<typeof userSchema>;

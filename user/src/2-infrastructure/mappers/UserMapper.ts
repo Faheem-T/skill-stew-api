@@ -20,13 +20,11 @@ export class UserMapper {
       avatar_url,
       about,
       is_blocked,
+      is_google_login,
     } = raw;
-    const user = new User(email, id);
-    if (role === "EXPERT") {
-      user.setExpert();
-      if (years_of_experience) {
-        user.setYearsOfExperience(years_of_experience);
-      }
+    const user = new User({ email, id, role, isGoogleLogin: is_google_login });
+    if (years_of_experience) {
+      user.setYearsOfExperience(years_of_experience);
     }
     if (username) user.username = username;
     if (name) user.name = name;
@@ -66,6 +64,7 @@ export class UserMapper {
       social_links: user.socialLinks,
       timezone: user.timezone ?? null,
       is_blocked: user.isBlocked,
+      is_google_login: user.isGoogleLogin,
     };
     if (user.id) {
       return Object.assign({ id: user.id }, result);

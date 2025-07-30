@@ -14,17 +14,12 @@ import {
 import { HttpStatus } from "@skillstew/common";
 import { DomainValidationError } from "../../0-domain/errors/DomainValidationError";
 import { ENV } from "../../config/dotenv";
-
-type routeHandlerParams = [
-  Request,
-  Response<{ success: boolean; data?: Record<string, any>; message?: string }>,
-  NextFunction,
-];
+import { GoogleAuthError } from "../../1-application/errors/GoogleAuthErrors";
 
 export class AuthController {
   constructor(private _authUsecases: AuthUsecases) {}
 
-  registerUser = async (...[req, res, next]: routeHandlerParams) => {
+  registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email } = registerSchema.parse(req.body);
       await this._authUsecases.registerUser(email);
@@ -37,7 +32,11 @@ export class AuthController {
     }
   };
 
-  setPasswordAndVerify = async (...[req, res, next]: routeHandlerParams) => {
+  setPasswordAndVerify = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const result = verifyEmailSchema.parse(req.body);
       await this._authUsecases.verifyUserAndSetPassword(result);
@@ -56,7 +55,11 @@ export class AuthController {
     }
   };
 
-  resendVerifyLink = async (...[req, res, next]: routeHandlerParams) => {
+  resendVerifyLink = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const { email } = resendVerifyEmailSchema.parse(req.body);
 
@@ -67,7 +70,7 @@ export class AuthController {
     }
   };
 
-  login = async (...[req, res, next]: routeHandlerParams) => {
+  login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = loginSchema.parse(req.body);
       const tokens = await this._authUsecases.loginUser(result);
@@ -95,11 +98,21 @@ export class AuthController {
           },
         });
     } catch (err) {
+      if (err instanceof GoogleAuthError) {
+        const status =
+          err.code === "LOCAL_ACCOUNT_EXISTS"
+            ? HttpStatus.CONFLICT
+            : HttpStatus.BAD_REQUEST;
+        res
+          .status(status)
+          .json({ success: false, message: err.message, error: err.code });
+        return;
+      }
       next(err);
     }
   };
 
-  refresh = async (...[req, res, next]: routeHandlerParams) => {
+  refresh = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const refreshToken = req.cookies?.refreshToken;
       if (!refreshToken) {
@@ -148,7 +161,7 @@ export class AuthController {
         await this._authUsecases.loginAdmin(details);
 
       res
-        .status(200)
+        .status(HttpStatus.OK)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
@@ -161,6 +174,48 @@ export class AuthController {
           },
         });
     } catch (err) {
+      next(err);
+    }
+  };
+
+  googleAuth = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const credential = req.body.credential;
+
+      if (!credential) {
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, message: "" });
+        return;
+      }
+
+      const { accessToken, refreshToken } =
+        await this._authUsecases.googleAuth(credential);
+
+      res
+        .status(HttpStatus.OK)
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: ENV.NODE_ENV === "production",
+          sameSite: "none",
+        })
+        .json({
+          success: true,
+          data: {
+            accessToken,
+          },
+        });
+    } catch (err) {
+      if (err instanceof GoogleAuthError) {
+        const status =
+          err.code === "LOCAL_ACCOUNT_EXISTS"
+            ? HttpStatus.CONFLICT
+            : HttpStatus.BAD_REQUEST;
+        res
+          .status(status)
+          .json({ success: false, message: err.message, error: err.code });
+        return;
+      }
       next(err);
     }
   };
