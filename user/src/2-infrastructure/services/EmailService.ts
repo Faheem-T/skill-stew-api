@@ -1,4 +1,5 @@
 import { IEmailService } from "../../1-application/ports/IEmailService";
+import { logger } from "../../3-presentation/logger";
 import { ENV } from "../../config/dotenv";
 import nodemailer from "nodemailer";
 
@@ -39,7 +40,9 @@ export class EmailService implements IEmailService {
     };
     try {
       const info = await this._transporter.sendMail(mailOptions);
-      console.log("Email sent successfully", info.response);
+      logger.info(`Email sent successfully to ${email}`, {
+        response: info.response,
+      });
     } catch (err) {
       throw new Error();
     }
