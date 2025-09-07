@@ -2,10 +2,10 @@ import { ENV } from "./config/dotenv";
 import { app } from "./app";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
-import { userSchema } from "./2-infrastructure/db/schemas/userSchema";
 import amqp from "amqplib";
 import { consumer, producer } from "./di";
 import { UserRegisteredEvent } from "@skillstew/common";
+import { logger } from "./3-presentation/logger";
 
 const { Pool } = pg;
 
@@ -18,18 +18,18 @@ const INTERESTED_EVENTS = ["user.registered"];
 
 async function start() {
   try {
-    console.log("Attempting to ping database...");
+    logger.info("Attempting to ping database...");
     await db.execute("select 1");
-    console.log("Successfully pinged database");
+    logger.info("Successfully pinged database");
   } catch (err) {
-    console.log("Error while pinging database", err);
+    logger.error("Error while pinging database", err);
   }
-  console.log("Connected to database");
+  logger.info("Connected to database");
 
   await initializeMessageQueue();
 
   app.listen(ENV.PORT, () => {
-    console.log(`Listening on port ${ENV.PORT}`);
+    logger.info(`Listening on port ${ENV.PORT}`);
   });
 }
 start();
@@ -37,7 +37,7 @@ start();
 // Disconnect from db when process is exiting
 process.on("exit", async () => {
   await db.$client.end();
-  console.log("Disconnected from database");
+  logger.info("Disconnected from database");
 });
 
 async function initializeMessageQueue() {
@@ -53,9 +53,9 @@ async function initializeMessageQueue() {
   consumer.registerHandler(
     "user.registered",
     async (event: UserRegisteredEvent) => {
-      console.log("Received user.registered event: \n", event);
+      logger.info("Received user.registered event: \n", event);
       return { success: true };
     },
   );
-  console.log("Producer and Consumer setup complete.");
+  logger.info("Producer and Consumer setup complete.");
 }
