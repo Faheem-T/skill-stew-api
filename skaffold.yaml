@@ -28,3 +28,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: faheem222/gateway
+      context: ./gateway
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
