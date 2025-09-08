@@ -1,4 +1,14 @@
-const envVars = ["USER_SERVICE_URL", "PAYMENTS_SERVICE_URL"] as const;
+const envVars = [
+  "USER_SERVICE_URL",
+  "AUTH_SERVICE_URL",
+  "PAYMENTS_SERVICE_URL",
+  "USER_ACCESS_TOKEN_SECRET",
+  "USER_REFRESH_TOKEN_SECRET",
+  "EXPERT_ACCESS_TOKEN_SECRET",
+  "EXPERT_REFRESH_TOKEN_SECRET",
+  "ADMIN_ACCESS_TOKEN_SECRET",
+  "ADMIN_REFRESH_TOKEN_SECRET",
+] as const;
 
 function generateEnvVars() {
   return envVars.reduce(
