@@ -1,0 +1,48 @@
+discovery.kubernetes "pods" {
+  role = "pod"
+  // Restrict to pods on the node to reduce cpu & memory usage
+  selectors {
+    role = "pod"
+    field = "spec.nodeName=" + coalesce(sys.env("HOSTNAME"), constants.hostname)
+
+  }
+}
+
+discovery.relabel "pod_logs" {
+  targets = discovery.kubernetes.pods.targets
+
+  rule {
+    source_labels = ["__meta_kubernetes_pod_name"]
+    regex         = ".*depl.*"
+    action        = "keep"
+  }
+
+  rule {
+    source_labels = ["__meta_kubernetes_namespace"]
+    action        = "replace"
+    target_label  = "namespace"
+  }
+  rule {
+    source_labels = ["__meta_kubernetes_pod_container_name"]
+    action        = "replace"
+    target_label  = "container"
+  }
+}
+
+
+loki.source.kubernetes "pods" {
+  targets    = discovery.relabel.pod_logs.output
+  forward_to = [loki.process.pod_logs.receiver]
+}
+
+loki.process "pod_logs" {
+    forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+    endpoint {
+    url = "http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push"
+  }
+}
+
+
