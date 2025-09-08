@@ -9,6 +9,7 @@ import {
   ForbiddenError,
   ApplicationError,
 } from "@skillstew/common";
+import { logger } from "../logger";
 
 export const errorHandler = (
   err: Error,
@@ -21,7 +22,7 @@ export const errorHandler = (
   }>,
   _next: NextFunction,
 ) => {
-  console.log(err);
+  logger.error(err);
   if (err instanceof DomainError) {
     if (err instanceof UnauthorizedError) {
       res.status(HttpStatus.UNAUTHORIZED).json({

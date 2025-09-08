@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cors from "cors";
 import userRouter from "./3-presentation/routers/UserRouter";
 import cookieParser from "cookie-parser";
+import { httpLogger } from "./3-presentation/middlewares/httpLogger";
 
 const app = express();
 
@@ -13,7 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // logger
-app.use(morgan("dev"));
+app.use(httpLogger);
 
 app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
 

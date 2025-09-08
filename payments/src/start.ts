@@ -2,6 +2,7 @@ import { ENV } from "./config/dotenv";
 import { app } from "./app";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
+import { logger } from "./presentation/logger";
 
 const { Pool } = pg;
 
@@ -11,16 +12,16 @@ export const db = drizzle({
 
 async function start() {
   try {
-    console.log("Attempting to ping database...");
+    logger.info("Attempting to ping database...");
     await db.execute("select 1");
-    console.log("Successfully pinged database");
+    logger.info("Successfully pinged database");
   } catch (err) {
-    console.log("Error while pinging database", err);
+    logger.error("Error while pinging database", err);
   }
-  console.log("Connected to database");
+  logger.info("Connected to database");
 
   app.listen(ENV.PORT, () => {
-    console.log(`Listening on port ${ENV.PORT}`);
+    logger.info(`Listening on port ${ENV.PORT}`);
   });
 }
 start();
@@ -28,5 +29,5 @@ start();
 // Disconnect from db when process is exiting
 process.on("exit", async () => {
   await db.$client.end();
-  console.log("Disconnected from database");
+  logger.info("Disconnected from database");
 });
