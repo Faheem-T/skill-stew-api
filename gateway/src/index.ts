@@ -1,7 +1,8 @@
 import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
-import { logger } from "./logger";
-import { ENV } from "./dotenv";
+import { logger } from "./utils/logger";
+import { ENV } from "./utils/dotenv";
+import { authMiddleware } from "./middlewares/authMiddleware";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,7 +15,7 @@ const ServiceConfigs = [
   },
   {
     path: "/api/v1/auth",
-    url: ENV.USER_SERVICE_URL,
+    url: ENV.AUTH_SERVICE_URL,
     name: "auth-service",
   },
   {
@@ -24,6 +25,8 @@ const ServiceConfigs = [
   },
 ];
 
+app.use(authMiddleware);
+
 ServiceConfigs.forEach((service) => {
   app.use(
     service.path,
@@ -31,8 +34,19 @@ ServiceConfigs.forEach((service) => {
       target: service.url,
       changeOrigin: true,
       on: {
-        proxyReq: (proxyReq, req, res) => {
+        proxyReq: (proxyReq, req, _res) => {
           logger.info(`Request for ${service.name}`);
+          const user = (req as any).user;
+          if (user) {
+            proxyReq.setHeader("x-user-id", user.id);
+            proxyReq.setHeader("x-user-role", user.role);
+            if (user.username) {
+              proxyReq.setHeader("x-user-username", user.username);
+            }
+            if (user.email) {
+              proxyReq.setHeader("x-user-email", user.email);
+            }
+          }
         },
         proxyRes: (proxyRes, req, res) => {},
       },

@@ -1,0 +1,38 @@
+import { match } from "path-to-regexp";
+import { UserRoles } from "../types/UserRoles";
+import { HTTPMethod } from "../types/HTTPMethod";
+
+interface Endpoint {
+  path: string;
+  roles: UserRoles[];
+}
+
+type IAuthRequiredEndpoints = {
+  [keys in HTTPMethod]?: Endpoint[];
+};
+
+const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
+  GET: [{ path: "/api/v1/users", roles: ["ADMIN"] }],
+  POST: [{ path: "/api/v1/payments/subscriptions", roles: ["ADMIN"] }],
+  PATCH: [
+    { path: "/api/v1/users/:id/block", roles: ["ADMIN"] },
+    { path: "/api/v1/users/:id/unblock", roles: ["ADMIN"] },
+    { path: "/api/v1/payments/subscriptions/:id", roles: ["ADMIN"] },
+  ],
+  DELETE: [{ path: "/api/v1/payments/subscriptions/:id", roles: ["ADMIN"] }],
+};
+
+export const isAuthRequired = (
+  path: string,
+  method: HTTPMethod,
+): { matched: boolean; roles: UserRoles[] } => {
+  const endpoints = AuthRequiredEndpoints[method] || [];
+
+  for (const endpoint of endpoints) {
+    const matcher = match(endpoint.path);
+    if (matcher(path)) {
+      return { matched: true, roles: endpoint.roles };
+    }
+  }
+  return { matched: false, roles: [] };
+};
