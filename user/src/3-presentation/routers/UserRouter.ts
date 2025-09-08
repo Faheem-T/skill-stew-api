@@ -7,7 +7,7 @@ const router = Router();
 // api/v1/users
 router.get(
   "/",
-  authMiddleware.verify,
+  // authMiddleware.verify,
   requireRole("ADMIN"),
   userController.getAllUsers,
 );

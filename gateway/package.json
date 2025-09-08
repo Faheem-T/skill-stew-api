@@ -14,8 +14,11 @@
     "tsx": "^4.20.5"
   },
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "express": "^5.1.0",
     "http-proxy-middleware": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "path-to-regexp": "^8.3.0",
     "winston": "^3.17.0"
   }
 }

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { UserRoles } from "../../0-domain/entities/UserRoles";
-import { HttpStatus } from "../../constants/HttpStatus";
+import { HttpStatus } from "@skillstew/common";
 import { HttpMessages } from "../../constants/HTTPMessages";
+import { UserRoles } from "../../types/UserRoles";
 
 export const requireRole = (...roles: UserRoles[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -12,6 +12,7 @@ export const requireRole = (...roles: UserRoles[]) => {
       res
         .status(HttpStatus.FORBIDDEN)
         .json({ success: false, message: HttpMessages.FORBIDDEN });
+      return;
     } else {
       next();
     }
