@@ -8,7 +8,6 @@ import { ENV } from "../config/dotenv";
 import { AdminRepository } from "../2-infrastructure/db/AdminRepository";
 import { UserUsecases } from "../1-application/UserUsecases";
 import { UserController } from "../3-presentation/controllers/UserController";
-import { AuthMiddleware } from "../3-presentation/middlewares/authMiddleware";
 import { Consumer, Producer } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
 
@@ -51,6 +50,3 @@ const userUsecases = new UserUsecases(userRepo);
 // Controllers
 export const authController = new AuthController(authUsecases);
 export const userController = new UserController(userUsecases);
-
-// Middleware
-export const authMiddleware = new AuthMiddleware(jwtService);
