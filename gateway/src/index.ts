@@ -35,8 +35,10 @@ ServiceConfigs.forEach((service) => {
       changeOrigin: true,
       on: {
         proxyReq: (proxyReq, req, _res) => {
-          logger.info(`Request for ${service.name}`);
           const user = (req as any).user;
+          logger.info(`Request for ${service.name}`, {
+            ...(user ? { userId: user.id, role: user.role } : {}),
+          });
           if (user) {
             proxyReq.setHeader("x-user-id", user.id);
             proxyReq.setHeader("x-user-role", user.role);

@@ -21,6 +21,8 @@ export class UserMapper {
       about,
       is_blocked,
       is_google_login,
+      created_at,
+      updated_at,
     } = raw;
     const user = new User({ email, id, role, isGoogleLogin: is_google_login });
     if (years_of_experience) {
@@ -42,6 +44,8 @@ export class UserMapper {
     if (avatar_url) user.avatarUrl = avatar_url;
     if (about) user.about = about;
     if (is_blocked) user.isBlocked = true;
+    if (created_at) user.createdAt = created_at;
+    if (updated_at) user.updatedAt = updated_at;
 
     return user;
   }
@@ -65,6 +69,8 @@ export class UserMapper {
       timezone: user.timezone ?? null,
       is_blocked: user.isBlocked,
       is_google_login: user.isGoogleLogin,
+      created_at: user.createdAt ?? new Date(),
+      updated_at: user.updatedAt ?? new Date(),
     };
     if (user.id) {
       return Object.assign({ id: user.id }, result);

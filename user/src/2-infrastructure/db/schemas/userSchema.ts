@@ -1,4 +1,11 @@
-import { pgTable, text, integer, boolean, uuid } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  integer,
+  boolean,
+  uuid,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { InferSelectModel, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
@@ -30,6 +37,10 @@ export const userSchema = pgTable("users", {
   is_verified: boolean().default(false).notNull(),
   is_blocked: boolean().default(false).notNull(),
   is_google_login: boolean().default(false).notNull(),
+  created_at: timestamp().defaultNow().notNull(),
+  updated_at: timestamp()
+    .defaultNow()
+    .$onUpdate(() => sql`now()`),
 });
 
 export type UserSchemaType = InferSelectModel<typeof userSchema>;

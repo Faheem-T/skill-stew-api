@@ -4,7 +4,7 @@ import { UserRepository } from "../2-infrastructure/db/UserRepository";
 import { EmailService } from "../2-infrastructure/services/EmailService";
 import { JwtService } from "../2-infrastructure/services/JwtService";
 import { BcryptHasher } from "../2-infrastructure/services/HashService";
-import { ENV } from "../config/dotenv";
+import { ENV } from "../utils/dotenv";
 import { AdminRepository } from "../2-infrastructure/db/AdminRepository";
 import { UserUsecases } from "../1-application/UserUsecases";
 import { UserController } from "../3-presentation/controllers/UserController";

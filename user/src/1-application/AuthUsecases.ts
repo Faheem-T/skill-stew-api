@@ -14,7 +14,7 @@ import { IProducer } from "./ports/IProducer";
 import { CreateEvent } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
 import { GoogleAuthError } from "./errors/GoogleAuthErrors";
-import { ENV } from "../config/dotenv";
+import { ENV } from "../utils/dotenv";
 
 export class AuthUsecases {
   constructor(

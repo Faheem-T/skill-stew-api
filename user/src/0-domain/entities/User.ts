@@ -25,6 +25,9 @@ export class User {
 
   isGoogleLogin: boolean;
 
+  createdAt?: Date;
+  updatedAt?: Date;
+
   constructor({
     email,
     id,

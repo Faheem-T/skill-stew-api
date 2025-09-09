@@ -2,13 +2,65 @@ import { NextFunction, Request, Response } from "express-serve-static-core";
 import { UserUsecases } from "../../1-application/UserUsecases";
 import { HttpStatus } from "@skillstew/common";
 import { IDSchema } from "../validators/IdValidator";
+import { UserFilters } from "../../0-domain/repositories/IUserRepository";
 
 export class UserController {
   constructor(private _userUsecases: UserUsecases) {}
 
-  getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-    const users = await this._userUsecases.getAllUsers();
-    res.status(HttpStatus.OK).json({ success: true, data: users });
+  createDummyUsers = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      await this._userUsecases.createDummyUsers();
+      res.status(HttpStatus.OK).json({ message: "Created", success: true });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getAllUsers = async (
+    req: Request<
+      {},
+      any,
+      any,
+      {
+        cursor?: string;
+        limit?: string;
+        query?: string;
+        isVerified?: boolean;
+      }
+    >,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const cursor = req.query.cursor;
+      let limit = 10;
+      if (req.query.limit) {
+        const int = parseInt(req.query.limit);
+        if (!isNaN(int)) {
+          limit = int;
+        }
+      }
+
+      const filters: UserFilters = {
+        query: req.query.query,
+        isVerified: req.query.isVerified,
+      };
+      const { users, nextCursor, hasNextPage } =
+        await this._userUsecases.getAllUsers({
+          cursor,
+          limit,
+          filters,
+        });
+      res
+        .status(HttpStatus.OK)
+        .json({ success: true, data: users, hasNextPage, nextCursor });
+    } catch (err) {
+      next(err);
+    }
   };
 
   blockUser = async (

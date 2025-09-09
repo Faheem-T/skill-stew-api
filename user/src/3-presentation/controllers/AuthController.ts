@@ -13,7 +13,7 @@ import {
 } from "../validators/AdminValidator";
 import { HttpStatus } from "@skillstew/common";
 import { DomainValidationError } from "../../0-domain/errors/DomainValidationError";
-import { ENV } from "../../config/dotenv";
+import { ENV } from "../../utils/dotenv";
 import { GoogleAuthError } from "../../1-application/errors/GoogleAuthErrors";
 
 export class AuthController {
