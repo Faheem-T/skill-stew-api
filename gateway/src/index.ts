@@ -56,10 +56,6 @@ ServiceConfigs.forEach((service) => {
   );
 });
 
-app.use((req, res) => {
-  res.json({ message: "Hello there :)" });
-});
-
 app.listen(port, () => {
   logger.info(`Listening on port ${port}`);
 });

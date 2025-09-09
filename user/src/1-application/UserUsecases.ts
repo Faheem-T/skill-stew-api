@@ -1,8 +1,9 @@
 import { User } from "../0-domain/entities/User";
 import { UserRepository } from "../2-infrastructure/db/UserRepository";
 import { GetAllUsersDTO } from "./dtos/GetAllUsersDTO";
+import { IUserUsecases } from "./interfaces/IUserUsecases";
 
-export class UserUsecases {
+export class UserUsecases implements IUserUsecases {
   constructor(private _userRepo: UserRepository) {}
 
   createDummyUsers = async () => {

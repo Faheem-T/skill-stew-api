@@ -15,8 +15,9 @@ import { CreateEvent } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
 import { GoogleAuthError } from "./errors/GoogleAuthErrors";
 import { ENV } from "../utils/dotenv";
+import { IAuthUsecases } from "./interfaces/IAuthUsecases";
 
-export class AuthUsecases {
+export class AuthUsecases implements IAuthUsecases{
   constructor(
     private _userRepo: IUserRepository,
     private _emailService: IEmailService,
