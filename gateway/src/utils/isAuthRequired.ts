@@ -13,7 +13,10 @@ type IAuthRequiredEndpoints = {
 
 const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
   GET: [{ path: "/api/v1/users", roles: ["ADMIN"] }],
-  POST: [{ path: "/api/v1/payments/subscriptions", roles: ["ADMIN"] }],
+  POST: [
+    { path: "/api/v1/payments/subscriptions", roles: ["ADMIN"] },
+    { path: "/api/v1/users/dummy", roles: ["ADMIN"] },
+  ],
   PATCH: [
     { path: "/api/v1/users/:id/block", roles: ["ADMIN"] },
     { path: "/api/v1/users/:id/unblock", roles: ["ADMIN"] },

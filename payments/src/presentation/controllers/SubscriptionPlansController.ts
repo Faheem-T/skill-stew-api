@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express-serve-static-core";
-import { SubscriptionPlansUsecases } from "../../application/SubscriptionPlansUsecases";
+import { ISubscriptionPlansUsecases } from "../../application/interfaces/ISubscriptionPlansUsecases";
 import {
   createSubscriptionPlanSchema,
   editSubscriptionPlanSchema,
@@ -7,7 +7,7 @@ import {
 import { HttpStatus } from "@skillstew/common";
 
 export class SubscriptionPlansController {
-  constructor(private _plansUsecases: SubscriptionPlansUsecases) {}
+  constructor(private _plansUsecases: ISubscriptionPlansUsecases) {}
 
   createPlan = async (req: Request, res: Response, next: NextFunction) => {
     try {

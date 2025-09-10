@@ -63,7 +63,7 @@ export const authMiddleware: RequestHandler = (req, res, next) => {
 const jwtService = new JwtService({
   adminAccessTokenSecret: ENV.ADMIN_ACCESS_TOKEN_SECRET,
   adminRefreshTokenSecret: ENV.ADMIN_REFRESH_TOKEN_SECRET,
-  expertAccessTokenSecret: ENV.EXPERT_REFRESH_TOKEN_SECRET,
+  expertAccessTokenSecret: ENV.EXPERT_ACCESS_TOKEN_SECRET,
   expertRefreshTokenSecret: ENV.EXPERT_REFRESH_TOKEN_SECRET,
   userAccessTokenSecret: ENV.USER_ACCESS_TOKEN_SECRET,
   userRefreshTokenSecret: ENV.USER_REFRESH_TOKEN_SECRET,

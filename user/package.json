@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx watch --clear-screen=false --include './src/**/*.ts' ./src/start.ts",
-    "syncDb": "drizzle-kit push --config=./src/config/drizzleConfig.ts",
+    "syncDb": "drizzle-kit push --config=./src/utils/drizzleConfig.ts",
     "test": "jest ./src/__tests__"
   },
   "keywords": [],
