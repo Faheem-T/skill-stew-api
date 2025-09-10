@@ -37,10 +37,10 @@ export const userSchema = pgTable("users", {
   is_verified: boolean().default(false).notNull(),
   is_blocked: boolean().default(false).notNull(),
   is_google_login: boolean().default(false).notNull(),
-  created_at: timestamp().defaultNow().notNull(),
-  updated_at: timestamp()
+  created_at: timestamp({ mode: "date", precision: 3 }).defaultNow().notNull(),
+  updated_at: timestamp({ mode: "date", precision: 3 })
     .defaultNow()
-    .$onUpdate(() => sql`now()`),
+    .$onUpdate(() => new Date()),
 });
 
 export type UserSchemaType = InferSelectModel<typeof userSchema>;
