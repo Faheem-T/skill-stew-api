@@ -10,4 +10,6 @@ router.get("/", requireRole("ADMIN"), userController.getAllUsers);
 router.patch("/:id/block", requireRole("ADMIN"), userController.blockUser);
 router.patch("/:id/unblock", requireRole("ADMIN"), userController.unblockUser);
 
+router.post("/dummy", requireRole("ADMIN"), userController.createDummyUsers);
+
 export default router;

@@ -1,17 +1,83 @@
 import { User } from "../../0-domain/entities/User";
 import { UserAlreadyExistsError } from "../../0-domain/errors/UserAlreadyExistsError";
-import { IUserRepository } from "../../0-domain/repositories/IUserRepository";
+import {
+  IUserRepository,
+  UserFilters,
+} from "../../0-domain/repositories/IUserRepository";
 import { db } from "../../start";
+import { decodeCursor, encodeCursor } from "../../utils/dbCursor";
 import { DatabaseError } from "../errors/DatabaseError";
 import { UserMapper } from "../mappers/UserMapper";
-import { userSchema, UserSchemaType } from "./schemas/userSchema";
-import { eq } from "drizzle-orm";
+import { userSchema } from "./schemas/userSchema";
+import { and, eq, ilike, gt, or } from "drizzle-orm";
 
 export class UserRepository implements IUserRepository {
-  getAllUsers = async (): Promise<Omit<UserSchemaType, "password_hash">[]> => {
+  getAllUsers = async ({
+    cursor,
+    limit,
+    filters,
+  }: {
+    cursor?: string; // base 64 encoded
+    limit: number;
+    filters?: UserFilters;
+  }): Promise<{
+    users: User[];
+    hasNextPage: boolean;
+    nextCursor: string | undefined;
+  }> => {
+    const conditions: any[] = [];
+
+    if (cursor) {
+      const { createdAt, id } = decodeCursor(cursor);
+      conditions.push(
+        or(
+          gt(userSchema.created_at, createdAt),
+          and(eq(userSchema.created_at, createdAt), gt(userSchema.id, id)),
+        ),
+      );
+    }
+
+    if (filters) {
+      const { query, isVerified } = filters;
+      if (query) {
+        conditions.push(
+          or(
+            ilike(userSchema.name, `%${query}%`),
+            ilike(userSchema.username, `%${query}%`),
+            ilike(userSchema.email, `%${query}%`),
+          ),
+        );
+      }
+      if (isVerified !== undefined) {
+        conditions.push(eq(userSchema.is_verified, isVerified));
+      }
+    }
+
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+
     try {
-      const result = await db.select().from(userSchema);
-      return result.map(UserMapper.toPresentation);
+      const rows = await db
+        .select()
+        .from(userSchema)
+        .where(where)
+        .orderBy(userSchema.created_at, userSchema.id)
+        .limit(limit + 1);
+
+      const hasNextPage = rows.length > limit;
+      const sliced = hasNextPage ? rows.slice(0, -1) : rows;
+
+      const users = sliced.map(UserMapper.toDomain);
+
+      return {
+        users,
+        hasNextPage,
+        nextCursor: hasNextPage
+          ? encodeCursor(
+              users[users.length - 1].createdAt!,
+              users[users.length - 1].id!,
+            )
+          : undefined,
+      };
     } catch (err) {
       throw new DatabaseError(err);
     }

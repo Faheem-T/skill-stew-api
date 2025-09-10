@@ -1,6 +1,6 @@
 import { IEmailService } from "../../1-application/ports/IEmailService";
 import { logger } from "../../3-presentation/logger";
-import { ENV } from "../../config/dotenv";
+import { ENV } from "../../utils/dotenv";
 import nodemailer from "nodemailer";
 
 export class EmailService implements IEmailService {
