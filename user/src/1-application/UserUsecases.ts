@@ -1,30 +1,44 @@
 import { User } from "../0-domain/entities/User";
-import { UserRepository } from "../2-infrastructure/db/UserRepository";
-import { GetAllUsersDTO } from "./dtos/GetAllUsersDTO";
+import { IUserRepository } from "../0-domain/repositories/IUserRepository";
+import { GetAllUsersInputDTO, PresentationUser } from "./dtos/GetAllUsersDTO";
 import { IUserUsecases } from "./interfaces/IUserUsecases";
+import { UserDTOMapper } from "./mappers/UserDTOMapper";
 
 export class UserUsecases implements IUserUsecases {
-  constructor(private _userRepo: UserRepository) {}
+  constructor(private _userRepo: IUserRepository) {}
 
   createDummyUsers = async () => {
-    for (const { email, role, isGoogleLogin, isVerified } of dummyUsers) {
-      const newUser = new User({ email, isGoogleLogin, role });
+    for (const { email, isGoogleLogin, isVerified } of dummyUsers) {
+      const newUser = new User({ email, isGoogleLogin });
       if (isVerified) {
-        newUser.verify();
+        newUser.isVerified = true;
       }
       await this._userRepo.save(newUser);
     }
   };
 
-  getAllUsers = async (dto: GetAllUsersDTO) => {
-    return this._userRepo.getAllUsers(dto);
+  getAllUsers = async (dto: GetAllUsersInputDTO) => {
+    const { users, hasNextPage, nextCursor } =
+      await this._userRepo.getAllUsers(dto);
+    const parsedUsers: PresentationUser[] = users.map(
+      UserDTOMapper.toPresentation,
+    );
+    return {
+      users: parsedUsers,
+      hasNextPage,
+      nextCursor,
+    };
   };
 
   blockUser = async (userId: string) => {
-    return this._userRepo.blockUser(userId);
+    const user = await this._userRepo.blockUser(userId);
+    if (!user) return null;
+    return UserDTOMapper.toPresentation(user);
   };
   unblockUser = async (userId: string) => {
-    return this._userRepo.unblockUser(userId);
+    const user = await this._userRepo.unblockUser(userId);
+    if (!user) return null;
+    return UserDTOMapper.toPresentation(user);
   };
 }
 const dummyUsers: {

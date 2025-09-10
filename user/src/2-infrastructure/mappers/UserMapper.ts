@@ -6,11 +6,9 @@ export class UserMapper {
     const {
       id,
       email,
-      years_of_experience,
       username,
       timezone,
       social_links,
-      role,
       phone_number,
       password_hash,
       name,
@@ -24,10 +22,7 @@ export class UserMapper {
       created_at,
       updated_at,
     } = raw;
-    const user = new User({ email, id, role, isGoogleLogin: is_google_login });
-    if (years_of_experience) {
-      user.setYearsOfExperience(years_of_experience);
-    }
+    const user = new User({ email, id, isGoogleLogin: is_google_login });
     if (username) user.username = username;
     if (name) user.name = name;
     if (timezone) user.timezone = timezone;
@@ -35,12 +30,8 @@ export class UserMapper {
     user.socialLinks = social_links;
     if (phone_number) user.phoneNumber = phone_number;
     if (password_hash) user.passwordHash = password_hash;
-    if (is_verified) {
-      user.verify();
-    }
-    if (is_subscribed) {
-      user.setSubscribed();
-    }
+    user.isVerified = is_verified;
+    user.isSubscribed = is_subscribed;
     if (avatar_url) user.avatarUrl = avatar_url;
     if (about) user.about = about;
     if (is_blocked) user.isBlocked = true;
@@ -53,18 +44,16 @@ export class UserMapper {
     user: User,
   ): UserSchemaType | Omit<UserSchemaType, "id"> {
     const result: Omit<UserSchemaType, "id"> = {
-      email: user.getEmail(),
+      email: user.email,
       about: user.about || null,
       avatar_url: user.avatarUrl || null,
-      is_verified: user.isVerified(),
-      is_subscribed: user.isSubscribed(),
-      years_of_experience: user.getExperience(),
+      is_verified: user.isVerified,
+      is_subscribed: user.isSubscribed,
       languages: user.languages,
       name: user.name ?? null,
       username: user.username ?? null,
       password_hash: user.passwordHash ?? null,
       phone_number: user.phoneNumber ?? null,
-      role: user.getRole(),
       social_links: user.socialLinks,
       timezone: user.timezone ?? null,
       is_blocked: user.isBlocked,
@@ -76,16 +65,5 @@ export class UserMapper {
       return Object.assign({ id: user.id }, result);
     }
     return result;
-  }
-  static toPresentation(
-    raw: UserSchemaType,
-  ): Omit<UserSchemaType, "password_hash"> {
-    const nonNullObject = Object.fromEntries(
-      Object.entries(raw).filter(
-        ([key, value]) => value !== null || key === "password_hash",
-      ),
-    ) as Omit<UserSchemaType, "password_hash">;
-
-    return nonNullObject;
   }
 }

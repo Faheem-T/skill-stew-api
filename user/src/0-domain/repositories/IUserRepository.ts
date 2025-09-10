@@ -1,4 +1,3 @@
-import { UserSchemaType } from "../../2-infrastructure/db/schemas/userSchema";
 import { User } from "../entities/User";
 
 export interface UserFilters {
@@ -17,7 +16,7 @@ export interface IUserRepository {
     limit: number;
     filters?: UserFilters;
   }): Promise<{
-    users: Omit<UserSchemaType, "password_hash">[];
+    users: User[];
     hasNextPage: boolean;
     nextCursor: string | undefined;
   }>;

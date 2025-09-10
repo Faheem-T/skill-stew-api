@@ -16,8 +16,9 @@ import { OAuth2Client } from "google-auth-library";
 import { GoogleAuthError } from "./errors/GoogleAuthErrors";
 import { ENV } from "../utils/dotenv";
 import { IAuthUsecases } from "./interfaces/IAuthUsecases";
+import { UserDTOMapper } from "./mappers/UserDTOMapper";
 
-export class AuthUsecases implements IAuthUsecases{
+export class AuthUsecases implements IAuthUsecases {
   constructor(
     private _userRepo: IUserRepository,
     private _emailService: IEmailService,
@@ -29,21 +30,25 @@ export class AuthUsecases implements IAuthUsecases{
   ) {}
 
   getUserById = async (id: string) => {
-    return this._userRepo.getUserById(id);
+    const user = await this._userRepo.getUserById(id);
+    if (!user) return null;
+    return UserDTOMapper.toPresentation(user);
   };
 
-  getUserByEmail = async (email: string): Promise<User | null> => {
-    return this._userRepo.getUserByEmail(email);
+  getUserByEmail = async (email: string) => {
+    const user = await this._userRepo.getUserByEmail(email);
+    if (!user) return null;
+    return UserDTOMapper.toPresentation(user);
   };
 
   registerUser = async (email: string) => {
-    const user = new User({ email, role: "USER", isGoogleLogin: false });
+    const user = new User({ email, isGoogleLogin: false });
     const savedUser = await this._userRepo.save(user);
     const event = CreateEvent(
       "user.registered",
       {
         id: savedUser.id!,
-        email: savedUser.getEmail(),
+        email: savedUser.email,
       },
       "user",
     );
@@ -53,14 +58,6 @@ export class AuthUsecases implements IAuthUsecases{
   sendVerificationLinkToEmail = async (email: string) => {
     const jwt = this._jwtService.generateEmailVerificationJwt({ email });
     await this._emailService.sendVerificationLinkToEmail(email, jwt);
-  };
-
-  verifyEmailJwt = (token: string) => {
-    return this._jwtService.verifyEmailVerificationJwt(token);
-  };
-
-  saveUser = (user: User) => {
-    return this._userRepo.save(user);
   };
 
   verifyUserAndSetPassword = async ({
@@ -76,9 +73,9 @@ export class AuthUsecases implements IAuthUsecases{
     if (!user) {
       throw new UserNotFoundError();
     }
-    user.verify();
+    user.isVerified = true;
     user.passwordHash = this._hasherService.hash(password);
-    this._userRepo.save(user);
+    await this._userRepo.save(user);
   };
 
   loginUser = async ({
@@ -95,7 +92,7 @@ export class AuthUsecases implements IAuthUsecases{
     if (user.isGoogleLogin) {
       throw new GoogleAuthError("GOOGLE_ACCOUNT_EXISTS");
     }
-    if (!user.isVerified() || !user.passwordHash) {
+    if (!user.isVerified || !user.passwordHash) {
       throw new UserNotVerifiedError();
     }
     if (!this._hasherService.compare(password, user.passwordHash)) {
@@ -105,7 +102,7 @@ export class AuthUsecases implements IAuthUsecases{
       throw new UserBlockedError();
     }
 
-    const role = user.getRole();
+    const role = user.role;
     const userId = user.id as string;
 
     const refreshToken = this._jwtService.generateRefreshToken(
@@ -205,10 +202,10 @@ export class AuthUsecases implements IAuthUsecases{
     if (!user) {
       // Handle new user
       const { name, picture } = payload;
-      const newUser = new User({ email, isGoogleLogin: true, role: "USER" });
+      const newUser = new User({ email, isGoogleLogin: true });
       newUser.avatarUrl = picture;
       newUser.name = name;
-      newUser.verify();
+      newUser.isVerified = true;
 
       user = await this._userRepo.save(newUser);
     } else {
@@ -220,14 +217,14 @@ export class AuthUsecases implements IAuthUsecases{
       }
     }
 
-    const tokenPayload = { email, role: user.getRole(), userId: user.id! };
+    const tokenPayload = { email, role: user.role, userId: user.id! };
     const refreshToken = this._jwtService.generateRefreshToken(
       tokenPayload,
-      user.getRole(),
+      user.role,
     );
     const accessToken = this._jwtService.generateAccessToken(
       tokenPayload,
-      user.getRole(),
+      user.role,
     );
     return { refreshToken, accessToken };
   };

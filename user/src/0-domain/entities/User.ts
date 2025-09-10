@@ -3,8 +3,9 @@ import { UserRoles } from "./UserRoles";
 
 export class User {
   id?: string;
-  private _email: string;
-  private _role: Extract<UserRoles, "USER" | "EXPERT">;
+  email: string;
+  // private _role: Extract<UserRoles, "USER" | "EXPERT">;
+  role: "USER";
   name?: string;
   username?: string;
   passwordHash?: string;
@@ -17,10 +18,10 @@ export class User {
   about?: string;
   socialLinks: string[];
   languages: string[];
-  private _isVerified: boolean;
+  isVerified: boolean;
 
-  private _isSubscribed?: boolean; // only for users
-  private _yearsOfExperience?: number; // only for experts
+  isSubscribed: boolean;
+  // private _yearsOfExperience?: number; // only for experts
   isBlocked: boolean;
 
   isGoogleLogin: boolean;
@@ -32,71 +33,69 @@ export class User {
     email,
     id,
     isGoogleLogin,
-    role,
   }: {
     email: string;
     id?: string;
     isGoogleLogin: boolean;
-    role: Extract<UserRoles, "USER" | "EXPERT">;
   }) {
     if (id) {
       this.id = id;
     }
-    this._email = email;
-    this._role = role;
-    this._isVerified = false;
-    this._isSubscribed = false;
+    this.email = email;
+    this.role = "USER";
+    this.isVerified = false;
+    this.isSubscribed = false;
     this.socialLinks = [];
     this.languages = [];
     this.isBlocked = false;
     this.isGoogleLogin = isGoogleLogin;
   }
 
-  setExpert() {
-    this._role = "EXPERT";
-  }
+  // setExpert() {
+  //   this._role = "EXPERT";
+  // }
 
-  setSubscribed() {
-    if (this._role === "EXPERT") {
-      throw new DomainValidationError("DOMAIN_USER_ONLY_FIELD");
-    }
-    this._isSubscribed = true;
-  }
+  // setSubscribed() {
+  //   if (this._role === "EXPERT") {
+  //     throw new DomainValidationError("DOMAIN_USER_ONLY_FIELD");
+  //   }
+  //   this._isSubscribed = true;
+  // }
 
-  verify() {
-    if (this._isVerified)
-      throw new DomainValidationError("USER_ALREADY_VERIFIED");
-    this._isVerified = true;
-  }
+  // verify() {
+  //   if (this._isVerified)
+  //     throw new DomainValidationError("USER_ALREADY_VERIFIED");
+  //   this._isVerified = true;
+  // }
 
-  setYearsOfExperience(years: number) {
-    if (this._role === "USER") {
-      throw new DomainValidationError("DOMAIN_EXPERT_ONLY_FIELD");
-    }
-    this._yearsOfExperience = years;
-  }
+  // setYearsOfExperience(years: number) {
+  //   if (this._role === "USER") {
+  //     throw new DomainValidationError("DOMAIN_EXPERT_ONLY_FIELD");
+  //   }
+  //   this._yearsOfExperience = years;
+  // }
 
-  getExperience() {
-    if (this._role === "USER") return null;
-    return this._yearsOfExperience as number;
-  }
+  // getExperience() {
+  //   if (this._role === "USER") return null;
+  //   return this._yearsOfExperience as number;
+  // }
 
-  isSubscribed() {
-    if (this._role === "EXPERT") return null;
-    return this._isSubscribed as boolean;
-  }
+  // isSubscribed() {
+  //   if (this._role === "EXPERT") return null;
+  //   return this._isSubscribed as boolean;
+  // }
 
-  isVerified() {
-    return this._isVerified;
-  }
-
-  getEmail() {
-    return this._email;
-  }
-
-  getRole() {
-    return this._role;
-  }
+  // isVerified() {
+  //   return this._isVerified;
+  // }
+  //
+  // getEmail() {
+  //   return this._email;
+  // }
+  //
+  // getRole() {
+  //   return this._role;
+  // }
 }
 
 interface IUserLocation {

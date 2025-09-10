@@ -8,8 +8,8 @@ import { db } from "../../start";
 import { decodeCursor, encodeCursor } from "../../utils/dbCursor";
 import { DatabaseError } from "../errors/DatabaseError";
 import { UserMapper } from "../mappers/UserMapper";
-import { userSchema, UserSchemaType } from "./schemas/userSchema";
-import { and, eq, ilike, lt, gt, or } from "drizzle-orm";
+import { userSchema } from "./schemas/userSchema";
+import { and, eq, ilike, gt, or } from "drizzle-orm";
 
 export class UserRepository implements IUserRepository {
   getAllUsers = async ({
@@ -21,7 +21,7 @@ export class UserRepository implements IUserRepository {
     limit: number;
     filters?: UserFilters;
   }): Promise<{
-    users: Omit<UserSchemaType, "password_hash">[];
+    users: User[];
     hasNextPage: boolean;
     nextCursor: string | undefined;
   }> => {
@@ -66,15 +66,15 @@ export class UserRepository implements IUserRepository {
       const hasNextPage = rows.length > limit;
       const sliced = hasNextPage ? rows.slice(0, -1) : rows;
 
-      const users = sliced.map(UserMapper.toPresentation);
+      const users = sliced.map(UserMapper.toDomain);
 
       return {
         users,
         hasNextPage,
         nextCursor: hasNextPage
           ? encodeCursor(
-              users[users.length - 1].created_at,
-              users[users.length - 1].id,
+              users[users.length - 1].createdAt!,
+              users[users.length - 1].id!,
             )
           : undefined,
       };
