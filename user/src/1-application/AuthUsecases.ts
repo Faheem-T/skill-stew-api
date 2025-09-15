@@ -11,12 +11,16 @@ import { Admin } from "../0-domain/entities/Admin";
 import { WrongAdminUsernameError } from "../0-domain/errors/WrongAdminUsernameError";
 import { UserBlockedError } from "../0-domain/errors/UserBlockedError";
 import { IProducer } from "./ports/IProducer";
-import { CreateEvent } from "@skillstew/common";
+import { CreateEvent, UserRoles } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
 import { GoogleAuthError } from "./errors/GoogleAuthErrors";
 import { ENV } from "../utils/dotenv";
 import { IAuthUsecases } from "./interfaces/IAuthUsecases";
 import { UserDTOMapper } from "./mappers/UserDTOMapper";
+import { GetProfileOutputDTO } from "./dtos/GetProfileDTO";
+import { DomainValidationError } from "../0-domain/errors/DomainValidationError";
+import { UserAlreadyExistsError } from "../0-domain/errors/UserAlreadyExistsError";
+import { RegisterOutputDTO } from "./dtos/RegisterDTO";
 
 export class AuthUsecases implements IAuthUsecases {
   constructor(
@@ -41,7 +45,15 @@ export class AuthUsecases implements IAuthUsecases {
     return UserDTOMapper.toPresentation(user);
   };
 
-  registerUser = async (email: string) => {
+  registerUser = async (email: string): Promise<RegisterOutputDTO> => {
+    const existingUser = await this._userRepo.getUserByEmail(email);
+    if (existingUser) {
+      if (existingUser.isVerified) {
+        return { success: false, userAlreadyExists: true, userVerified: true };
+      } else {
+        return { success: false, userAlreadyExists: true, userVerified: false };
+      }
+    }
     const user = new User({ email, isGoogleLogin: false });
     const savedUser = await this._userRepo.save(user);
     const event = CreateEvent(
@@ -53,9 +65,17 @@ export class AuthUsecases implements IAuthUsecases {
       "user",
     );
     this._messageProducer.publish(event);
+    return { success: true };
   };
 
   sendVerificationLinkToEmail = async (email: string) => {
+    const user = await this._userRepo.getUserByEmail(email);
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+    if (user.isVerified) {
+      throw new DomainValidationError("USER_ALREADY_VERIFIED");
+    }
     const jwt = this._jwtService.generateEmailVerificationJwt({ email });
     await this._emailService.sendVerificationLinkToEmail(email, jwt);
   };
@@ -72,6 +92,9 @@ export class AuthUsecases implements IAuthUsecases {
     const user = await this._userRepo.getUserByEmail(email);
     if (!user) {
       throw new UserNotFoundError();
+    }
+    if (user.isVerified) {
+      throw new DomainValidationError("USER_ALREADY_VERIFIED");
     }
     user.isVerified = true;
     user.passwordHash = this._hasherService.hash(password);
@@ -227,5 +250,30 @@ export class AuthUsecases implements IAuthUsecases {
       user.role,
     );
     return { refreshToken, accessToken };
+  };
+
+  getAdminById = async (id: string): Promise<Admin | null> => {
+    const admin = await this._adminRepo.getAdminById(id);
+    if (!admin) return null;
+    return admin;
+  };
+
+  getProfile = async (
+    userId: string,
+    role: UserRoles,
+  ): Promise<GetProfileOutputDTO> => {
+    if (role === "USER") {
+      const user = await this.getUserById(userId);
+      if (!user) return null;
+      const { id, email, username, name } = user;
+      return { id, email, username, name, role };
+    } else {
+      // HANDLE EXPERT ALSO
+      const admin = await this.getAdminById(userId);
+      if (!admin) return null;
+      const { username } = admin;
+      const id = admin.id!;
+      return { id, username, role: "ADMIN" };
+    }
   };
 }
