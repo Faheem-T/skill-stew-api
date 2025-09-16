@@ -1,3 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,10 +33,15 @@ spec:
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d/init.sql
               subPath: init.sql
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
       volumes:
         - name: init-script
           configMap:
             name: pg-init-script
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
 ---
 apiVersion: v1
 kind: Service

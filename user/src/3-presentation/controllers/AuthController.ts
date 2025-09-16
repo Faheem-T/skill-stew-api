@@ -10,7 +10,7 @@ import {
   adminLoginSchema,
   createAdminSchema,
 } from "../validators/AdminValidator";
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus, UserRoles } from "@skillstew/common";
 import { DomainValidationError } from "../../0-domain/errors/DomainValidationError";
 import { ENV } from "../../utils/dotenv";
 import { GoogleAuthError } from "../../1-application/errors/GoogleAuthErrors";
@@ -22,7 +22,16 @@ export class AuthController {
   registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email } = registerSchema.parse(req.body);
-      await this._authUsecases.registerUser(email);
+      const result = await this._authUsecases.registerUser(email);
+
+      if (!result.success) {
+        const { userAlreadyExists, userVerified } = result;
+        res
+          .status(400)
+          .json({ success: false, userAlreadyExists, userVerified });
+        return;
+      }
+
       await this._authUsecases.sendVerificationLinkToEmail(email);
       res
         .status(201)
@@ -48,7 +57,7 @@ export class AuthController {
       if (err instanceof DomainValidationError) {
         res
           .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: "User is already verified" });
+          .json({ success: false, message: err.message });
         return;
       }
       next(err);
@@ -216,6 +225,17 @@ export class AuthController {
           .json({ success: false, message: err.message, error: err.code });
         return;
       }
+      next(err);
+    }
+  };
+
+  me = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.headers["x-user-id"] as string;
+      const role = req.headers["x-user-role"] as UserRoles;
+      const profile = await this._authUsecases.getProfile(userId, role);
+      res.status(HttpStatus.OK).json({ success: true, data: profile });
+    } catch (err) {
       next(err);
     }
   };
