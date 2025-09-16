@@ -26,4 +26,18 @@ export class AdminRepository implements IAdminRepository {
       throw new DatabaseError(err);
     }
   };
+  getAdminById = async (id: string): Promise<Admin | null> => {
+    try {
+      const [foundAdmin] = await db
+        .select()
+        .from(adminSchema)
+        .where(eq(adminSchema.id, id));
+      if (!foundAdmin) {
+        return null;
+      }
+      return AdminMapper.toDomain(foundAdmin);
+    } catch (err) {
+      throw new DatabaseError(err);
+    }
+  };
 }

@@ -1,9 +1,13 @@
+import { UserRoles } from "@skillstew/common";
 import type { PresentationUser } from "../dtos/GetAllUsersDTO";
+import type { GetProfileOutputDTO } from "../dtos/GetProfileDTO";
+import { Admin } from "../../0-domain/entities/Admin";
+import { RegisterOutputDTO } from "../dtos/RegisterDTO";
 
 export interface IAuthUsecases {
   getUserById(id: string): Promise<PresentationUser | null>;
   getUserByEmail(email: string): Promise<PresentationUser | null>;
-  registerUser(email: string): Promise<void>;
+  registerUser(email: string): Promise<RegisterOutputDTO>;
   sendVerificationLinkToEmail(email: string): Promise<void>;
   verifyUserAndSetPassword(params: {
     token: string;
@@ -22,4 +26,6 @@ export interface IAuthUsecases {
   googleAuth(
     credential: string,
   ): Promise<{ refreshToken: string; accessToken: string }>;
+  getAdminById(id: string): Promise<Admin | null>;
+  getProfile(userId: string, role: UserRoles): Promise<GetProfileOutputDTO>;
 }
