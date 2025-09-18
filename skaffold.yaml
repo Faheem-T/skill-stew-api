@@ -36,3 +36,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: faheem222/es-proxy
+      context: ./es-proxy
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
