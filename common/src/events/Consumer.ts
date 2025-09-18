@@ -8,16 +8,15 @@ import {
 } from "../errors/MessageQueueErrors";
 import z from "zod";
 
-type EventHandler<T extends EventName> = (event: AppEvent<T>) => Promise<HandlerResult>;
+type EventHandler<T extends EventName> = (
+  event: AppEvent<T>,
+) => Promise<HandlerResult>;
 
 export class Consumer {
   private _channel!: Channel;
   private _exchange!: string;
   private _initialized: boolean = false;
-  private _handlers = new Map<
-    EventName,
-  EventHandler<EventName>
-  >();
+  private _handlers = new Map<EventName, EventHandler<EventName>>();
   constructor() {}
 
   init = async (
@@ -61,7 +60,7 @@ export class Consumer {
     }
     const parseResult = schema.safeParse(event.data);
     if (!parseResult.success) {
-      this._channel.nack(msg);
+      this._channel.ack(msg);
       const error = z.prettifyError(parseResult.error);
       throw new InvalidEventPayloadError(eventName, error);
     }
