@@ -3,10 +3,8 @@ import { EventName, EventSchemas } from "./EventMap";
 import { AnyAppEvent, AppEvent } from "./AppEvent";
 import {
   ConsumerUsedBeforeInitializationError,
-  InvalidEventPayloadError,
   UnknownEventError,
 } from "../errors/MessageQueueErrors";
-import z from "zod";
 
 type EventHandler<T extends EventName> = (
   event: AppEvent<T>,
@@ -60,9 +58,8 @@ export class Consumer {
     }
     const parseResult = schema.safeParse(event.data);
     if (!parseResult.success) {
-      this._channel.ack(msg);
-      const error = z.prettifyError(parseResult.error);
-      throw new InvalidEventPayloadError(eventName, error);
+      this._channel.nack(msg, false, false);
+      return;
     }
 
     // create typed app event
