@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-depl
+  name: es-proxy-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user
+      app: es-proxy
   template:
     metadata:
       labels:
-        app: user
+        app: es-proxy
     spec:
       initContainers:
         - name: wait-for-dependencies
@@ -19,14 +19,14 @@ spec:
             [
               "sh",
               "-c",
-              "timeout 60 sh -c 'until nc -z pg-srv 5432; do echo waiting for db; sleep 2; done && until nc -z my-rabbit 5672; do echo waiting for rabbitmq; sleep 2; done'",
+              "timeout 60 sh -c 'until nc -z my-rabbit 5672; do echo waiting for rabbitmq; sleep 2; done'",
             ]
       containers:
-        - name: user
-          image: faheem222/user
+        - name: es-proxy
+          image: faheem222/es-proxy
           envFrom:
             - configMapRef:
-                name: user-config
+                name: es-proxy-config
           env:
             - name: RABBITMQ_USER
               valueFrom:
@@ -43,12 +43,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-srv
+  name: es-proxy-srv
 spec:
   selector:
-    app: user
+    app: es-proxy
   ports:
-    - name: user
+    - name: es-proxy
       protocol: TCP
       port: 3000
       targetPort: 3000

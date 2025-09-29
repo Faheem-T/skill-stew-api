@@ -99,6 +99,9 @@ export class AuthUsecases implements IAuthUsecases {
     user.isVerified = true;
     user.passwordHash = this._hasherService.hash(password);
     await this._userRepo.save(user);
+    this._messageProducer.publish(
+      CreateEvent("user.verified", { id: user.id! }, "user-service"),
+    );
   };
 
   loginUser = async ({
