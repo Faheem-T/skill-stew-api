@@ -11,7 +11,6 @@ router.post("/login", authController.login);
 router.post("/refresh", authController.refresh);
 router.post("/google-auth", authController.googleAuth);
 router.get("/me", authController.me);
-router.post("/logout", authController.logout);
 
 // admin auth routes
 router.post("/admin/create", authController.createAdmin);

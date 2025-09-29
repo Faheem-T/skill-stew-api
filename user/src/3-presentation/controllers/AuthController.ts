@@ -239,13 +239,4 @@ export class AuthController {
       next(err);
     }
   };
-
-  logout = async (_req: Request, res: Response, next: NextFunction) => {
-    try {
-      res.clearCookie("refreshToken");
-      res.status(HttpStatus.OK).json({ success: true });
-    } catch (err) {
-      next(err);
-    }
-  };
 }
