@@ -8,7 +8,7 @@ import { db } from "../../start";
 import { decodeCursor, encodeCursor } from "../../utils/dbCursor";
 import { DatabaseError } from "../errors/DatabaseError";
 import { UserMapper } from "../mappers/UserMapper";
-import { userSchema } from "./schemas/userSchema";
+import { userSchema } from "../db/schemas/userSchema";
 import { and, eq, ilike, gt, or } from "drizzle-orm";
 
 export class UserRepository implements IUserRepository {

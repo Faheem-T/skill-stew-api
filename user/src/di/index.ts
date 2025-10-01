@@ -1,11 +1,11 @@
 import { AuthController } from "../presentation/controllers/AuthController";
 import { AuthUsecases } from "../application/AuthUsecases";
-import { UserRepository } from "../infrastructure/db/UserRepository";
+import { UserRepository } from "../infrastructure/repositories/UserRepository";
 import { EmailService } from "../infrastructure/services/EmailService";
 import { JwtService } from "../infrastructure/services/JwtService";
 import { BcryptHasher } from "../infrastructure/services/HashService";
 import { ENV } from "../utils/dotenv";
-import { AdminRepository } from "../infrastructure/db/AdminRepository";
+import { AdminRepository } from "../infrastructure/repositories/AdminRepository";
 import { UserUsecases } from "../application/UserUsecases";
 import { UserController } from "../presentation/controllers/UserController";
 import { Consumer, Producer } from "@skillstew/common";

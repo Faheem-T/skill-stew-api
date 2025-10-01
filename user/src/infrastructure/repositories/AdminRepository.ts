@@ -3,7 +3,7 @@ import { Admin } from "../../domain/entities/Admin";
 import { IAdminRepository } from "../../domain/repositories/IAdminRepository";
 import { db } from "../../start";
 import { AdminMapper } from "../mappers/AdminMapper";
-import { adminSchema } from "./schemas/adminSchema";
+import { adminSchema } from "../db/schemas/adminSchema";
 import { DatabaseError } from "../errors/DatabaseError";
 
 export class AdminRepository implements IAdminRepository {
