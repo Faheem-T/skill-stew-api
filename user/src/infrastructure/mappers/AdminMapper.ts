@@ -1,4 +1,4 @@
-import { Admin } from "../../0-domain/entities/Admin";
+import { Admin } from "../../domain/entities/Admin";
 import { AdminSchemaType } from "../db/schemas/adminSchema";
 
 export class AdminMapper {

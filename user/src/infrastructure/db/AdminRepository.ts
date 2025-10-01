@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { Admin } from "../../0-domain/entities/Admin";
-import { IAdminRepository } from "../../0-domain/repositories/IAdminRepository";
+import { Admin } from "../../domain/entities/Admin";
+import { IAdminRepository } from "../../domain/repositories/IAdminRepository";
 import { db } from "../../start";
 import { AdminMapper } from "../mappers/AdminMapper";
 import { adminSchema } from "./schemas/adminSchema";

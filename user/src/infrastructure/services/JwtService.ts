@@ -4,7 +4,7 @@ import {
   tokenBody,
   IJwtService,
   JWTPayload,
-} from "../../1-application/ports/IJwtService";
+} from "../../application/ports/IJwtService";
 import jwt, { JwtHeader } from "jsonwebtoken";
 import {
   AccessTokenVerifyError,
@@ -14,7 +14,7 @@ import {
   RefreshTokenVerifyError,
   TokenRoleMismatchError,
 } from "@skillstew/common";
-import { UserRoles } from "../../0-domain/entities/UserRoles";
+import { UserRoles } from "../../domain/entities/UserRoles";
 
 // type guard for user roles
 function isUserRole(role: string): role is UserRoles {

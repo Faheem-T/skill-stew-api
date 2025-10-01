@@ -5,7 +5,7 @@ import pg from "pg";
 import amqp from "amqplib";
 import { consumer, producer } from "./di";
 import { UserRegisteredEvent } from "@skillstew/common";
-import { logger } from "./3-presentation/logger";
+import { logger } from "./presentation/logger";
 
 const { Pool } = pg;
 

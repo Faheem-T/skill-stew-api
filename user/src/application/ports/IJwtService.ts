@@ -1,4 +1,4 @@
-import { UserRoles } from "../../0-domain/entities/UserRoles";
+import { UserRoles } from "../../domain/entities/UserRoles";
 
 export type tokenBody =
   | {

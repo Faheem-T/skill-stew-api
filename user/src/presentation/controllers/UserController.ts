@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express-serve-static-core";
 import { HttpStatus } from "@skillstew/common";
 import { IDSchema } from "../validators/IdValidator";
-import { UserFilters } from "../../0-domain/repositories/IUserRepository";
-import { IUserUsecases } from "../../1-application/interfaces/IUserUsecases";
+import { UserFilters } from "../../domain/repositories/IUserRepository";
+import { IUserUsecases } from "../../application/interfaces/IUserUsecases";
 
 export class UserController {
   constructor(private _userUsecases: IUserUsecases) {}
@@ -103,6 +103,18 @@ export class UserController {
       }
 
       res.status(HttpStatus.OK).json({ message: "User has been unblocked" });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  userProfileUpdate = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const data = req.body;
     } catch (err) {
       next(err);
     }

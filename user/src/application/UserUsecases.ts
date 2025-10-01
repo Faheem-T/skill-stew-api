@@ -1,5 +1,5 @@
-import { User } from "../0-domain/entities/User";
-import { IUserRepository } from "../0-domain/repositories/IUserRepository";
+import { User } from "../domain/entities/User";
+import { IUserRepository } from "../domain/repositories/IUserRepository";
 import { GetAllUsersInputDTO, PresentationUser } from "./dtos/GetAllUsersDTO";
 import { IUserUsecases } from "./interfaces/IUserUsecases";
 import { UserDTOMapper } from "./mappers/UserDTOMapper";

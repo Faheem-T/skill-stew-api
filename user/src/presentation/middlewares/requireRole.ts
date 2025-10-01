@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { UserRoles } from "../../0-domain/entities/UserRoles";
+import { UserRoles } from "../../domain/entities/UserRoles";
 import { HttpStatus } from "../../constants/HttpStatus";
 import { HttpMessages } from "../../constants/HTTPMessages";
 

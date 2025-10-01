@@ -1,5 +1,5 @@
-import { IEmailService } from "../../1-application/ports/IEmailService";
-import { logger } from "../../3-presentation/logger";
+import { IEmailService } from "../../application/ports/IEmailService";
+import { logger } from "../../presentation/logger";
 import { ENV } from "../../utils/dotenv";
 import nodemailer from "nodemailer";
 

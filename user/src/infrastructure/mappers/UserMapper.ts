@@ -1,4 +1,4 @@
-import { User } from "../../0-domain/entities/User";
+import { User } from "../../domain/entities/User";
 import { UserSchemaType } from "../db/schemas/userSchema";
 
 export class UserMapper {

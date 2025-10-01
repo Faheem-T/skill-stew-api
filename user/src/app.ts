@@ -1,11 +1,11 @@
 import express from "express";
-import { errorHandler } from "./3-presentation/middlewares/errorHandler";
-import authRouter from "./3-presentation/routers/AuthRouter";
+import { errorHandler } from "./presentation/middlewares/errorHandler";
+import authRouter from "./presentation/routers/AuthRouter";
 import morgan from "morgan";
 import cors from "cors";
-import userRouter from "./3-presentation/routers/UserRouter";
+import userRouter from "./presentation/routers/UserRouter";
 import cookieParser from "cookie-parser";
-import { httpLogger } from "./3-presentation/middlewares/httpLogger";
+import { httpLogger } from "./presentation/middlewares/httpLogger";
 
 const app = express();
 

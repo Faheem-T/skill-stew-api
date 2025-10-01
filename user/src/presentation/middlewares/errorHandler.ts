@@ -2,15 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import { PresentationError } from "../errors/PresentationError";
 import { PresentationErrorCodes } from "../errors/PresentationErrorCodes";
 import { ZodError } from "zod";
-import { UnauthorizedError } from "../../0-domain/errors/UnauthorizedError";
-import { UserAlreadyExistsError } from "../../0-domain/errors/UserAlreadyExistsError";
+import { UnauthorizedError } from "../../domain/errors/UnauthorizedError";
+import { UserAlreadyExistsError } from "../../domain/errors/UserAlreadyExistsError";
 import {
   EmailVerificationJwtVerifyError,
   HttpStatus,
   DomainError,
   InfrastructureError,
 } from "@skillstew/common";
-import { UserBlockedError } from "../../0-domain/errors/UserBlockedError";
+import { UserBlockedError } from "../../domain/errors/UserBlockedError";
 import { logger } from "../logger";
 
 export const errorHandler = (

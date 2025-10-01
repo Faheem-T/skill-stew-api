@@ -1,4 +1,4 @@
-import { UserFilters } from "../../0-domain/repositories/IUserRepository";
+import { UserFilters } from "../../domain/repositories/IUserRepository";
 
 export interface GetAllUsersInputDTO {
   limit: number;

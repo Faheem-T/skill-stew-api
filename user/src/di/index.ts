@@ -1,13 +1,13 @@
-import { AuthController } from "../3-presentation/controllers/AuthController";
-import { AuthUsecases } from "../1-application/AuthUsecases";
-import { UserRepository } from "../2-infrastructure/db/UserRepository";
-import { EmailService } from "../2-infrastructure/services/EmailService";
-import { JwtService } from "../2-infrastructure/services/JwtService";
-import { BcryptHasher } from "../2-infrastructure/services/HashService";
+import { AuthController } from "../presentation/controllers/AuthController";
+import { AuthUsecases } from "../application/AuthUsecases";
+import { UserRepository } from "../infrastructure/db/UserRepository";
+import { EmailService } from "../infrastructure/services/EmailService";
+import { JwtService } from "../infrastructure/services/JwtService";
+import { BcryptHasher } from "../infrastructure/services/HashService";
 import { ENV } from "../utils/dotenv";
-import { AdminRepository } from "../2-infrastructure/db/AdminRepository";
-import { UserUsecases } from "../1-application/UserUsecases";
-import { UserController } from "../3-presentation/controllers/UserController";
+import { AdminRepository } from "../infrastructure/db/AdminRepository";
+import { UserUsecases } from "../application/UserUsecases";
+import { UserController } from "../presentation/controllers/UserController";
 import { Consumer, Producer } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
 

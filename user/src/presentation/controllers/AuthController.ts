@@ -5,16 +5,16 @@ import {
   resendVerifyEmailSchema,
   verifyEmailSchema,
 } from "../validators/UserValidator";
-import { UnauthorizedError } from "../../0-domain/errors/UnauthorizedError";
+import { UnauthorizedError } from "../../domain/errors/UnauthorizedError";
 import {
   adminLoginSchema,
   createAdminSchema,
 } from "../validators/AdminValidator";
 import { HttpStatus, UserRoles } from "@skillstew/common";
-import { DomainValidationError } from "../../0-domain/errors/DomainValidationError";
+import { DomainValidationError } from "../../domain/errors/DomainValidationError";
 import { ENV } from "../../utils/dotenv";
-import { GoogleAuthError } from "../../1-application/errors/GoogleAuthErrors";
-import { IAuthUsecases } from "../../1-application/interfaces/IAuthUsecases";
+import { GoogleAuthError } from "../../application/errors/GoogleAuthErrors";
+import { IAuthUsecases } from "../../application/interfaces/IAuthUsecases";
 
 export class AuthController {
   constructor(private _authUsecases: IAuthUsecases) {}

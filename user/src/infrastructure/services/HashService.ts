@@ -1,5 +1,5 @@
 import { hashSync, genSaltSync, compareSync } from "bcrypt";
-import { IHasherService } from "../../1-application/ports/IHasherService";
+import { IHasherService } from "../../application/ports/IHasherService";
 
 export class BcryptHasher implements IHasherService {
   SALT_ROUNDS: number;

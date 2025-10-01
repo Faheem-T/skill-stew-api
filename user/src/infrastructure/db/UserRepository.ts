@@ -1,9 +1,9 @@
-import { User } from "../../0-domain/entities/User";
-import { UserAlreadyExistsError } from "../../0-domain/errors/UserAlreadyExistsError";
+import { User } from "../../domain/entities/User";
+import { UserAlreadyExistsError } from "../../domain/errors/UserAlreadyExistsError";
 import {
   IUserRepository,
   UserFilters,
-} from "../../0-domain/repositories/IUserRepository";
+} from "../../domain/repositories/IUserRepository";
 import { db } from "../../start";
 import { decodeCursor, encodeCursor } from "../../utils/dbCursor";
 import { DatabaseError } from "../errors/DatabaseError";

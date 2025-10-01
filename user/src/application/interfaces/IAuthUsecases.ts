@@ -1,7 +1,7 @@
 import { UserRoles } from "@skillstew/common";
 import type { PresentationUser } from "../dtos/GetAllUsersDTO";
 import type { GetProfileOutputDTO } from "../dtos/GetProfileDTO";
-import { Admin } from "../../0-domain/entities/Admin";
+import { Admin } from "../../domain/entities/Admin";
 import { RegisterOutputDTO } from "../dtos/RegisterDTO";
 
 export interface IAuthUsecases {
