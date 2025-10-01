@@ -37,7 +37,6 @@ export class ESClient {
       throw new Error("ES client is not initialized");
     }
     await this._es.index({ index, document, id });
-    // await this._es.indices.delete({ index });
   };
 
   search = async (index: (typeof this._indexes)[number]): Promise<User[]> => {
@@ -48,8 +47,35 @@ export class ESClient {
     return response.hits.hits.map((user) => user._source!);
   };
 
-  updateUser = async (id: string, doc: any) => {
+  updateUser = async (
+    id: string,
+    doc: any,
+    maxRetries = 5,
+    initialDelay = 50,
+  ) => {
+    let attempt = 0;
     const index: (typeof this._indexes)[number] = "users";
-    this._es.update({ id, index, doc });
+
+    while (attempt < maxRetries) {
+      try {
+        await this._es.update({ id, index, doc });
+        logger.info(`Update succeeded on attempt #${attempt}`);
+        return;
+      } catch (err: any) {
+        if (err.meta?.status === 404) {
+          attempt++;
+          if (attempt >= maxRetries) {
+            logger.error(`Update failed after ${maxRetries} attempts`);
+            throw err;
+          }
+
+          const delay = initialDelay * Math.pow(2, attempt - 1);
+          logger.warn(`Doc not found. Retrying in ${delay} ms`);
+          await new Promise((res) => {
+            setTimeout(res, delay);
+          });
+        }
+      }
+    }
   };
 }
