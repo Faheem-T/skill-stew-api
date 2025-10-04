@@ -52,9 +52,8 @@ export class AuthUsecases implements IAuthUsecases {
     if (existingUser) {
       return { success: false, userAlreadyExists: true };
     }
-    const user = new User({ email, isGoogleLogin: false });
-
-    user.passwordHash = this._hasherService.hash(password);
+    const passwordHash = this._hasherService.hash(password);
+    const user = new User({ email, isGoogleLogin: false, passwordHash });
 
     const savedUser = await this._userRepo.save(user);
     const event = CreateEvent(

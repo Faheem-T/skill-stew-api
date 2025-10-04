@@ -22,14 +22,21 @@ export class UserMapper {
       created_at,
       updated_at,
     } = raw;
-    const user = new User({ email, id, isGoogleLogin: is_google_login });
+
+    const user = is_google_login
+      ? new User({ email, id, isGoogleLogin: is_google_login })
+      : new User({
+          email,
+          id,
+          isGoogleLogin: is_google_login,
+          passwordHash: password_hash!,
+        });
     if (username) user.username = username;
     if (name) user.name = name;
     if (timezone) user.timezone = timezone;
     user.languages = languages;
     user.socialLinks = social_links;
     if (phone_number) user.phoneNumber = phone_number;
-    if (password_hash) user.passwordHash = password_hash;
     user.isVerified = is_verified;
     user.isSubscribed = is_subscribed;
     if (avatar_url) user.avatarUrl = avatar_url;

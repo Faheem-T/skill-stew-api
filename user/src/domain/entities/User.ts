@@ -29,26 +29,29 @@ export class User {
   createdAt?: Date;
   updatedAt?: Date;
 
-  constructor({
-    email,
-    id,
-    isGoogleLogin,
-  }: {
-    email: string;
-    id?: string;
-    isGoogleLogin: boolean;
-  }) {
-    if (id) {
-      this.id = id;
+  constructor(
+    user: {
+      email: string;
+      id?: string;
+    } & (
+      | { isGoogleLogin: true }
+      | { isGoogleLogin: false; passwordHash: string }
+    ),
+  ) {
+    if (user.id) {
+      this.id = user.id;
     }
-    this.email = email;
+    this.email = user.email;
     this.role = "USER";
     this.isVerified = false;
     this.isSubscribed = false;
     this.socialLinks = [];
     this.languages = [];
     this.isBlocked = false;
-    this.isGoogleLogin = isGoogleLogin;
+    this.isGoogleLogin = user.isGoogleLogin;
+    if (!user.isGoogleLogin) {
+      this.passwordHash = user.passwordHash;
+    }
   }
 
   // setExpert() {

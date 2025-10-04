@@ -8,8 +8,12 @@ export class UserUsecases implements IUserUsecases {
   constructor(private _userRepo: IUserRepository) {}
 
   createDummyUsers = async () => {
-    for (const { email, isGoogleLogin, isVerified } of dummyUsers) {
-      const newUser = new User({ email, isGoogleLogin });
+    for (const { email, isVerified } of dummyUsers) {
+      const newUser = new User({
+        email,
+        isGoogleLogin: false,
+        passwordHash: "password",
+      });
       if (isVerified) {
         newUser.isVerified = true;
       }
@@ -44,11 +48,9 @@ export class UserUsecases implements IUserUsecases {
 const dummyUsers: {
   email: string;
   role: "USER";
-  isGoogleLogin: boolean;
   isVerified: boolean;
 }[] = Array.from({ length: 100 }, (_, i) => ({
   email: `anotheruser${i + 1}@example.com`,
   role: "USER",
-  isGoogleLogin: Math.random() > 0.5,
   isVerified: Math.random() > 0.5,
 }));
