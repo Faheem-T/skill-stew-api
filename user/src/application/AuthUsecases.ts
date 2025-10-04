@@ -112,10 +112,7 @@ export class AuthUsecases implements IAuthUsecases {
     if (user.isGoogleLogin) {
       throw new GoogleAuthError("GOOGLE_ACCOUNT_EXISTS");
     }
-    if (!user.isVerified || !user.passwordHash) {
-      throw new UserNotVerifiedError();
-    }
-    if (!this._hasherService.compare(password, user.passwordHash)) {
+    if (!this._hasherService.compare(password, user.passwordHash!)) {
       throw new WrongPasswordError();
     }
     if (user.isBlocked) {
