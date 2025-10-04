@@ -5,7 +5,7 @@ const router = Router();
 
 // /api/v1/auth
 router.post("/register", authController.registerUser);
-router.post("/set-password", authController.setPasswordAndVerify);
+router.post("/verify", authController.verify);
 router.post("/resend-verification-link", authController.resendVerifyLink);
 router.post("/login", authController.login);
 router.post("/refresh", authController.refresh);

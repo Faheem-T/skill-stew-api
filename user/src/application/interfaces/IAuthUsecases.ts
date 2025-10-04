@@ -9,10 +9,7 @@ export interface IAuthUsecases {
   getUserByEmail(email: string): Promise<PresentationUser | null>;
   registerUser(email: string, password: string): Promise<RegisterOutputDTO>;
   sendVerificationLinkToEmail(email: string): Promise<void>;
-  verifyUserAndSetPassword(params: {
-    token: string;
-    password: string;
-  }): Promise<void>;
+  verifyUser(params: { token: string }): Promise<void>;
   loginUser(params: {
     email: string;
     password: string;

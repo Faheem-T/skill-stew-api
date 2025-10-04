@@ -26,31 +26,29 @@ export class AuthController {
 
       if (!result.success) {
         const { userAlreadyExists } = result;
-        res.status(400).json({ success: false, userAlreadyExists });
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, userAlreadyExists });
         return;
       }
 
       await this._authUsecases.sendVerificationLinkToEmail(email);
 
       res
-        .status(201)
+        .status(HttpStatus.CREATED)
         .json({ success: true, message: "User registered successfully" });
     } catch (err) {
       next(err);
     }
   };
 
-  setPasswordAndVerify = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
+  verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const result = verifyEmailSchema.parse(req.body);
-      await this._authUsecases.verifyUserAndSetPassword(result);
-      res.status(200).json({
+      await this._authUsecases.verifyUser(result);
+      res.status(HttpStatus.OK).json({
         success: true,
-        message: "User has been verified and password has been set",
+        message: "User has been verified.",
       });
     } catch (err) {
       if (err instanceof DomainValidationError) {
@@ -72,7 +70,9 @@ export class AuthController {
       const { email } = resendVerifyEmailSchema.parse(req.body);
 
       await this._authUsecases.sendVerificationLinkToEmail(email);
-      res.status(200).json({ success: true, message: "Email has been resent" });
+      res
+        .status(HttpStatus.OK)
+        .json({ success: true, message: "Email has been resent" });
     } catch (err) {
       next(err);
     }
@@ -93,7 +93,7 @@ export class AuthController {
       const { refreshToken, accessToken } = tokens;
 
       res
-        .status(200)
+        .status(HttpStatus.OK)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
@@ -127,7 +127,7 @@ export class AuthController {
         throw new UnauthorizedError();
       }
       const accessToken = this._authUsecases.refresh({ refreshToken });
-      res.status(200).json({ success: true, data: { accessToken } });
+      res.status(HttpStatus.OK).json({ success: true, data: { accessToken } });
     } catch (err) {
       next(err);
     }

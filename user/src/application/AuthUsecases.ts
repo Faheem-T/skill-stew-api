@@ -81,13 +81,7 @@ export class AuthUsecases implements IAuthUsecases {
     await this._emailService.sendVerificationLinkToEmail(email, jwt);
   };
 
-  verifyUserAndSetPassword = async ({
-    token,
-    password,
-  }: {
-    token: string;
-    password: string;
-  }) => {
+  verifyUser = async ({ token }: { token: string }) => {
     const payload = this._jwtService.verifyEmailVerificationJwt(token);
     const email = payload.email;
     const user = await this._userRepo.getUserByEmail(email);
@@ -98,7 +92,6 @@ export class AuthUsecases implements IAuthUsecases {
       throw new DomainValidationError("USER_ALREADY_VERIFIED");
     }
     user.isVerified = true;
-    user.passwordHash = this._hasherService.hash(password);
     await this._userRepo.save(user);
     this._messageProducer.publish(
       CreateEvent("user.verified", { id: user.id! }, "user-service"),

@@ -4,7 +4,6 @@ import { passwordSchema } from "./PasswordValidator";
 
 export const verifyEmailSchema = z.object({
   token: z.string(),
-  password: passwordSchema,
 });
 
 export const resendVerifyEmailSchema = z.object({
