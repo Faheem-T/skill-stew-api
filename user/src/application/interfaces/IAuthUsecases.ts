@@ -7,7 +7,7 @@ import { RegisterOutputDTO } from "../dtos/RegisterDTO";
 export interface IAuthUsecases {
   getUserById(id: string): Promise<PresentationUser | null>;
   getUserByEmail(email: string): Promise<PresentationUser | null>;
-  registerUser(email: string): Promise<RegisterOutputDTO>;
+  registerUser(email: string, password: string): Promise<RegisterOutputDTO>;
   sendVerificationLinkToEmail(email: string): Promise<void>;
   verifyUserAndSetPassword(params: {
     token: string;

@@ -21,21 +21,20 @@ export class AuthController {
 
   registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email } = registerSchema.parse(req.body);
-      const result = await this._authUsecases.registerUser(email);
+      const { email, password } = registerSchema.parse(req.body);
+      const result = await this._authUsecases.registerUser(email, password);
 
       if (!result.success) {
-        const { userAlreadyExists, userVerified } = result;
-        res
-          .status(400)
-          .json({ success: false, userAlreadyExists, userVerified });
+        const { userAlreadyExists } = result;
+        res.status(400).json({ success: false, userAlreadyExists });
         return;
       }
 
       await this._authUsecases.sendVerificationLinkToEmail(email);
+
       res
         .status(201)
-        .json({ success: true, message: "Link has been sent to email" });
+        .json({ success: true, message: "User registered successfully" });
     } catch (err) {
       next(err);
     }

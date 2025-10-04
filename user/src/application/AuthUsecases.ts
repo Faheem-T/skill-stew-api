@@ -44,16 +44,18 @@ export class AuthUsecases implements IAuthUsecases {
     return UserDTOMapper.toPresentation(user);
   };
 
-  registerUser = async (email: string): Promise<RegisterOutputDTO> => {
+  registerUser = async (
+    email: string,
+    password: string,
+  ): Promise<RegisterOutputDTO> => {
     const existingUser = await this._userRepo.getUserByEmail(email);
     if (existingUser) {
-      if (existingUser.isVerified) {
-        return { success: false, userAlreadyExists: true, userVerified: true };
-      } else {
-        return { success: false, userAlreadyExists: true, userVerified: false };
-      }
+      return { success: false, userAlreadyExists: true };
     }
     const user = new User({ email, isGoogleLogin: false });
+
+    user.passwordHash = this._hasherService.hash(password);
+
     const savedUser = await this._userRepo.save(user);
     const event = CreateEvent(
       "user.registered",

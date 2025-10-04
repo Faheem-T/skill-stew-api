@@ -18,4 +18,5 @@ export const loginSchema = z.object({
 
 export const registerSchema = z.object({
   email: z.string().email(PresentationErrorCodes.INVALID_EMAIL_FORMAT_ERROR),
+  password: passwordSchema,
 });

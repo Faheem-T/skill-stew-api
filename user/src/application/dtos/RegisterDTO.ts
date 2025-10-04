@@ -5,5 +5,4 @@ export type RegisterOutputDTO =
   | {
       success: false;
       userAlreadyExists: boolean;
-      userVerified: boolean;
     };
