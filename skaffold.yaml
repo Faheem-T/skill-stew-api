@@ -44,3 +44,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: faheem222/skill
+      context: ./skill
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .

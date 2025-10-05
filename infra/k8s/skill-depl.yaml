@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skill-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skill
+  template:
+    metadata:
+      labels:
+        app: skill
+    spec:
+      containers:
+        - name: skill
+          image: faheem222/skill
+          envFrom:
+            - configMapRef:
+                name: skill-config
+          env:
+            - name: RABBITMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: my-rabbit-default-user # created by operator
+                  key: username
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-rabbit-default-user # created by operator
+                  key: password
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: skill-srv
+spec:
+  selector:
+    app: skill
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
