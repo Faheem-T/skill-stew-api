@@ -23,6 +23,11 @@ const ServiceConfigs = [
     url: ENV.PAYMENTS_SERVICE_URL,
     name: "payments-service",
   },
+  {
+    path: "/api/v1/skills",
+    url: ENV.SKILL_SERVICE_URL,
+    name: "skill-service",
+  },
 ];
 
 app.use(authMiddleware);
