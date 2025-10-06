@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { v7 as uuidv7 } from "uuid";
 
 const skillStatuses = ["Pending", "Approved", "Rejected"] as const;
 
@@ -21,6 +22,10 @@ interface SkillModel extends mongoose.Model<SkillDoc> {
 }
 
 const skillSchema = new mongoose.Schema<SkillDoc>({
+  _id: {
+    type: String,
+    default: uuidv7,
+  },
   name: {
     type: String,
     required: true,
