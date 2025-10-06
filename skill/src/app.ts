@@ -16,9 +16,9 @@ app.use(httpLogger);
 
 app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
 
-app.use(errorHandler);
-
 // Routes
 app.use("/api/v1/skills", skillRouter);
+
+app.use(errorHandler);
 
 export { app };
