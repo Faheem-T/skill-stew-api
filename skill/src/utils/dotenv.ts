@@ -1,4 +1,4 @@
-const envVars = ["PORT"] as const;
+const envVars = ["PORT", "DATABASE_URL"] as const;
 
 export function generateEnvVars() {
   return envVars.reduce(
