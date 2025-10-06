@@ -1,6 +1,7 @@
 import { Skill } from "../entities/Skill";
 import { ISkillRepository } from "../interfaces/repository-interfaces/ISkillRepository";
 import { SkillAttr, SkillDoc, SkillModel } from "../models/skillModel";
+import mongoose from "mongoose";
 
 export class SkillRepository implements ISkillRepository {
   save = async (skill: Skill): Promise<Skill> => {
@@ -8,6 +9,12 @@ export class SkillRepository implements ISkillRepository {
     const newSkill = SkillModel.build(attrs);
     const savedSkill = await newSkill.save();
     return SkillRepository.toDomain(savedSkill);
+  };
+
+  getById = async (id: string): Promise<Skill | null> => {
+    const doc = await SkillModel.findById(id);
+    if (!doc) return null;
+    return SkillRepository.toDomain(doc);
   };
 
   private static toPersistence = (skill: Skill): SkillAttr => {
