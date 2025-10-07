@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: skill-seed
+spec:
+  template:
+    spec:
+      containers:
+        - name: skill
+          image: faheem222/skill
+          envFrom:
+            - configMapRef:
+                name: skill-config
+          command: ["npm", "run", "seed"]
+      restartPolicy: Never
+  backoffLimit: 2
