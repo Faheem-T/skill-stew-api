@@ -17,7 +17,7 @@ export class ESClient {
         await this._es.indices.create({ index });
       } catch (err) {
         const e = err as any;
-        if (e.meta.body.error.type === "resource_already_exists_exception") {
+        if (e.meta?.body?.error?.type === "resource_already_exists_exception") {
           logger.info("Index not created as it already exists");
         } else {
           logger.error(e);
