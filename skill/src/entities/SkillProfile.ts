@@ -10,7 +10,7 @@ type SkillProficiency = (typeof skillProficiencies)[number];
 
 interface OfferedSkill {
   skillId: string;
-  level: SkillProficiency;
+  proficiency: SkillProficiency;
   hoursTaught: number;
 }
 

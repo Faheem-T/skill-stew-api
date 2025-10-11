@@ -1,23 +1,22 @@
 import { Skill } from "../entities/Skill";
 import { ISkillRepository } from "../interfaces/repository-interfaces/ISkillRepository";
 import { SkillAttr, SkillDoc, SkillModel } from "../models/skillModel";
-import mongoose from "mongoose";
 
 export class SkillRepository implements ISkillRepository {
   save = async (skill: Skill): Promise<Skill> => {
-    const attrs = SkillRepository.toPersistence(skill);
+    const attrs = this.toPersistence(skill);
     const newSkill = SkillModel.build(attrs);
     const savedSkill = await newSkill.save();
-    return SkillRepository.toDomain(savedSkill);
+    return this.toDomain(savedSkill);
   };
 
   getById = async (id: string): Promise<Skill | null> => {
     const doc = await SkillModel.findById(id);
     if (!doc) return null;
-    return SkillRepository.toDomain(doc);
+    return this.toDomain(doc);
   };
 
-  private static toPersistence = (skill: Skill): SkillAttr => {
+  private toPersistence = (skill: Skill): SkillAttr => {
     const {
       id,
       name,
@@ -39,7 +38,7 @@ export class SkillRepository implements ISkillRepository {
     };
   };
 
-  private static toDomain = (doc: SkillDoc): Skill => {
+  private toDomain = (doc: SkillDoc): Skill => {
     const { _id, name, description, alternateNames, status, category } = doc;
     return new Skill({
       id: _id,

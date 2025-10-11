@@ -21,13 +21,13 @@ interface WantedSkill {
   hoursLearned: number;
 }
 
-interface SkillProfileAttr {
+export interface SkillProfileAttr {
   _id: string;
   offered: OfferedSkill[];
   wanted: WantedSkill[];
 }
 
-type SkillProfileDoc = SkillProfileAttr & mongoose.Document;
+export type SkillProfileDoc = SkillProfileAttr & mongoose.Document;
 
 interface SkillProfileModel extends mongoose.Model<SkillProfileDoc> {
   build: (attr: SkillProfileAttr) => SkillProfileDoc;
