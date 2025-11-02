@@ -1,4 +1,4 @@
-const skillProficiencies = [
+export const skillProficiencies = [
   "Beginner",
   "Advanced Beginner",
   "Intermediate",
@@ -11,15 +11,18 @@ type SkillProficiency = (typeof skillProficiencies)[number];
 interface OfferedSkill {
   skillId: string;
   proficiency: SkillProficiency;
-  hoursTaught: number;
+  hoursTaught?: number;
 }
 
 interface WantedSkill {
   skillId: string;
-  hoursLearned: number;
+  hoursLearned?: number;
 }
 
 export class SkillProfile {
+  createdAt?: Date;
+  updatedAt?: Date;
+
   constructor(
     public id: string,
     public offered: OfferedSkill[],
