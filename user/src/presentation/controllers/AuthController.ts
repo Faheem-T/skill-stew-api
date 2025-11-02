@@ -34,9 +34,20 @@ export class AuthController {
 
       await this._authUsecases.sendVerificationLinkToEmail(email);
 
+      const { accessToken, refreshToken } = result;
+
       res
         .status(HttpStatus.CREATED)
-        .json({ success: true, message: "User registered successfully" });
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: ENV.NODE_ENV === "production",
+          sameSite: "none",
+        })
+        .json({
+          success: true,
+          message: "User registered successfully",
+          data: { accessToken },
+        });
     } catch (err) {
       next(err);
     }

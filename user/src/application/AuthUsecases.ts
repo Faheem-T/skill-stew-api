@@ -65,7 +65,28 @@ export class AuthUsecases implements IAuthUsecases {
       "user",
     );
     this._messageProducer.publish(event);
-    return { success: true };
+
+    const userId = savedUser.id!;
+    const role = savedUser.role;
+
+    const refreshToken = this._jwtService.generateRefreshToken(
+      {
+        email,
+        role,
+        userId,
+      },
+      role,
+    );
+    const accessToken = this._jwtService.generateAccessToken(
+      {
+        email,
+        role,
+        userId,
+      },
+      role,
+    );
+
+    return { refreshToken, accessToken, success: true };
   };
 
   sendVerificationLinkToEmail = async (email: string) => {
