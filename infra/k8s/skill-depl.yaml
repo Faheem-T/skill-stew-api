@@ -12,6 +12,15 @@ spec:
       labels:
         app: skill
     spec:
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "timeout 60 sh -c 'until nc -z mongo-srv 27017; do echo waiting for db; sleep 2; done'",
+            ]
       containers:
         - name: skill
           image: faheem222/skill

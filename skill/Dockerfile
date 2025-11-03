@@ -1,12 +1,9 @@
-FROM node:22-alpine
+FROM oven/bun:alpine
 
 WORKDIR /app
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 
-COPY package.json pnpm-lock.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+COPY package.json bun.lock ./
+RUN bun install
 COPY . .
 
-CMD ["sh", "-c", "pnpm start"]
+CMD ["sh", "-c", "bun run start"]

@@ -5,12 +5,21 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "timeout 60 sh -c 'until nc -z mongo-srv 27017; do echo waiting for db; sleep 2; done'",
+            ]
       containers:
         - name: skill
           image: faheem222/skill
           envFrom:
             - configMapRef:
                 name: skill-config
-          command: ["npm", "run", "seed"]
+          command: ["bun", "run", "seed"]
       restartPolicy: Never
   backoffLimit: 2

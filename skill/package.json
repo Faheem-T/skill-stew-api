@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "tsx watch --clear-screen=false --include './src/**/*.ts' ./src/start.ts",
-    "seed": "tsx ./src/config/seedSkillData.ts"
+    "start": "bun --watch --no-clear-screen ./src/start.ts",
+    "seed": "bun ./src/config/seedSkillData.ts",
+    "_start": "tsx watch --clear-screen=false --include './src/**/*.ts' ./src/start.ts",
+    "_seed": "tsx ./src/config/seedSkillData.ts"
   },
   "keywords": [],
   "author": "",
