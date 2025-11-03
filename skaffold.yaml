@@ -11,6 +11,7 @@ manifests:
 build:
   local:
     push: false
+    useBuildkit: true
   artifacts:
     - image: faheem222/user
       context: ./user

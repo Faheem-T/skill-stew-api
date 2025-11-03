@@ -1,8 +1,12 @@
 FROM node:22-alpine
 
 WORKDIR /app
-COPY package.json .
-RUN npm install
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
 
-CMD ["sh", "-c", "npm run syncDb && npm start"]
+CMD ["sh", "-c", "pnpm run syncDb && pnpm start"]
