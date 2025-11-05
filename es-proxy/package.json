@@ -21,6 +21,7 @@
     "@skillstew/common": "^1.0.22",
     "amqplib": "^0.10.9",
     "express": "^5.1.0",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "zod": "^4.1.12"
   }
 }

@@ -23,6 +23,9 @@ importers:
       winston:
         specifier: ^3.17.0
         version: 3.18.3
+      zod:
+        specifier: ^4.1.12
+        version: 4.1.12
     devDependencies:
       '@types/amqplib':
         specifier: ^0.10.7
