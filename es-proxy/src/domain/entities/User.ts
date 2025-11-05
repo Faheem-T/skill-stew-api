@@ -7,6 +7,9 @@ export class User {
   languages?: string[];
   isVerified?: boolean;
 
+  offeredSkills?: string[];
+  wantedSkills?: string[];
+
   constructor(id: string) {
     this.id = id;
   }
