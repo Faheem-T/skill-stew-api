@@ -25,17 +25,23 @@ export const INDEXES: { name: string; mappings: MappingTypeMapping }[] = [
 export const es = new Client({ node: ENV.ES_URL });
 
 export async function setupES() {
+  try {
+    await es.ping();
+    logger.info("✅ Connected to Elasticsearch");
+  } catch (err) {
+    logger.error("❌ Failed to connect to Elasticsearch", err);
+    throw err;
+  }
+
   for (const { name, mappings } of INDEXES) {
-    try {
+    logger.info(`Setting up index: ${name}`);
+    const exists = await es.indices.exists({ index: name });
+
+    if (!exists) {
       await es.indices.create({ index: name, mappings });
-    } catch (err) {
-      const e = err as any;
-      if (e.meta?.body?.error?.type === "resource_already_exists_exception") {
-        logger.info("Index not created as it already exists");
-      } else {
-        logger.error(e);
-        throw e;
-      }
+      logger.info(`✅ Created index: ${name}`);
+    } else {
+      logger.info(`ℹ️ Index already exists: ${name}`);
     }
   }
 }
