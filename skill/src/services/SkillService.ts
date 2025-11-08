@@ -1,10 +1,15 @@
+import { CreateEvent } from "@skillstew/common";
 import { CreateSkillDTO, SkillResponseDTO } from "../dtos/skill.dto";
 import { Skill } from "../entities/Skill";
 import { ISkillRepository } from "../interfaces/repository-interfaces/ISkillRepository";
 import { ISkillService } from "../interfaces/service-interfaces/ISkillService";
+import { IMessageProducer } from "../ports/IMessageProducer";
 
 export class SkillService implements ISkillService {
-  constructor(private _skillRepo: ISkillRepository) {}
+  constructor(
+    private _skillRepo: ISkillRepository,
+    private messageProducer: IMessageProducer,
+  ) {}
 
   createSkill = async ({
     name,
@@ -21,6 +26,8 @@ export class SkillService implements ISkillService {
       category,
     });
     const savedSkill = await this._skillRepo.save(skill);
+    const event = CreateEvent("skill.created", { ...savedSkill }, "skill");
+    this.messageProducer.publish(event);
     return {
       id: savedSkill.id,
       name: savedSkill.name,

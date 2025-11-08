@@ -91,7 +91,7 @@
 
     "@sindresorhus/merge-streams": ["@sindresorhus/merge-streams@2.3.0", "", {}, "sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg=="],
 
-    "@skillstew/common": ["@skillstew/common@1.0.23", "", { "dependencies": { "@types/express": "^5.0.3", "@types/jsonwebtoken": "^9.0.10", "amqplib": "^0.10.8", "del-cli": "^6.0.0", "express": "^5.1.0", "jsonwebtoken": "^9.0.2", "zod": "^4.0.10" } }, "sha512-HqjsjYRuey4pRPqXKHuoivI91sxustfoM1fpxzF5ozyGLUs1Gyp8a+/QsF48TvIyPJ+8KPAbGvJ8rkgyQPbQYQ=="],
+    "@skillstew/common": ["@skillstew/common@1.0.24", "", { "dependencies": { "@types/express": "^5.0.3", "@types/jsonwebtoken": "^9.0.10", "amqplib": "^0.10.8", "del-cli": "^6.0.0", "express": "^5.1.0", "jsonwebtoken": "^9.0.2", "zod": "^4.0.10" } }, "sha512-1JhwmuhN43ddFs9SHaI0bN1Qp+tySZ1GNB5jkaKidFPTPB68Fb4Eabu2JzUcQccRKepluZTjZkZODjE/KPXX5g=="],
 
     "@so-ric/colorspace": ["@so-ric/colorspace@1.1.6", "", { "dependencies": { "color": "^5.0.2", "text-hex": "1.0.x" } }, "sha512-/KiKkpHNOBgkFJwu9sh48LkHSMYGyuTcSFK/qMBdnOAlrRJzRSXAOFB5qwzaVQuDl8wAvHVMkaASQDReTahxuw=="],
 
@@ -317,7 +317,7 @@
 
     "mongodb-connection-string-url": ["mongodb-connection-string-url@3.0.2", "", { "dependencies": { "@types/whatwg-url": "^11.0.2", "whatwg-url": "^14.1.0 || ^13.0.0" } }, "sha512-rMO7CGo/9BFwyZABcKAWL8UJwH/Kc2x0g72uhDWzG48URRax5TCIcJ7Rc3RZqffZzO/Gwff/jyKwCU9TN8gehA=="],
 
-    "mongoose": ["mongoose@8.19.2", "", { "dependencies": { "bson": "^6.10.4", "kareem": "2.6.3", "mongodb": "~6.20.0", "mpath": "0.9.0", "mquery": "5.0.0", "ms": "2.1.3", "sift": "17.1.3" } }, "sha512-ww2T4dBV+suCbOfG5YPwj9pLCfUVyj8FEA1D3Ux1HHqutpLxGyOYEPU06iPRBW4cKr3PJfOSYsIpHWPTkz5zig=="],
+    "mongoose": ["mongoose@8.19.3", "", { "dependencies": { "bson": "^6.10.4", "kareem": "2.6.3", "mongodb": "~6.20.0", "mpath": "0.9.0", "mquery": "5.0.0", "ms": "2.1.3", "sift": "17.1.3" } }, "sha512-fTAGaIohkk8wCggMuBuqTVD4YrM1/J8cBr1ekqzFqtz65qkLjtX2dcy3NH1e+2rk2365dyrrsPAnt4YTxBhEiQ=="],
 
     "morgan": ["morgan@1.10.1", "", { "dependencies": { "basic-auth": "~2.0.1", "debug": "2.6.9", "depd": "~2.0.0", "on-finished": "~2.3.0", "on-headers": "~1.1.0" } }, "sha512-223dMRJtI/l25dJKWpgij2cMtywuG/WiUKXdvwfbhGKBhy1puASqXwFzmWZ7+K73vUPoR7SS2Qz2cI/g9MKw0A=="],
 

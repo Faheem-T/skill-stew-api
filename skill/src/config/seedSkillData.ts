@@ -4,6 +4,7 @@ import { readFile } from "fs/promises";
 import { logger } from "../utils/logger";
 import { Skill } from "../entities/Skill";
 import { SkillModel } from "../models/skillModel";
+import { CreateEvent, Producer } from "@skillstew/common";
 
 async function seedData() {
   try {
@@ -21,6 +22,12 @@ async function seedData() {
   });
   const data: Skill[] = JSON.parse(rawData);
   await SkillModel.insertMany(data);
+  const messageProducer = new Producer();
+  data.forEach((skill) => {
+    messageProducer.publish(
+      CreateEvent("skill.created", { ...skill }, "skill"),
+    );
+  });
   logger.info("Seeding complete.");
 }
 
