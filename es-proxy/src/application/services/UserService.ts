@@ -1,6 +1,10 @@
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
-import { SaveUserDTO, UpdateUserProfileDTO } from "../dtos/UserDTO";
+import {
+  SaveUserDTO,
+  UpdateUserProfileDTO,
+  UpdateUserSkillProfileDTO,
+} from "../dtos/UserDTO";
 import { IUserService } from "../interfaces/IUserService";
 
 export class UserService implements IUserService {
@@ -13,7 +17,7 @@ export class UserService implements IUserService {
   verifyUser = async (id: string): Promise<void> => {
     const user = new User(id);
     user.isVerified = true;
-    await this._userRepo.save(user);
+    await this._userRepo.update(user);
   };
 
   updateUserProfile = async (dto: UpdateUserProfileDTO): Promise<void> => {
@@ -25,6 +29,15 @@ export class UserService implements IUserService {
     user.location = location;
     user.languages = languages;
 
-    await this._userRepo.save(user);
+    await this._userRepo.update(user);
+  };
+  updateUserSkillProfile = async (
+    dto: UpdateUserSkillProfileDTO,
+  ): Promise<void> => {
+    const { id, offeredSkills, wantedSkills } = dto;
+    const user = new User(id);
+    user.offeredSkills = offeredSkills;
+    user.wantedSkills = wantedSkills;
+    await this._userRepo.update(user);
   };
 }

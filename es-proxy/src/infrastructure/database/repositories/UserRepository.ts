@@ -15,6 +15,16 @@ export class UserRepository implements IUserRepository {
     });
   };
 
+  update = async (user: User): Promise<void> => {
+    const document = this.toPersistance(user);
+    await this._es.update({
+      index: this._indexName,
+      id: document.id,
+      doc: document,
+      retry_on_conflict: 3,
+    });
+  };
+
   private toPersistance = (user: User) => {
     const location = user.location
       ? { lat: user.location.latitude, lon: user.location.longitude }

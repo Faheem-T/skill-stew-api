@@ -15,6 +15,8 @@ export async function startConsumer() {
   await consumer.init(channel, "stew_exchange", "es_proxy", [
     "user.registered",
     "user.verified",
+    "user.profileUpdated",
+    "skill.profileUpdated",
   ]);
   logger.info("Event consumer set up.");
 
@@ -27,7 +29,29 @@ export async function startConsumer() {
   consumer.registerHandler("user.verified", async (event) => {
     const { id } = event.data;
 
-    await userService.verifyUser(id);
+    try {
+      await userService.verifyUser(id);
+    } catch (err) {
+      logger.error(err);
+      return { success: false, retryable: true };
+    }
+
+    return { success: true };
+  });
+
+  consumer.registerHandler("user.profileUpdated", async (event) => {
+    await userService.updateUserProfile(event.data);
+    return { success: true };
+  });
+
+  consumer.registerHandler("skill.profileUpdated", async (event) => {
+    const { userId, offered, wanted } = event.data;
+
+    await userService.updateUserSkillProfile({
+      id: userId,
+      offeredSkills: offered,
+      wantedSkills: wanted,
+    });
 
     return { success: true };
   });
