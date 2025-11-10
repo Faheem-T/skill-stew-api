@@ -1,10 +1,8 @@
-import { DomainValidationError } from "../errors/DomainValidationError";
-import { UserRoles } from "./UserRoles";
+import { v7 as uuidv7 } from "uuid";
 
 export class User {
-  id?: string;
+  id: string;
   email: string;
-  // private _role: Extract<UserRoles, "USER" | "EXPERT">;
   role: "USER";
   name?: string;
   username?: string;
@@ -12,7 +10,8 @@ export class User {
 
   // Profile
   phoneNumber?: string;
-  avatarUrl?: string;
+  avatarKey?: string;
+  bannerKey?: string;
   timezone?: string;
   location?: IUserLocation;
   about?: string;
@@ -21,7 +20,6 @@ export class User {
   isVerified: boolean;
 
   isSubscribed: boolean;
-  // private _yearsOfExperience?: number; // only for experts
   isBlocked: boolean;
 
   isGoogleLogin: boolean;
@@ -38,9 +36,7 @@ export class User {
       | { isGoogleLogin: false; passwordHash: string }
     ),
   ) {
-    if (user.id) {
-      this.id = user.id;
-    }
+    this.id = user.id ?? uuidv7();
     this.email = user.email;
     this.role = "USER";
     this.isVerified = false;

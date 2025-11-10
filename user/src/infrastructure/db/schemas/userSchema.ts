@@ -1,15 +1,8 @@
-import {
-  pgTable,
-  text,
-  integer,
-  boolean,
-  uuid,
-  timestamp,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, uuid, timestamp } from "drizzle-orm/pg-core";
 import { InferSelectModel, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
-export const userSchema = pgTable("users", {
+export const userTable = pgTable("users", {
   id: uuid()
     .primaryKey()
     .$default(() => randomUUID()),
@@ -18,7 +11,8 @@ export const userSchema = pgTable("users", {
   email: text().unique().notNull(),
   password_hash: text(),
   phone_number: text(),
-  avatar_url: text(),
+  avatar_key: text(),
+  banner_key: text(),
   timezone: text(),
   about: text(),
   social_links: text()
@@ -30,7 +24,6 @@ export const userSchema = pgTable("users", {
     .notNull()
     .default(sql`ARRAY[]::text[]`),
   is_subscribed: boolean().default(false).notNull(),
-  // years_of_experience: integer(),
   is_verified: boolean().default(false).notNull(),
   is_blocked: boolean().default(false).notNull(),
   is_google_login: boolean().default(false).notNull(),
@@ -40,4 +33,4 @@ export const userSchema = pgTable("users", {
     .$onUpdate(() => new Date()),
 });
 
-export type UserSchemaType = InferSelectModel<typeof userSchema>;
+export type UserTableType = InferSelectModel<typeof userTable>;

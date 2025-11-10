@@ -1,8 +1,9 @@
 import { User } from "../../domain/entities/User";
-import { UserSchemaType } from "../db/schemas/userSchema";
+import { UserTableType } from "../db/schemas/userSchema";
+import { Mapper } from "./interfaces/Mapper";
 
-export class UserMapper {
-  static toDomain(raw: UserSchemaType): User {
+export class UserMapper implements Mapper<User, UserTableType> {
+  toDomain(raw: UserTableType): User {
     const {
       id,
       email,
@@ -15,7 +16,7 @@ export class UserMapper {
       languages,
       is_verified,
       is_subscribed,
-      avatar_url,
+      avatar_key,
       about,
       is_blocked,
       is_google_login,
@@ -39,7 +40,7 @@ export class UserMapper {
     if (phone_number) user.phoneNumber = phone_number;
     user.isVerified = is_verified;
     user.isSubscribed = is_subscribed;
-    if (avatar_url) user.avatarUrl = avatar_url;
+    if (avatar_key) user.avatarKey = avatar_key;
     if (about) user.about = about;
     if (is_blocked) user.isBlocked = true;
     if (created_at) user.createdAt = created_at;
@@ -47,13 +48,13 @@ export class UserMapper {
 
     return user;
   }
-  static toPersistence(
-    user: User,
-  ): UserSchemaType | Omit<UserSchemaType, "id"> {
-    const result: Omit<UserSchemaType, "id"> = {
+  toPersistence(user: User): UserTableType {
+    const result = {
+      id: user.id,
       email: user.email,
       about: user.about || null,
-      avatar_url: user.avatarUrl || null,
+      avatar_key: user.avatarKey || null,
+      banner_key: user.bannerKey || null,
       is_verified: user.isVerified,
       is_subscribed: user.isSubscribed,
       languages: user.languages,
@@ -68,9 +69,40 @@ export class UserMapper {
       created_at: user.createdAt ?? new Date(),
       updated_at: user.updatedAt ?? new Date(),
     };
-    if (user.id) {
-      return Object.assign({ id: user.id }, result);
-    }
+    return result;
+  }
+  toPersistencePartial(partial: Partial<User>): Partial<UserTableType> {
+    const result: Partial<UserTableType> = {};
+
+    if (partial.id !== undefined) result.id = partial.id;
+    if (partial.email !== undefined) result.email = partial.email;
+    if (partial.about !== undefined) result.about = partial.about ?? null;
+    if (partial.avatarKey !== undefined)
+      result.avatar_key = partial.avatarKey ?? null;
+    if (partial.bannerKey !== undefined)
+      result.banner_key = partial.bannerKey ?? null;
+    if (partial.isVerified !== undefined)
+      result.is_verified = partial.isVerified;
+    if (partial.isSubscribed !== undefined)
+      result.is_subscribed = partial.isSubscribed;
+    if (partial.languages !== undefined) result.languages = partial.languages;
+    if (partial.name !== undefined) result.name = partial.name ?? null;
+    if (partial.username !== undefined)
+      result.username = partial.username ?? null;
+    if (partial.passwordHash !== undefined)
+      result.password_hash = partial.passwordHash ?? null;
+    if (partial.phoneNumber !== undefined)
+      result.phone_number = partial.phoneNumber ?? null;
+    if (partial.socialLinks !== undefined)
+      result.social_links = partial.socialLinks;
+    if (partial.timezone !== undefined)
+      result.timezone = partial.timezone ?? null;
+    if (partial.isBlocked !== undefined) result.is_blocked = partial.isBlocked;
+    if (partial.isGoogleLogin !== undefined)
+      result.is_google_login = partial.isGoogleLogin;
+    if (partial.createdAt !== undefined) result.created_at = partial.createdAt;
+    if (partial.updatedAt !== undefined) result.updated_at = partial.updatedAt;
+
     return result;
   }
 }
