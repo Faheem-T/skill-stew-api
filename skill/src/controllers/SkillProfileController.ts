@@ -18,7 +18,11 @@ export class SkillProfileController {
 
       res
         .status(HttpStatus.OK)
-        .json({ id, wanted, offered, createdAt, updatedAt });
+        .json({
+          success: true,
+          message: "Skill profile updated",
+          data: { id, wanted, offered, createdAt, updatedAt },
+        });
     } catch (err) {
       next(err);
     }

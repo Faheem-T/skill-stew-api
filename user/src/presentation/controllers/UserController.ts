@@ -124,13 +124,11 @@ export class UserController {
           .json({ success: false, message: "User not found" });
         return;
       }
-      res
-        .status(HttpStatus.OK)
-        .json({
-          success: true,
-          message: "User profile updated",
-          data: { updatedUser },
-        });
+      res.status(HttpStatus.OK).json({
+        success: true,
+        message: "User profile updated",
+        data: updatedUser,
+      });
     } catch (err) {
       next(err);
     }
