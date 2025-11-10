@@ -1,17 +1,21 @@
-export interface UpdateProfileDTO {
-  id: string;
-  name?: string;
-  username?: string;
-  phoneNumber?: string;
-  avatarKey?: string;
-  timezone?: string;
-  location?: IUserLocation;
-  about?: string;
-  socialLinks?: string[];
-  languages?: string[];
-}
+import { z } from "zod";
 
-interface IUserLocation {
-  latitude: number;
-  longitude: number;
-}
+const userLocationSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+});
+
+export const updateProfileSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  username: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  avatarKey: z.string().optional(),
+  timezone: z.string().optional(),
+  location: userLocationSchema.optional(),
+  about: z.string().optional(),
+  socialLinks: z.array(z.string()).optional(),
+  languages: z.array(z.string()).optional(),
+});
+
+export type UpdateProfileDTO = z.infer<typeof updateProfileSchema>;
