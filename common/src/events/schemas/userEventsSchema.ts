@@ -11,10 +11,12 @@ export const userVerifiedSchema = z.object({
 
 export const userProfileUpdatedSchema = z.object({
   id: z.uuid(),
-  name: z.string(),
-  username: z.string(),
-  location: z.object({ latitude: z.number(), longitude: z.number() }),
-  languages: z.array(z.string()),
+  name: z.string().optional(),
+  username: z.string().optional(),
+  location: z
+    .object({ latitude: z.number(), longitude: z.number() })
+    .optional(),
+  languages: z.array(z.string()).optional(),
 });
 
 export const UserEventSchemas = {
