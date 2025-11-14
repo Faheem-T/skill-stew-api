@@ -4,13 +4,14 @@ import { PresentationUser } from "../dtos/GetAllUsersDTO";
 export class UserDTOMapper {
   static toPresentation(user: User): PresentationUser {
     return {
-      id: user.id!,
+      id: user.id,
       role: user.role,
       name: user.name,
       username: user.username,
       email: user.email,
       phone_number: user.phoneNumber,
-      avatar_url: user.avatarUrl,
+      avatar_key: user.avatarKey,
+      banner_key: user.bannerKey,
       timezone: user.timezone,
       about: user.about,
       social_links: user.socialLinks,

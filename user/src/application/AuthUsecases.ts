@@ -33,7 +33,7 @@ export class AuthUsecases implements IAuthUsecases {
   ) {}
 
   getUserById = async (id: string) => {
-    const user = await this._userRepo.getUserById(id);
+    const user = await this._userRepo.findById(id);
     if (!user) return null;
     return UserDTOMapper.toPresentation(user);
   };
@@ -55,7 +55,7 @@ export class AuthUsecases implements IAuthUsecases {
     const passwordHash = this._hasherService.hash(password);
     const user = new User({ email, isGoogleLogin: false, passwordHash });
 
-    const savedUser = await this._userRepo.save(user);
+    const savedUser = await this._userRepo.create(user);
     const event = CreateEvent(
       "user.registered",
       {
@@ -112,7 +112,7 @@ export class AuthUsecases implements IAuthUsecases {
       throw new DomainValidationError("USER_ALREADY_VERIFIED");
     }
     user.isVerified = true;
-    await this._userRepo.save(user);
+    await this._userRepo.update(user.id, user);
     this._messageProducer.publish(
       CreateEvent("user.verified", { id: user.id! }, "user-service"),
     );
@@ -240,16 +240,15 @@ export class AuthUsecases implements IAuthUsecases {
       // Handle new user
       const { name, picture } = payload;
       const newUser = new User({ email, isGoogleLogin: true });
-      newUser.avatarUrl = picture;
       newUser.name = name;
       newUser.isVerified = true;
 
-      user = await this._userRepo.save(newUser);
+      user = await this._userRepo.create(newUser);
 
       // emit event
       const event = CreateEvent(
         "user.registered",
-        { id: user.id!, email: user.email },
+        { id: user.id, email: user.email },
         "user-service",
       );
 

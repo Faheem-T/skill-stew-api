@@ -13,7 +13,8 @@ export interface PresentationUser {
   username: string | undefined;
   email: string;
   phone_number: string | undefined;
-  avatar_url: string | undefined;
+  avatar_key: string | undefined;
+  banner_key: string | undefined;
   timezone: string | undefined;
   about: string | undefined;
   social_links: string[];

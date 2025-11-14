@@ -1,10 +1,10 @@
-import { pgTable, uuid, serial, real } from "drizzle-orm/pg-core";
-import { userSchema } from "./userSchema";
+import { pgTable, uuid, real } from "drizzle-orm/pg-core";
+import { userTable } from "./userSchema";
 
 export const locationsSchema = pgTable("locations", {
-  id: serial().primaryKey(),
+  id: uuid().primaryKey(),
   user_id: uuid()
-    .references(() => userSchema.id)
+    .references(() => userTable.id)
     .notNull(),
   latitude: real().notNull(),
   longitude: real().notNull(),
