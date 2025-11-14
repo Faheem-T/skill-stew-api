@@ -2,41 +2,28 @@ import { Client } from "@elastic/elasticsearch";
 import { User } from "../../../domain/entities/User";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { BaseRepository } from "./BaseRepository";
-import { Mapper } from "../../mappers/interfaces/Mapper";
+import { UserMapper } from "../../mappers/UserMapper";
+
+export interface UserDoc {
+  id: string;
+
+  name?: string;
+  username?: string;
+  location?: { lat: number; lon: number };
+  languages?: string[];
+  isVerified?: boolean;
+
+  offeredSkills?: string[];
+  wantedSkills?: string[];
+}
 
 export class UserRepository
-  extends BaseRepository<User, any>
+  extends BaseRepository<User, UserDoc>
   implements IUserRepository
 {
   constructor(es: Client) {
     super("users", es);
   }
 
-  protected mapper: Mapper<User, any> = {
-    toPersistence(entity) {
-      const location = entity.location
-        ? { lat: entity.location.latitude, lon: entity.location.longitude }
-        : undefined;
-      return {
-        ...entity,
-        location,
-      };
-    },
-
-    toDomain(raw: any) {
-      const {} = raw;
-      const user = new User(raw.id);
-      return user;
-    },
-
-    toPersistencePartial(partial) {
-      const location = partial.location
-        ? { lat: partial.location.latitude, lon: partial.location.longitude }
-        : undefined;
-      return {
-        ...partial,
-        location,
-      };
-    },
-  };
+  protected mapper = new UserMapper();
 }

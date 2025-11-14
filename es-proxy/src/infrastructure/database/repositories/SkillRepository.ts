@@ -1,11 +1,17 @@
 import { Skill } from "../../../domain/entities/Skill";
 import { ISkillRepository } from "../../../domain/repositories/ISkillRepository";
-import { Mapper } from "../../mappers/interfaces/Mapper";
+import { SkillMapper } from "../../mappers/SkillMapper";
 import { BaseRepository } from "./BaseRepository";
 
+export interface SkillDoc {
+  id: string;
+  name: string;
+  alternateNames: string[];
+}
+
 export class SkillRepository
-  extends BaseRepository<Skill, any>
+  extends BaseRepository<Skill, SkillDoc>
   implements ISkillRepository
 {
-  protected mapper: Mapper<Skill, any>;
+  protected mapper = new SkillMapper();
 }
