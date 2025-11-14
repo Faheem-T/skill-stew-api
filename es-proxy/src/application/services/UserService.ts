@@ -9,15 +9,15 @@ import { IUserService } from "../interfaces/IUserService";
 
 export class UserService implements IUserService {
   constructor(private _userRepo: IUserRepository) {}
-  save = async (dto: SaveUserDTO): Promise<void> => {
+  create = async (dto: SaveUserDTO): Promise<void> => {
     const user = new User(dto.id);
-    await this._userRepo.save(user);
+    await this._userRepo.create(user.id, user);
   };
 
   verifyUser = async (id: string): Promise<void> => {
     const user = new User(id);
     user.isVerified = true;
-    await this._userRepo.update(user);
+    await this._userRepo.update(id, user);
   };
 
   updateUserProfile = async (dto: UpdateUserProfileDTO): Promise<void> => {
@@ -29,7 +29,7 @@ export class UserService implements IUserService {
     user.location = location;
     user.languages = languages;
 
-    await this._userRepo.update(user);
+    await this._userRepo.update(id, user);
   };
   updateUserSkillProfile = async (
     dto: UpdateUserSkillProfileDTO,
@@ -38,6 +38,6 @@ export class UserService implements IUserService {
     const user = new User(id);
     user.offeredSkills = offeredSkills;
     user.wantedSkills = wantedSkills;
-    await this._userRepo.update(user);
+    await this._userRepo.update(id, user);
   };
 }

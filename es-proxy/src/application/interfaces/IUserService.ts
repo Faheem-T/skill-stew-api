@@ -5,7 +5,7 @@ import {
 } from "../dtos/UserDTO";
 
 export interface IUserService {
-  save(dto: SaveUserDTO): Promise<void>;
+  create(dto: SaveUserDTO): Promise<void>;
   verifyUser(id: string): Promise<void>;
   updateUserProfile(dto: UpdateUserProfileDTO): Promise<void>;
   updateUserSkillProfile(dto: UpdateUserSkillProfileDTO): Promise<void>;

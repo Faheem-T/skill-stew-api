@@ -13,7 +13,7 @@ export const updateUserProfileDTO = z.object({
   location: z
     .object({ latitude: z.number(), longitude: z.number() })
     .optional(),
-  languages: z.array(z.string()),
+  languages: z.array(z.string()).optional(),
 });
 
 export type UpdateUserProfileDTO = z.infer<typeof updateUserProfileDTO>;

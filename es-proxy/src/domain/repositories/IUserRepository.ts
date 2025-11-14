@@ -1,6 +1,4 @@
 import { User } from "../entities/User";
+import { IBaseRepository } from "./IBaseRepository";
 
-export interface IUserRepository {
-  save(user: User): Promise<void>;
-  update(user: User): Promise<void>;
-}
+export interface IUserRepository extends IBaseRepository<User> {}

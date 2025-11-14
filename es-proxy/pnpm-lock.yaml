@@ -12,8 +12,8 @@ importers:
         specifier: ^9.2.0
         version: 9.2.0
       '@skillstew/common':
-        specifier: ^1.0.24
-        version: 1.0.24
+        specifier: ^1.0.25
+        version: 1.0.25
       amqplib:
         specifier: ^0.10.9
         version: 0.10.9
@@ -243,8 +243,8 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
-  '@skillstew/common@1.0.24':
-    resolution: {integrity: sha512-1JhwmuhN43ddFs9SHaI0bN1Qp+tySZ1GNB5jkaKidFPTPB68Fb4Eabu2JzUcQccRKepluZTjZkZODjE/KPXX5g==}
+  '@skillstew/common@1.0.25':
+    resolution: {integrity: sha512-93Foh9YOl18ckYrzneJcHzdnkMrwK4EzcXAPyth6Y+YBgOYMfCXhz36SLPTlSHk06AcyxwUXFWzE9nkAE6H7tQ==}
 
   '@so-ric/colorspace@1.1.6':
     resolution: {integrity: sha512-/KiKkpHNOBgkFJwu9sh48LkHSMYGyuTcSFK/qMBdnOAlrRJzRSXAOFB5qwzaVQuDl8wAvHVMkaASQDReTahxuw==}
@@ -1067,7 +1067,7 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
-  '@skillstew/common@1.0.24':
+  '@skillstew/common@1.0.25':
     dependencies:
       '@types/express': 5.0.5
       '@types/jsonwebtoken': 9.0.10

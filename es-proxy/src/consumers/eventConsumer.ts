@@ -22,7 +22,7 @@ export async function startConsumer() {
 
   consumer.registerHandler("user.registered", async (event) => {
     const { id } = event.data;
-    await userService.save({ id });
+    await userService.create({ id });
     return { success: true };
   });
 

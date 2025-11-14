@@ -45,7 +45,7 @@ const authUsecases = new AuthUsecases(
   producer,
   oAuthClient,
 );
-const userUsecases = new UserUsecases(userRepo);
+const userUsecases = new UserUsecases(userRepo, producer);
 
 // Controllers
 export const authController = new AuthController(authUsecases);
