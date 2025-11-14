@@ -1,12 +1,17 @@
+import { CreateEvent } from "@skillstew/common";
 import { User } from "../domain/entities/User";
 import { IUserRepository } from "../domain/repositories/IUserRepository";
 import { GetAllUsersInputDTO, PresentationUser } from "./dtos/GetAllUsersDTO";
 import { UpdateProfileDTO } from "./dtos/UpdateProfileDTO";
 import { IUserUsecases } from "./interfaces/IUserUsecases";
 import { UserDTOMapper } from "./mappers/UserDTOMapper";
+import { IProducer } from "./ports/IProducer";
 
 export class UserUsecases implements IUserUsecases {
-  constructor(private _userRepo: IUserRepository) {}
+  constructor(
+    private _userRepo: IUserRepository,
+    private _messageProducer: IProducer,
+  ) {}
 
   createDummyUsers = async () => {
     for (const { email, isVerified } of dummyUsers) {
@@ -75,6 +80,18 @@ export class UserUsecases implements IUserUsecases {
     };
     const savedUser = await this._userRepo.update(id, user);
     if (!savedUser) return null;
+    const event = CreateEvent(
+      "user.profileUpdated",
+      {
+        id: savedUser.id,
+        name: savedUser.name,
+        username: savedUser.username,
+        languages: savedUser.languages,
+        location: savedUser.location,
+      },
+      "user-service",
+    );
+    this._messageProducer.publish(event);
     return UserDTOMapper.toPresentation(savedUser);
   };
 }
