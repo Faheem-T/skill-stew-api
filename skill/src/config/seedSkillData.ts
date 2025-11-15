@@ -5,13 +5,17 @@ import { logger } from "../utils/logger";
 import { Skill } from "../entities/Skill";
 import { SkillModel } from "../models/skillModel";
 import { CreateEvent, Producer } from "@skillstew/common";
+import amqp from "amqplib";
 
 async function seedData() {
   try {
     await mongoose.connect(ENV.DATABASE_URL);
 
     const count = await SkillModel.countDocuments();
-    if (count > 0) return;
+    if (count > 0) {
+      logger.info("Seeding has be done before... skipping.");
+      return;
+    }
   } catch (err) {
     logger.error("Couldn't connect to mongodb", err);
     throw err;
@@ -22,12 +26,21 @@ async function seedData() {
   });
   const data: Skill[] = JSON.parse(rawData);
   await SkillModel.insertMany(data);
+
+  const connection = await amqp.connect(
+    `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
+  );
+  const channel = await connection.createChannel();
+
   const messageProducer = new Producer();
+  await messageProducer.init(channel, "stew_exchange");
   data.forEach((skill) => {
+    logger.info(`Publishing event for ${skill.name}`);
     messageProducer.publish(
       CreateEvent("skill.created", { ...skill }, "skill"),
     );
   });
+  await channel.close();
   logger.info("Seeding complete.");
 }
 

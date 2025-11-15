@@ -7,7 +7,7 @@ import { SkillProfileService } from "../services/SkillProfileService";
 import { SkillService } from "../services/SkillService";
 
 // Message Producer
-const messageProducer = new Producer();
+export const messageProducer = new Producer();
 
 const skillRepo = new SkillRepository();
 const skillService = new SkillService(skillRepo, messageProducer);

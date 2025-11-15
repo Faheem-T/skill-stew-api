@@ -1,209 +1,209 @@
 [
   {
-    "_id": "962462f6-8a14-4e5f-8b03-08a59a856184",
+    "id": "962462f6-8a14-4e5f-8b03-08a59a856184",
     "name": "Programming",
     "normalizedName": "programming",
     "alternateNames": ["coding"],
     "status": "Approved"
   },
   {
-    "_id": "2f5a67b3-3f42-4eab-b0a6-93f85f51d143",
+    "id": "2f5a67b3-3f42-4eab-b0a6-93f85f51d143",
     "name": "Web Development",
     "normalizedName": "web development",
     "alternateNames": ["frontend", "backend", "full stack"],
     "status": "Approved"
   },
   {
-    "_id": "8a40b41b-32de-4d12-bf84-39cbb9ed8a2f",
+    "id": "8a40b41b-32de-4d12-bf84-39cbb9ed8a2f",
     "name": "Data Structures",
     "normalizedName": "data structures",
     "alternateNames": ["ds"],
     "status": "Approved"
   },
   {
-    "_id": "5f7c1c6e-5a39-4f21-9f1c-34a1b3178a5a",
+    "id": "5f7c1c6e-5a39-4f21-9f1c-34a1b3178a5a",
     "name": "Algorithms",
     "normalizedName": "algorithms",
     "alternateNames": ["algo"],
     "status": "Approved"
   },
   {
-    "_id": "7e13ac56-9a77-4c91-85db-0a7c01d85b5c",
+    "id": "7e13ac56-9a77-4c91-85db-0a7c01d85b5c",
     "name": "Machine Learning",
     "normalizedName": "machine learning",
     "alternateNames": ["ml"],
     "status": "Approved"
   },
   {
-    "_id": "cb7b2e4a-75b0-43e0-9a2d-44d4699d8c60",
+    "id": "cb7b2e4a-75b0-43e0-9a2d-44d4699d8c60",
     "name": "Databases",
     "normalizedName": "databases",
     "alternateNames": ["db", "sql", "nosql"],
     "status": "Approved"
   },
   {
-    "_id": "f4b1d4cc-f85a-42a9-9b0f-6e7f57b0b0f3",
+    "id": "f4b1d4cc-f85a-42a9-9b0f-6e7f57b0b0f3",
     "name": "Cloud Computing",
     "normalizedName": "cloud computing",
     "alternateNames": ["aws", "azure", "gcp"],
     "status": "Approved"
   },
   {
-    "_id": "0cf9eeba-b3c2-41b8-bcb0-27f5b72a6d3a",
+    "id": "0cf9eeba-b3c2-41b8-bcb0-27f5b72a6d3a",
     "name": "Cybersecurity",
     "normalizedName": "cybersecurity",
     "alternateNames": ["infosec", "security"],
     "status": "Approved"
   },
   {
-    "_id": "f3a6b1b4-5d5c-4f7f-90d2-14f7e1b7d643",
+    "id": "f3a6b1b4-5d5c-4f7f-90d2-14f7e1b7d643",
     "name": "DevOps",
     "normalizedName": "devops",
     "alternateNames": ["ci/cd", "sre"],
     "status": "Approved"
   },
   {
-    "_id": "4aeb16c1-d1d7-4c9f-82a2-0d6b733e8453",
+    "id": "4aeb16c1-d1d7-4c9f-82a2-0d6b733e8453",
     "name": "Artificial Intelligence",
     "normalizedName": "artificial intelligence",
     "alternateNames": ["ai"],
     "status": "Approved"
   },
   {
-    "_id": "aee1d19c-f64d-4c58-b449-88a92c3f8a2d",
+    "id": "aee1d19c-f64d-4c58-b449-88a92c3f8a2d",
     "name": "Cooking",
     "normalizedName": "cooking",
     "alternateNames": ["culinary arts", "chef skills"],
     "status": "Approved"
   },
   {
-    "_id": "d11898be-7a9c-49f5-9c71-407d36c6fb11",
+    "id": "d11898be-7a9c-49f5-9c71-407d36c6fb11",
     "name": "Singing",
     "normalizedName": "singing",
     "alternateNames": ["vocal performance", "vocals"],
     "status": "Approved"
   },
   {
-    "_id": "6f23211f-d0ab-4186-b764-14f1d52f7cc0",
+    "id": "6f23211f-d0ab-4186-b764-14f1d52f7cc0",
     "name": "Origami",
     "normalizedName": "origami",
     "alternateNames": ["paper folding"],
     "status": "Approved"
   },
   {
-    "_id": "4d187e8e-9ed8-4a37-a1b4-0b2a503a0d7d",
+    "id": "4d187e8e-9ed8-4a37-a1b4-0b2a503a0d7d",
     "name": "Public Speaking",
     "normalizedName": "public speaking",
     "alternateNames": ["oratory", "speech"],
     "status": "Approved"
   },
   {
-    "_id": "ff6a64b2-2a18-4f94-a44e-0c91c7c82d08",
+    "id": "ff6a64b2-2a18-4f94-a44e-0c91c7c82d08",
     "name": "Photography",
     "normalizedName": "photography",
     "alternateNames": ["photo editing", "camera skills"],
     "status": "Approved"
   },
   {
-    "_id": "cc4a63d4-f3a3-4a27-8440-f8e90f9d35db",
+    "id": "cc4a63d4-f3a3-4a27-8440-f8e90f9d35db",
     "name": "Painting",
     "normalizedName": "painting",
     "alternateNames": ["art", "drawing"],
     "status": "Approved"
   },
   {
-    "_id": "ed13e011-44d4-4a16-9aa5-85c89fc3df31",
+    "id": "ed13e011-44d4-4a16-9aa5-85c89fc3df31",
     "name": "Writing",
     "normalizedName": "writing",
     "alternateNames": ["creative writing", "storytelling"],
     "status": "Approved"
   },
   {
-    "_id": "b53d16f1-71b0-4c34-bf6a-6f236674fcf1",
+    "id": "b53d16f1-71b0-4c34-bf6a-6f236674fcf1",
     "name": "Teamwork",
     "normalizedName": "teamwork",
     "alternateNames": ["collaboration", "working with others"],
     "status": "Approved"
   },
   {
-    "_id": "9d92ad7f-3a7b-4e82-9aa1-19d7c25a812f",
+    "id": "9d92ad7f-3a7b-4e82-9aa1-19d7c25a812f",
     "name": "Problem Solving",
     "normalizedName": "problem solving",
     "alternateNames": ["critical thinking", "analytical skills"],
     "status": "Approved"
   },
   {
-    "_id": "9f1a6a92-69b0-4766-94e3-247d3f5141a2",
+    "id": "9f1a6a92-69b0-4766-94e3-247d3f5141a2",
     "name": "Leadership",
     "normalizedName": "leadership",
     "alternateNames": ["management", "mentoring"],
     "status": "Approved"
   },
   {
-    "_id": "36ac4a12-bd92-4e0a-87c5-1d593b04d0b5",
+    "id": "36ac4a12-bd92-4e0a-87c5-1d593b04d0b5",
     "name": "Time Management",
     "normalizedName": "time management",
     "alternateNames": ["productivity", "scheduling"],
     "status": "Approved"
   },
   {
-    "_id": "2e4a59f1-cf9c-4b22-83a6-b1d2a6f53265",
+    "id": "2e4a59f1-cf9c-4b22-83a6-b1d2a6f53265",
     "name": "Negotiation",
     "normalizedName": "negotiation",
     "alternateNames": ["bargaining", "persuasion"],
     "status": "Approved"
   },
   {
-    "_id": "6a0ff0cc-3c17-44fc-94a4-7a9db9f46df6",
+    "id": "6a0ff0cc-3c17-44fc-94a4-7a9db9f46df6",
     "name": "Dancing",
     "normalizedName": "dancing",
     "alternateNames": ["choreography", "performance dance"],
     "status": "Approved"
   },
   {
-    "_id": "af1244f6-1a89-4970-ae9b-f4bb8ef338a9",
+    "id": "af1244f6-1a89-4970-ae9b-f4bb8ef338a9",
     "name": "Gardening",
     "normalizedName": "gardening",
     "alternateNames": ["horticulture"],
     "status": "Approved"
   },
   {
-    "_id": "94d0a3c4-39e4-4862-b9ab-3f8f8a7dd9f6",
+    "id": "94d0a3c4-39e4-4862-b9ab-3f8f8a7dd9f6",
     "name": "Meditation",
     "normalizedName": "meditation",
     "alternateNames": ["mindfulness", "relaxation"],
     "status": "Approved"
   },
   {
-    "_id": "86d3251d-7f6e-4429-8787-ef4d52cf9e6d",
+    "id": "86d3251d-7f6e-4429-8787-ef4d52cf9e6d",
     "name": "First Aid",
     "normalizedName": "first aid",
     "alternateNames": ["medical assistance"],
     "status": "Approved"
   },
   {
-    "_id": "ceae2919-9b54-4633-8467-89f344fa32b6",
+    "id": "ceae2919-9b54-4633-8467-89f344fa32b6",
     "name": "Foreign Languages",
     "normalizedName": "foreign languages",
     "alternateNames": ["language learning"],
     "status": "Approved"
   },
   {
-    "_id": "11d63b91-4d8c-4729-b846-43dd7b5aef6d",
+    "id": "11d63b91-4d8c-4729-b846-43dd7b5aef6d",
     "name": "Knitting",
     "normalizedName": "knitting",
     "alternateNames": ["crochet"],
     "status": "Approved"
   },
   {
-    "_id": "5876fa8c-0c56-46e7-95b8-87135b216f7f",
+    "id": "5876fa8c-0c56-46e7-95b8-87135b216f7f",
     "name": "Swimming",
     "normalizedName": "swimming",
     "alternateNames": ["aquatics"],
     "status": "Approved"
   },
   {
-    "_id": "f8e37ab9-50e5-4f73-a3f5-4f6f6f3a98c7",
+    "id": "f8e37ab9-50e5-4f73-a3f5-4f6f6f3a98c7",
     "name": "Driving",
     "normalizedName": "driving",
     "alternateNames": ["car driving", "vehicle operation"],

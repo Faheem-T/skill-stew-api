@@ -1,4 +1,9 @@
-const envVars = ["PORT", "DATABASE_URL"] as const;
+const envVars = [
+  "PORT",
+  "DATABASE_URL",
+  "RABBITMQ_USER",
+  "RABBITMQ_PASSWORD",
+] as const;
 
 export function generateEnvVars() {
   return envVars.reduce(

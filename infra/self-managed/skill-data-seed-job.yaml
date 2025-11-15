@@ -20,6 +20,17 @@ spec:
           envFrom:
             - configMapRef:
                 name: skill-config
+          env:
+            - name: RABBITMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: my-rabbit-default-user # created by operator
+                  key: username
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-rabbit-default-user # created by operator
+                  key: password
           command: ["bun", "run", "seed"]
       restartPolicy: Never
   backoffLimit: 2

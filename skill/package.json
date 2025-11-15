@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "@skillstew/common": "^1.0.24",
+    "@types/amqplib": "^0.10.8",
+    "amqplib": "^0.10.9",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^5.1.0",
