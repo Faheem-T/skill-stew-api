@@ -1,15 +1,16 @@
 import { AuthController } from "../presentation/controllers/AuthController";
-import { AuthUsecases } from "../application/AuthUsecases";
+import { AuthUsecases } from "../application/use-cases/AuthUsecases";
 import { UserRepository } from "../infrastructure/repositories/UserRepository";
 import { EmailService } from "../infrastructure/services/EmailService";
 import { JwtService } from "../infrastructure/services/JwtService";
 import { BcryptHasher } from "../infrastructure/services/HashService";
 import { ENV } from "../utils/dotenv";
 import { AdminRepository } from "../infrastructure/repositories/AdminRepository";
-import { UserUsecases } from "../application/UserUsecases";
+import { UserUsecases } from "../application/use-cases/UserUsecases";
 import { UserController } from "../presentation/controllers/UserController";
 import { Consumer, Producer } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
+import { UserProfileUpdate } from "../application/use-cases/user/UserProfileUpdate.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -46,7 +47,11 @@ const authUsecases = new AuthUsecases(
   oAuthClient,
 );
 const userUsecases = new UserUsecases(userRepo, producer);
+const userProfileUpdateUsecase = new UserProfileUpdate(producer, userRepo);
 
 // Controllers
 export const authController = new AuthController(authUsecases);
-export const userController = new UserController(userUsecases);
+export const userController = new UserController(
+  userUsecases,
+  userProfileUpdateUsecase,
+);

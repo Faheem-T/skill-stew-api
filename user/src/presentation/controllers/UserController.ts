@@ -3,10 +3,14 @@ import { HttpStatus } from "@skillstew/common";
 import { IDSchema } from "../validators/IdValidator";
 import { UserFilters } from "../../domain/repositories/IUserRepository";
 import { IUserUsecases } from "../../application/interfaces/IUserUsecases";
-import { updateProfileSchema } from "../../application/dtos/UpdateProfileDTO";
+import { updateProfileSchema } from "../../application/dtos/user/UpdateProfileDTO";
+import { IUserProfileUpdate } from "../../application/interfaces/user/IUserProfileUpdate";
 
 export class UserController {
-  constructor(private _userUsecases: IUserUsecases) {}
+  constructor(
+    private _userUsecases: IUserUsecases,
+    private _userProfileUpdateUsecase: IUserProfileUpdate,
+  ) {}
 
   createDummyUsers = async (
     _req: Request,
@@ -117,7 +121,7 @@ export class UserController {
     try {
       const id = req.headers["x-user-id"];
       const dto = updateProfileSchema.parse({ id, ...req.body });
-      const updatedUser = await this._userUsecases.updateProfile(dto);
+      const updatedUser = await this._userProfileUpdateUsecase.exec(dto);
       if (updatedUser === null) {
         res
           .status(HttpStatus.NOT_FOUND)
