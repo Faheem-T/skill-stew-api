@@ -1,6 +1,10 @@
 import { Skill } from "../../domain/entities/Skill";
 import { ISkillRepository } from "../../domain/repositories/ISkillRepository";
-import { CreateSkillDTO, UpdateSkillDTO } from "../dtos/SkillDTO";
+import {
+  CreateSkillDTO,
+  SkillOutputDTO,
+  UpdateSkillDTO,
+} from "../dtos/SkillDTO";
 import { ISkillService } from "../interfaces/ISkillService";
 
 export class SkillService implements ISkillService {
@@ -21,5 +25,9 @@ export class SkillService implements ISkillService {
 
   delete = async (id: string): Promise<void> => {
     await this._repo.delete(id);
+  };
+
+  search = async (query: string): Promise<SkillOutputDTO> => {
+    return this._repo.search(query);
   };
 }

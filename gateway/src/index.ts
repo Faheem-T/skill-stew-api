@@ -28,6 +28,11 @@ const ServiceConfigs = [
     url: ENV.SKILL_SERVICE_URL,
     name: "skill-service",
   },
+  {
+    path: "/api/v1/search",
+    url: ENV.SEARCH_SERVICE_URL,
+    name: "search-service",
+  },
 ];
 
 app.use(authMiddleware);

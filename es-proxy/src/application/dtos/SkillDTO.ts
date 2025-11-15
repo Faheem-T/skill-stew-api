@@ -15,3 +15,9 @@ export const updateSkillDTO = z.object({
 });
 
 export type UpdateSkillDTO = z.infer<typeof updateSkillDTO>;
+
+export type SkillOutputDTO = {
+  id: string;
+  name: string;
+  alternateNames: string[];
+}[];
