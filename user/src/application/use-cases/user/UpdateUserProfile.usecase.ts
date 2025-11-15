@@ -2,12 +2,12 @@ import { CreateEvent } from "@skillstew/common";
 import { User } from "../../../domain/entities/User";
 import { PresentationUser } from "../../dtos/GetAllUsersDTO";
 import { UpdateProfileDTO } from "../../dtos/user/UpdateProfileDTO";
-import { IUserProfileUpdate } from "../../interfaces/user/IUserProfileUpdate";
+import { IUpdateUserProfile } from "../../interfaces/user/IUpdateUserProfile";
 import { IProducer } from "../../ports/IProducer";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { UserDTOMapper } from "../../mappers/UserDTOMapper";
 
-export class UserProfileUpdate implements IUserProfileUpdate {
+export class UpdateUserProfile implements IUpdateUserProfile {
   constructor(
     private _messageProducer: IProducer,
     private _userRepo: IUserRepository,

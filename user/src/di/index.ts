@@ -10,7 +10,7 @@ import { UserUsecases } from "../application/use-cases/UserUsecases";
 import { UserController } from "../presentation/controllers/UserController";
 import { Consumer, Producer } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
-import { UserProfileUpdate } from "../application/use-cases/user/UserProfileUpdate.usecase";
+import { UpdateUserProfile } from "../application/use-cases/user/UpdateUserProfile.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -46,12 +46,12 @@ const authUsecases = new AuthUsecases(
   producer,
   oAuthClient,
 );
-const userUsecases = new UserUsecases(userRepo, producer);
-const userProfileUpdateUsecase = new UserProfileUpdate(producer, userRepo);
+const userUsecases = new UserUsecases(userRepo);
+const updateUserProfileUsecase = new UpdateUserProfile(producer, userRepo);
 
 // Controllers
 export const authController = new AuthController(authUsecases);
 export const userController = new UserController(
   userUsecases,
-  userProfileUpdateUsecase,
+  updateUserProfileUsecase,
 );

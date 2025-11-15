@@ -1,16 +1,11 @@
-import { CreateEvent } from "@skillstew/common";
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { GetAllUsersInputDTO, PresentationUser } from "../dtos/GetAllUsersDTO";
 import { IUserUsecases } from "../interfaces/IUserUsecases";
 import { UserDTOMapper } from "../mappers/UserDTOMapper";
-import { IProducer } from "../ports/IProducer";
 
 export class UserUsecases implements IUserUsecases {
-  constructor(
-    private _userRepo: IUserRepository,
-    private _messageProducer: IProducer,
-  ) {}
+  constructor(private _userRepo: IUserRepository) {}
 
   createDummyUsers = async () => {
     for (const { email, isVerified } of dummyUsers) {

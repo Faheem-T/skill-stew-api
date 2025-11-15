@@ -1,25 +1,25 @@
-import { User } from "../domain/entities/User";
-import { UserNotFoundError } from "../domain/errors/UserNotFoundError";
-import { IUserRepository } from "../domain/repositories/IUserRepository";
-import { IEmailService } from "./ports/IEmailService";
-import { IJwtService } from "./ports/IJwtService";
-import { IHasherService } from "./ports/IHasherService";
-import { WrongPasswordError } from "../domain/errors/WrongPasswordError";
-import { UserNotVerifiedError } from "../domain/errors/UserNotVerifiedError";
-import { IAdminRepository } from "../domain/repositories/IAdminRepository";
-import { Admin } from "../domain/entities/Admin";
-import { WrongAdminUsernameError } from "../domain/errors/WrongAdminUsernameError";
-import { UserBlockedError } from "../domain/errors/UserBlockedError";
-import { IProducer } from "./ports/IProducer";
+import { User } from "../../domain/entities/User";
+import { UserNotFoundError } from "../../domain/errors/UserNotFoundError";
+import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { IEmailService } from "../ports/IEmailService";
+import { IJwtService } from "../ports/IJwtService";
+import { IHasherService } from "../ports/IHasherService";
+import { WrongPasswordError } from "../../domain/errors/WrongPasswordError";
+import { UserNotVerifiedError } from "../../domain/errors/UserNotVerifiedError";
+import { IAdminRepository } from "../../domain/repositories/IAdminRepository";
+import { Admin } from "../../domain/entities/Admin";
+import { WrongAdminUsernameError } from "../../domain/errors/WrongAdminUsernameError";
+import { UserBlockedError } from "../../domain/errors/UserBlockedError";
+import { IProducer } from "../ports/IProducer";
 import { CreateEvent, UserRoles } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
-import { GoogleAuthError } from "./errors/GoogleAuthErrors";
-import { ENV } from "../utils/dotenv";
-import { IAuthUsecases } from "./interfaces/IAuthUsecases";
-import { UserDTOMapper } from "./mappers/UserDTOMapper";
-import { GetProfileOutputDTO } from "./dtos/GetProfileDTO";
-import { DomainValidationError } from "../domain/errors/DomainValidationError";
-import { RegisterOutputDTO } from "./dtos/RegisterDTO";
+import { GoogleAuthError } from "../errors/GoogleAuthErrors";
+import { ENV } from "../../utils/dotenv";
+import { IAuthUsecases } from "../interfaces/IAuthUsecases";
+import { UserDTOMapper } from "../mappers/UserDTOMapper";
+import { GetProfileOutputDTO } from "../dtos/GetProfileDTO";
+import { DomainValidationError } from "../../domain/errors/DomainValidationError";
+import { RegisterOutputDTO } from "../dtos/RegisterDTO";
 
 export class AuthUsecases implements IAuthUsecases {
   constructor(
