@@ -11,6 +11,9 @@ import { UserController } from "../presentation/controllers/UserController";
 import { Consumer, Producer } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
 import { UpdateUserProfile } from "../application/use-cases/user/UpdateUserProfile.usecase";
+import { GetUserProfile } from "../application/use-cases/user/GetUserProfile.usecase";
+import { UserOnboardingController } from "../presentation/controllers/UserOnboardingController";
+import { OnboardingUpdateProfile } from "../application/use-cases/user/OnboardingUpdateUserProfile.dto";
 
 // Services
 const emailService = new EmailService();
@@ -48,10 +51,14 @@ const authUsecases = new AuthUsecases(
 );
 const userUsecases = new UserUsecases(userRepo);
 const updateUserProfileUsecase = new UpdateUserProfile(producer, userRepo);
+const getUserProfileUsecase = new GetUserProfile(userRepo);
+const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(producer, userRepo)
 
 // Controllers
 export const authController = new AuthController(authUsecases);
 export const userController = new UserController(
   userUsecases,
   updateUserProfileUsecase,
+  getUserProfileUsecase,
 );
+export const onboardingController = new UserOnboardingController(onboardingUpdateUserProfileUsecase)

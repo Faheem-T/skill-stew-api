@@ -41,7 +41,7 @@ export class AuthController {
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: "none",
+          sameSite: ENV.NODE_ENV ==="production" ? "none" : "lax",
         })
         .json({
           success: true,
@@ -108,7 +108,7 @@ export class AuthController {
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: "none",
+          sameSite: ENV.NODE_ENV ==="production" ? "none" : "lax",
         })
         .json({
           success: true,
@@ -184,7 +184,7 @@ export class AuthController {
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: "none",
+          sameSite: ENV.NODE_ENV ==="production" ? "none" : "lax",
         })
         .json({
           success: true,
@@ -216,7 +216,7 @@ export class AuthController {
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: "none",
+          sameSite: ENV.NODE_ENV ==="production" ? "none" : "lax",
         })
         .json({
           success: true,

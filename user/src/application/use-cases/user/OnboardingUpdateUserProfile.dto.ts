@@ -1,42 +1,34 @@
 import { CreateEvent } from "@skillstew/common";
 import { User } from "../../../domain/entities/User";
 import { PresentationUser } from "../../dtos/GetAllUsersDTO";
-import { UpdateProfileDTO } from "../../dtos/user/UpdateUserProfile.dto";
-import { IUpdateUserProfile } from "../../interfaces/user/IUpdateUserProfile";
 import { IProducer } from "../../ports/IProducer";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { UserDTOMapper } from "../../mappers/UserDTOMapper";
+import { OnboardingUpdateUserProfileDTO } from "../../dtos/user/OnboardingUpdateProfile.dto";
+import { IOnboardingUpdateUserProfile } from "../../interfaces/user/IOnbaordingUpdateProfile";
 
-export class UpdateUserProfile implements IUpdateUserProfile {
+export class OnboardingUpdateProfile implements IOnboardingUpdateUserProfile {
   constructor(
     private _messageProducer: IProducer,
     private _userRepo: IUserRepository,
   ) { }
 
-  exec = async (dto: UpdateProfileDTO): Promise<PresentationUser | null> => {
+  exec = async (dto: OnboardingUpdateUserProfileDTO): Promise<PresentationUser | null> => {
     const {
       id,
       name,
       username,
-      about,
       avatarKey,
       location,
       languages,
-      phoneNumber,
-      socialLinks,
-      timezone,
     } = dto;
     const user: Partial<User> = {
       id,
       name,
       username,
-      about,
       avatarKey,
       location,
       languages,
-      phoneNumber,
-      socialLinks,
-      timezone,
     };
     const savedUser = await this._userRepo.update(id, user);
     if (!savedUser) return null;

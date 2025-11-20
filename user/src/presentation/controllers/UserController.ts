@@ -3,14 +3,16 @@ import { HttpStatus } from "@skillstew/common";
 import { IDSchema } from "../validators/IdValidator";
 import { UserFilters } from "../../domain/repositories/IUserRepository";
 import { IUserUsecases } from "../../application/interfaces/IUserUsecases";
-import { updateProfileSchema } from "../../application/dtos/user/UpdateProfileDTO";
+import { updateProfileSchema } from "../../application/dtos/user/UpdateUserProfile.dto";
 import { IUpdateUserProfile } from "../../application/interfaces/user/IUpdateUserProfile";
+import { IGetUserProfile } from "../../application/interfaces/user/IGetUserProfile";
 
 export class UserController {
   constructor(
     private _userUsecases: IUserUsecases,
     private _updateUserProfile: IUpdateUserProfile,
-  ) {}
+    private _getUserProfile: IGetUserProfile
+  ) { }
 
   createDummyUsers = async (
     _req: Request,
@@ -133,6 +135,24 @@ export class UserController {
         message: "User profile updated",
         data: updatedUser,
       });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = req.headers["x-user-id"] as string;
+      if (!id) {
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, message: "Couldn't access user id" });
+        return;
+      }
+
+      const profile = await this._getUserProfile.exec(id);
+
+      res.status(HttpStatus.OK).json({ success: true, data: profile });
     } catch (err) {
       next(err);
     }

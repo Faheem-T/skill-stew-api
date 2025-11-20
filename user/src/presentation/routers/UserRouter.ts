@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireRole } from "../middlewares/requireRole";
-import { userController } from "../../di";
+import { onboardingController, userController } from "../../di";
 
 const router = Router();
 
@@ -13,5 +13,8 @@ router.patch("/:id/unblock", requireRole("ADMIN"), userController.unblockUser);
 router.post("/dummy", requireRole("ADMIN"), userController.createDummyUsers);
 
 router.patch("/profile", requireRole("USER"), userController.userProfileUpdate);
+router.get("/profile", requireRole("USER"), userController.getUserProfile);
+
+router.patch("/onboarding/profile", requireRole("USER"), onboardingController.onboardingUserProfileUpdate)
 
 export default router;
