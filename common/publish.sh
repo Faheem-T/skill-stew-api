@@ -4,7 +4,7 @@
 set -e
 
 # Change to correct dir
-cd "/home/fahi/dev/brototype/skillStew/skill-stew-api/common/"
+cd "/home/faheem/Work/dev/brototype/skillStew/skill-stew-api/common/"
 
 # Step 1: Bump patch version
 npm version patch

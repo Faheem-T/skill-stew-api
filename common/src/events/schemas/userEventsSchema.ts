@@ -14,7 +14,11 @@ export const userProfileUpdatedSchema = z.object({
   name: z.string().optional(),
   username: z.string().optional(),
   location: z
-    .object({ latitude: z.number(), longitude: z.number() })
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+      formattedAddress: z.string(),
+    })
     .optional(),
   languages: z.array(z.string()).optional(),
 });
