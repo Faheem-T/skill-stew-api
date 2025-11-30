@@ -9,9 +9,15 @@ export class UserMapper implements Mapper<User, UserDoc> {
     const location = entity.location
       ? { lat: entity.location.latitude, lon: entity.location.longitude }
       : undefined;
+
+    const formattedAddress = entity.location
+      ? entity.location.formattedAddress
+      : undefined;
+
     return {
       ...entity,
       location,
+      formattedAddress,
     };
   }
 
@@ -25,9 +31,15 @@ export class UserMapper implements Mapper<User, UserDoc> {
     const location = partial.location
       ? { lat: partial.location.latitude, lon: partial.location.longitude }
       : undefined;
+
+    const formattedAddress = partial.location
+      ? partial.location.formattedAddress
+      : undefined;
+
     return {
       ...partial,
       location,
+      formattedAddress,
     };
   }
 }

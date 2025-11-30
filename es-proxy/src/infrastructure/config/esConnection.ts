@@ -13,6 +13,7 @@ export const INDEXES: { name: string; mappings: MappingTypeMapping }[] = [
         name: { type: "text" },
         username: { type: "text" },
         isVerified: { type: "boolean" },
+        formattedAddress: { type: "text" },
         location: { type: "geo_point" },
         languages: { type: "keyword" },
         offeredSkills: { type: "keyword" },

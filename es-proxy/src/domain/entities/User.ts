@@ -18,4 +18,5 @@ export class User {
 interface IUserLocation {
   latitude: number;
   longitude: number;
+  formattedAddress: string;
 }
