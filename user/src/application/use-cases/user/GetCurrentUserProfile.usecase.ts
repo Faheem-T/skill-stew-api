@@ -1,22 +1,10 @@
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { IGetUserProfile } from "../../interfaces/user/IGetUserProfile";
+import { GetCurrentUserProfileDTO } from "../../dtos/user/GetUserProfile.dto";
+import { IGetCurrentUserProfile } from "../../interfaces/user/IGetCurrentUserProfile";
 
-export class GetUserProfile implements IGetUserProfile {
+export class GetUserProfile implements IGetCurrentUserProfile {
   constructor(private readonly _userRepo: IUserRepository) {}
-  exec = async (
-    id: string,
-  ): Promise<{
-    name?: string;
-    username?: string;
-    phoneNumber?: string;
-    avatarUrl?: string;
-    bannerUrl?: string;
-    timezone?: string;
-    location?: { latitude: number; longitude: number };
-    about?: string;
-    socialLinks: string[];
-    languages: string[];
-  } | null> => {
+  exec = async (id: string): Promise<GetCurrentUserProfileDTO | null> => {
     const user = await this._userRepo.findById(id);
     if (!user) return null;
 

@@ -13,8 +13,12 @@ router.patch("/:id/unblock", requireRole("ADMIN"), userController.unblockUser);
 router.post("/dummy", requireRole("ADMIN"), userController.createDummyUsers);
 
 router.patch("/profile", requireRole("USER"), userController.userProfileUpdate);
-router.get("/profile", requireRole("USER"), userController.getUserProfile);
+router.get("/me", requireRole("USER"), userController.getCurrentUserProfile);
 
-router.patch("/onboarding/profile", requireRole("USER"), onboardingController.onboardingUserProfileUpdate)
+router.patch(
+  "/onboarding/profile",
+  requireRole("USER"),
+  onboardingController.onboardingUserProfileUpdate,
+);
 
 export default router;

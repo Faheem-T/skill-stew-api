@@ -1,17 +1,25 @@
-// {
-//     name?: string;
-//     username?: string;
-//     phoneNumber?: string;
-//     avatarUrl?: string;
-//     bannerUrl?: string;
-//     timezone?: string;
-//     location?: {
-//       latitude: number;
-//       longitude: number;
-//     };
-//     about?: string;
-//     socialLinks: string[];
-//     languages: string[];
-//   }
+import z from "zod";
 
-// export const getCurrentUserProfile
+export const getCurrentUserProfileSchema = z.object({
+  name: z.string().optional(),
+  username: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  avatarUrl: z.string().optional(),
+  bannerUrl: z.string().optional(),
+  timezone: z.string().optional(),
+  location: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+      placeId: z.string(),
+      formattedAddress: z.string(),
+    })
+    .optional(),
+  about: z.string().optional(),
+  socialLinks: z.array(z.string()),
+  languages: z.array(z.string()),
+});
+
+export type GetCurrentUserProfileDTO = z.infer<
+  typeof getCurrentUserProfileSchema
+>;
