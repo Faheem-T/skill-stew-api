@@ -6,7 +6,7 @@ import { IOnboardingUpdateUserProfile } from "../../application/interfaces/user/
 export class UserOnboardingController {
   constructor(
     private _onboardingUpdateUserProfile: IOnboardingUpdateUserProfile,
-  ) { }
+  ) {}
 
   onboardingUserProfileUpdate = async (
     req: Request,
@@ -31,5 +31,5 @@ export class UserOnboardingController {
     } catch (err) {
       next(err);
     }
-  }
+  };
 }

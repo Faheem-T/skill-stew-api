@@ -1,5 +1,5 @@
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { GetCurrentUserProfileDTO } from "../../dtos/user/GetUserProfile.dto";
+import { GetCurrentUserProfileDTO } from "../../dtos/user/GetCurrentUserProfile.dto";
 import { IGetCurrentUserProfile } from "../../interfaces/user/IGetCurrentUserProfile";
 
 export class GetUserProfile implements IGetCurrentUserProfile {
