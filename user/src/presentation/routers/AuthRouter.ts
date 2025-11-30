@@ -10,7 +10,6 @@ router.post("/resend-verification-link", authController.resendVerifyLink);
 router.post("/login", authController.login);
 router.post("/refresh", authController.refresh);
 router.post("/google-auth", authController.googleAuth);
-router.get("/me", authController.me);
 router.post("/logout", authController.logout);
 
 // admin auth routes

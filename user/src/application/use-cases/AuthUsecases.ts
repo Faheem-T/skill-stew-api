@@ -287,23 +287,4 @@ export class AuthUsecases implements IAuthUsecases {
     if (!admin) return null;
     return admin;
   };
-
-  getProfile = async (
-    userId: string,
-    role: UserRoles,
-  ): Promise<GetProfileOutputDTO> => {
-    if (role === "USER") {
-      const user = await this.getUserById(userId);
-      if (!user) return null;
-      const { id, email, username, name } = user;
-      return { id, email, username, name, role };
-    } else {
-      // HANDLE EXPERT ALSO
-      const admin = await this.getAdminById(userId);
-      if (!admin) return null;
-      const { username } = admin;
-      const id = admin.id!;
-      return { id, username, role: "ADMIN" };
-    }
-  };
 }

@@ -24,5 +24,4 @@ export interface IAuthUsecases {
     credential: string,
   ): Promise<{ refreshToken: string; accessToken: string }>;
   getAdminById(id: string): Promise<Admin | null>;
-  getProfile(userId: string, role: UserRoles): Promise<GetProfileOutputDTO>;
 }

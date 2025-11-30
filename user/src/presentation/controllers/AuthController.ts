@@ -41,7 +41,7 @@ export class AuthController {
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: ENV.NODE_ENV ==="production" ? "none" : "lax",
+          sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
         })
         .json({
           success: true,
@@ -108,7 +108,7 @@ export class AuthController {
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: ENV.NODE_ENV ==="production" ? "none" : "lax",
+          sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
         })
         .json({
           success: true,
@@ -184,7 +184,7 @@ export class AuthController {
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: ENV.NODE_ENV ==="production" ? "none" : "lax",
+          sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
         })
         .json({
           success: true,
@@ -216,7 +216,7 @@ export class AuthController {
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: ENV.NODE_ENV ==="production" ? "none" : "lax",
+          sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
         })
         .json({
           success: true,
@@ -235,17 +235,6 @@ export class AuthController {
           .json({ success: false, message: err.message, error: err.code });
         return;
       }
-      next(err);
-    }
-  };
-
-  me = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId = req.headers["x-user-id"] as string;
-      const role = req.headers["x-user-role"] as UserRoles;
-      const profile = await this._authUsecases.getProfile(userId, role);
-      res.status(HttpStatus.OK).json({ success: true, data: profile });
-    } catch (err) {
       next(err);
     }
   };
