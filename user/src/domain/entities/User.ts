@@ -97,7 +97,9 @@ export class User {
   // }
 }
 
-interface IUserLocation {
+export interface IUserLocation {
+  placeId: string;
+  formattedAddress: string;
   latitude: number;
   longitude: number;
 }

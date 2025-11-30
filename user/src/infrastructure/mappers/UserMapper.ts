@@ -20,6 +20,8 @@ export class UserMapper implements Mapper<User, UserTableType> {
       about,
       is_blocked,
       is_google_login,
+      banner_key,
+      location,
       created_at,
       updated_at,
     } = raw;
@@ -45,6 +47,8 @@ export class UserMapper implements Mapper<User, UserTableType> {
     if (is_blocked) user.isBlocked = true;
     if (created_at) user.createdAt = created_at;
     if (updated_at) user.updatedAt = updated_at;
+    if (location) user.location = location;
+    if (banner_key) user.bannerKey = banner_key;
 
     return user;
   }
@@ -68,6 +72,7 @@ export class UserMapper implements Mapper<User, UserTableType> {
       is_google_login: user.isGoogleLogin,
       created_at: user.createdAt ?? new Date(),
       updated_at: user.updatedAt ?? new Date(),
+      location: user.location ?? null,
     };
     return result;
   }
@@ -100,6 +105,8 @@ export class UserMapper implements Mapper<User, UserTableType> {
     if (partial.isBlocked !== undefined) result.is_blocked = partial.isBlocked;
     if (partial.isGoogleLogin !== undefined)
       result.is_google_login = partial.isGoogleLogin;
+    if (partial.location !== undefined)
+      result.location = partial.location ?? null;
     if (partial.createdAt !== undefined) result.created_at = partial.createdAt;
     if (partial.updatedAt !== undefined) result.updated_at = partial.updatedAt;
 

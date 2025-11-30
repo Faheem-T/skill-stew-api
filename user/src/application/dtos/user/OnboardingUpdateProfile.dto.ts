@@ -1,8 +1,7 @@
 import { z } from "zod";
 
 const userLocationSchema = z.object({
-  latitude: z.number(),
-  longitude: z.number(),
+  placeId: z.string()
 });
 
 export const onboardingUpdateUserProfileSchema = z.object({

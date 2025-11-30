@@ -1,6 +1,14 @@
-import { pgTable, text, boolean, uuid, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  boolean,
+  uuid,
+  timestamp,
+  json,
+} from "drizzle-orm/pg-core";
 import { InferSelectModel, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { IUserLocation } from "../../../domain/entities/User";
 
 export const userTable = pgTable("users", {
   id: uuid()
@@ -27,6 +35,7 @@ export const userTable = pgTable("users", {
   is_verified: boolean().default(false).notNull(),
   is_blocked: boolean().default(false).notNull(),
   is_google_login: boolean().default(false).notNull(),
+  location: json().$type<IUserLocation>(),
   created_at: timestamp({ mode: "date", precision: 3 }).defaultNow().notNull(),
   updated_at: timestamp({ mode: "date", precision: 3 })
     .defaultNow()

@@ -19,6 +19,10 @@ export class GetUserProfile implements IGetUserProfile {
   } | null> => {
     const user = await this._userRepo.findById(id);
     if (!user) return null;
+
+    // TODO
+    // convert avatarKey and bannerKey to url
+
     const {
       name,
       username,

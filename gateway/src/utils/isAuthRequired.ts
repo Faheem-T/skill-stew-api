@@ -26,6 +26,7 @@ const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
     { path: "/api/v1/users/:id/unblock", roles: ["ADMIN"] },
     { path: "/api/v1/payments/subscriptions/:id", roles: ["ADMIN"] },
     { path: "/api/v1/users/profile", roles: ["USER"] },
+    { path: "/api/v1/users/onboarding/profile", roles: ["USER"] },
   ],
   DELETE: [{ path: "/api/v1/payments/subscriptions/:id", roles: ["ADMIN"] }],
 };

@@ -14,6 +14,7 @@ import { UpdateUserProfile } from "../application/use-cases/user/UpdateUserProfi
 import { GetUserProfile } from "../application/use-cases/user/GetUserProfile.usecase";
 import { UserOnboardingController } from "../presentation/controllers/UserOnboardingController";
 import { OnboardingUpdateProfile } from "../application/use-cases/user/OnboardingUpdateUserProfile.dto";
+import { GoogleLocationProvider } from "../infrastructure/services/GoogleLocationProvider";
 
 // Services
 const emailService = new EmailService();
@@ -27,6 +28,7 @@ const jwtService = new JwtService({
   emailJwtSecret: ENV.EMAIL_VERIFICATON_JWT_SECRET,
 });
 const hasherService = new BcryptHasher();
+const locationProvider = new GoogleLocationProvider();
 
 // OAuthClient
 const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
@@ -52,7 +54,11 @@ const authUsecases = new AuthUsecases(
 const userUsecases = new UserUsecases(userRepo);
 const updateUserProfileUsecase = new UpdateUserProfile(producer, userRepo);
 const getUserProfileUsecase = new GetUserProfile(userRepo);
-const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(producer, userRepo)
+const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
+  producer,
+  userRepo,
+  locationProvider,
+);
 
 // Controllers
 export const authController = new AuthController(authUsecases);
@@ -61,4 +67,6 @@ export const userController = new UserController(
   updateUserProfileUsecase,
   getUserProfileUsecase,
 );
-export const onboardingController = new UserOnboardingController(onboardingUpdateUserProfileUsecase)
+export const onboardingController = new UserOnboardingController(
+  onboardingUpdateUserProfileUsecase,
+);

@@ -18,6 +18,7 @@ const envVars = [
   "RABBITMQ_PASSWORD",
   "NODE_ENV",
   "GOOGLE_CLIENT_ID",
+  "GOOGLE_MAPS_API_KEY",
 ] as const;
 
 export function generateEnvVars() {
