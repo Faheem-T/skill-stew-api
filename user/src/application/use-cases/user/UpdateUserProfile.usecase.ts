@@ -1,17 +1,19 @@
 import { CreateEvent } from "@skillstew/common";
-import { User } from "../../../domain/entities/User";
+import { IUserLocation, User } from "../../../domain/entities/User";
 import { PresentationUser } from "../../dtos/GetAllUsersDTO";
 import { UpdateProfileDTO } from "../../dtos/user/UpdateUserProfile.dto";
 import { IUpdateUserProfile } from "../../interfaces/user/IUpdateUserProfile";
 import { IProducer } from "../../ports/IProducer";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { UserDTOMapper } from "../../mappers/UserDTOMapper";
+import { ILocationProvider } from "../../ports/ILocationProvider";
 
 export class UpdateUserProfile implements IUpdateUserProfile {
   constructor(
     private _messageProducer: IProducer,
     private _userRepo: IUserRepository,
-  ) { }
+    private _locationProvider: ILocationProvider,
+  ) {}
 
   exec = async (dto: UpdateProfileDTO): Promise<PresentationUser | null> => {
     const {
@@ -26,13 +28,24 @@ export class UpdateUserProfile implements IUpdateUserProfile {
       socialLinks,
       timezone,
     } = dto;
+
+    let locationDetails: IUserLocation | undefined = undefined;
+    if (location) {
+      const details = await this._locationProvider.getPlaceById(
+        location.placeId,
+      );
+      if (details) {
+        locationDetails = details;
+      }
+    }
+
     const user: Partial<User> = {
       id,
       name,
       username,
       about,
       avatarKey,
-      location,
+      location: locationDetails,
       languages,
       phoneNumber,
       socialLinks,

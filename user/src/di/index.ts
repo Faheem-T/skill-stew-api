@@ -13,7 +13,7 @@ import { OAuth2Client } from "google-auth-library";
 import { UpdateUserProfile } from "../application/use-cases/user/UpdateUserProfile.usecase";
 import { GetUserProfile } from "../application/use-cases/user/GetUserProfile.usecase";
 import { UserOnboardingController } from "../presentation/controllers/UserOnboardingController";
-import { OnboardingUpdateProfile } from "../application/use-cases/user/OnboardingUpdateUserProfile.dto";
+import { OnboardingUpdateProfile } from "../application/use-cases/user/OnboardingUpdateUserProfile.usecase";
 import { GoogleLocationProvider } from "../infrastructure/services/GoogleLocationProvider";
 
 // Services
@@ -52,7 +52,11 @@ const authUsecases = new AuthUsecases(
   oAuthClient,
 );
 const userUsecases = new UserUsecases(userRepo);
-const updateUserProfileUsecase = new UpdateUserProfile(producer, userRepo);
+const updateUserProfileUsecase = new UpdateUserProfile(
+  producer,
+  userRepo,
+  locationProvider,
+);
 const getUserProfileUsecase = new GetUserProfile(userRepo);
 const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
   producer,
