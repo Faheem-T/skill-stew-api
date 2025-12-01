@@ -14,6 +14,11 @@ const ServiceConfigs = [
     name: "user-service",
   },
   {
+    path: "/api/v1/me",
+    url: ENV.ME_SERVICE_URL,
+    name: "user-profile-service",
+  },
+  {
     path: "/api/v1/auth",
     url: ENV.AUTH_SERVICE_URL,
     name: "auth-service",

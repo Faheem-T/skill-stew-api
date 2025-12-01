@@ -10,6 +10,7 @@ const envVars = [
   "ADMIN_ACCESS_TOKEN_SECRET",
   "ADMIN_REFRESH_TOKEN_SECRET",
   "SEARCH_SERVICE_URL",
+  "ME_SERVICE_URL",
 ] as const;
 
 function generateEnvVars() {
