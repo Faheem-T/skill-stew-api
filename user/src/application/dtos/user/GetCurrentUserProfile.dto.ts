@@ -2,6 +2,8 @@ import z from "zod";
 
 export const getCurrentUserProfileSchema = z.object({
   name: z.string().optional(),
+  email: z.string(),
+  role: z.enum(["USER"]),
   username: z.string().optional(),
   phoneNumber: z.string().optional(),
   avatarUrl: z.string().optional(),

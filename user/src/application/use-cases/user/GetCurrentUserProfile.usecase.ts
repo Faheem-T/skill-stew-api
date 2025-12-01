@@ -22,9 +22,13 @@ export class GetCurrentUserProfile implements IGetCurrentUserProfile {
       about,
       socialLinks,
       languages,
+      email,
+      role,
     } = user;
     return {
       name,
+      email,
+      role,
       username,
       phoneNumber,
       avatarUrl: avatarKey,
