@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireRole } from "../middlewares/requireRole";
-import { userController } from "../../di";
+import { currentUserProfileController, userController } from "../../di";
 
 // api/v1/me
 const router = Router();
@@ -8,7 +8,7 @@ const router = Router();
 router.get(
   "/",
   requireRole("USER", "EXPERT", "ADMIN"),
-  userController.getCurrentUserProfile,
+  currentUserProfileController.getCurrentUserProfile,
 );
 
 export default router;

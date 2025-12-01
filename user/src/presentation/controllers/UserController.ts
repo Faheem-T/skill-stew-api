@@ -5,13 +5,11 @@ import { UserFilters } from "../../domain/repositories/IUserRepository";
 import { IUserUsecases } from "../../application/interfaces/IUserUsecases";
 import { updateProfileSchema } from "../../application/dtos/user/UpdateUserProfile.dto";
 import { IUpdateUserProfile } from "../../application/interfaces/user/IUpdateUserProfile";
-import { IGetCurrentUserProfile } from "../../application/interfaces/user/IGetCurrentUserProfile";
 
 export class UserController {
   constructor(
     private _userUsecases: IUserUsecases,
     private _updateUserProfile: IUpdateUserProfile,
-    private _getCurrentUserProfile: IGetCurrentUserProfile,
   ) {}
 
   createDummyUsers = async (
@@ -135,28 +133,6 @@ export class UserController {
         message: "User profile updated",
         data: updatedUser,
       });
-    } catch (err) {
-      next(err);
-    }
-  };
-
-  getCurrentUserProfile = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      const id = req.headers["x-user-id"] as string;
-      if (!id) {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: "Couldn't access user id" });
-        return;
-      }
-
-      const profile = await this._getCurrentUserProfile.exec(id);
-
-      res.status(HttpStatus.OK).json({ success: true, data: profile });
     } catch (err) {
       next(err);
     }

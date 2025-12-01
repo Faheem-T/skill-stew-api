@@ -11,10 +11,13 @@ import { UserController } from "../presentation/controllers/UserController";
 import { Consumer, Producer } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
 import { UpdateUserProfile } from "../application/use-cases/user/UpdateUserProfile.usecase";
-import { GetUserProfile } from "../application/use-cases/user/GetCurrentUserProfile.usecase";
+import { GetCurrentUserProfile } from "../application/use-cases/user/GetCurrentUserProfile.usecase";
 import { UserOnboardingController } from "../presentation/controllers/UserOnboardingController";
 import { OnboardingUpdateProfile } from "../application/use-cases/user/OnboardingUpdateUserProfile.usecase";
 import { GoogleLocationProvider } from "../infrastructure/services/GoogleLocationProvider";
+import { CurrentUserProfileController } from "../presentation/controllers/CurrentUserProfileController";
+import { GetCurrentExpertProfileUsecase } from "../application/use-cases/expert/GetCurrentExpertProfile.usecase";
+import { GetCurrentAdminProfileUsecase } from "../application/use-cases/admin/GetCurrentAdminProfile.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -57,7 +60,11 @@ const updateUserProfileUsecase = new UpdateUserProfile(
   userRepo,
   locationProvider,
 );
-const getUserProfileUsecase = new GetUserProfile(userRepo);
+const getCurrentUserProfileUsecase = new GetCurrentUserProfile(userRepo);
+const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase();
+const getCurrentAdminProfileUsecase = new GetCurrentAdminProfileUsecase(
+  adminRepo,
+);
 const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
   producer,
   userRepo,
@@ -69,8 +76,12 @@ export const authController = new AuthController(authUsecases);
 export const userController = new UserController(
   userUsecases,
   updateUserProfileUsecase,
-  getUserProfileUsecase,
 );
 export const onboardingController = new UserOnboardingController(
   onboardingUpdateUserProfileUsecase,
+);
+export const currentUserProfileController = new CurrentUserProfileController(
+  getCurrentUserProfileUsecase,
+  getCurrentExpertProfileUsecase,
+  getCurrentAdminProfileUsecase,
 );
