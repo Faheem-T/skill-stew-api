@@ -8,8 +8,7 @@ export class GetCurrentUserProfile implements IGetCurrentUserProfile {
     const user = await this._userRepo.findById(id);
     if (!user) return null;
 
-    // TODO
-    // convert avatarKey and bannerKey to url
+    // TODO: convert avatarKey and bannerKey to url
 
     const {
       name,
