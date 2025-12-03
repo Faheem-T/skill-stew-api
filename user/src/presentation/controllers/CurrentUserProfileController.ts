@@ -5,12 +5,15 @@ import { USER_ROLES, UserRoles } from "../../domain/entities/UserRoles";
 import { ForbiddenError } from "../errors/ForbiddenError";
 import { IGetCurrentExpertProfile } from "../../application/interfaces/expert/IGetCurrentExpertProfile";
 import { IGetCurrentAdminProfile } from "../../application/interfaces/admin/IGetCurrentAdminProfile";
+import { IGeneratePresignedUploadUrl } from "../../application/interfaces/common/IGeneratePresignedUploadUrl";
+import { generatePresignedUploadUrlSchema } from "../../application/dtos/common/GeneratePresignedUploadUrl.dto";
 
 export class CurrentUserProfileController {
   constructor(
     private _getCurrentUserProfile: IGetCurrentUserProfile,
     private _getCurrentExpertProfile: IGetCurrentExpertProfile,
     private _getCurrentAdminProfile: IGetCurrentAdminProfile,
+    private _generatePresignedUploadUrl: IGeneratePresignedUploadUrl,
   ) {}
 
   getCurrentUserProfile = async (
@@ -40,6 +43,33 @@ export class CurrentUserProfileController {
       }
 
       res.status(HttpStatus.OK).json({ success: true, data: profile });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  generateUploadPresignedUrl = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userId = req.headers["x-user-id"] as string;
+      const userRole = req.headers["x-user-role"] as UserRoles;
+      const dto = generatePresignedUploadUrlSchema.parse({
+        userId,
+        userRole,
+        ...req.body,
+      });
+      const { uploadUrl, key } =
+        await this._generatePresignedUploadUrl.exec(dto);
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: {
+          uploadUrl,
+          key,
+        },
+      });
     } catch (err) {
       next(err);
     }

@@ -18,6 +18,8 @@ import { GoogleLocationProvider } from "../infrastructure/services/GoogleLocatio
 import { CurrentUserProfileController } from "../presentation/controllers/CurrentUserProfileController";
 import { GetCurrentExpertProfileUsecase } from "../application/use-cases/expert/GetCurrentExpertProfile.usecase";
 import { GetCurrentAdminProfileUsecase } from "../application/use-cases/admin/GetCurrentAdminProfile.usecase";
+import { S3StorageService } from "../infrastructure/services/S3StorageService";
+import { GeneratePresignedUploadUrl } from "../application/use-cases/common/GeneratePresignedUploadUrl.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -32,6 +34,7 @@ const jwtService = new JwtService({
 });
 const hasherService = new BcryptHasher();
 const locationProvider = new GoogleLocationProvider();
+const s3StorageService = new S3StorageService();
 
 // OAuthClient
 const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
@@ -60,15 +63,22 @@ const updateUserProfileUsecase = new UpdateUserProfile(
   userRepo,
   locationProvider,
 );
-const getCurrentUserProfileUsecase = new GetCurrentUserProfile(userRepo);
+const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
+  userRepo,
+  s3StorageService,
+);
 const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase();
 const getCurrentAdminProfileUsecase = new GetCurrentAdminProfileUsecase(
   adminRepo,
+  s3StorageService,
 );
 const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
   producer,
   userRepo,
   locationProvider,
+);
+const generatePresignedUploadUrlUsecase = new GeneratePresignedUploadUrl(
+  s3StorageService,
 );
 
 // Controllers
@@ -84,4 +94,5 @@ export const currentUserProfileController = new CurrentUserProfileController(
   getCurrentUserProfileUsecase,
   getCurrentExpertProfileUsecase,
   getCurrentAdminProfileUsecase,
+  generatePresignedUploadUrlUsecase,
 );

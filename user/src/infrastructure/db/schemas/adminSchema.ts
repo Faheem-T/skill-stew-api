@@ -8,7 +8,7 @@ export const adminSchema = pgTable("admin", {
     .$default(() => randomUUID()),
   username: text().notNull(),
   password_hash: text().notNull(),
-  avatarKey: text(),
+  avatar_key: text(),
 });
 
 export type AdminSchemaType = InferSelectModel<typeof adminSchema>;

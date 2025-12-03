@@ -19,6 +19,10 @@ const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
   POST: [
     { path: "/api/v1/payments/subscriptions", roles: ["ADMIN"] },
     { path: "/api/v1/users/dummy", roles: ["ADMIN"] },
+    {
+      path: "/api/v1/me/upload/pre-signed",
+      roles: ["USER", "EXPERT", "ADMIN"],
+    },
   ],
   PUT: [{ path: "/api/v1/skills/profile", roles: ["USER"] }],
   PATCH: [

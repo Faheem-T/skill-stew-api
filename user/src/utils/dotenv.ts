@@ -19,6 +19,8 @@ const envVars = [
   "NODE_ENV",
   "GOOGLE_CLIENT_ID",
   "GOOGLE_MAPS_API_KEY",
+  "S3_BUCKET_NAME",
+  "CDN_DOMAIN_NAME",
 ] as const;
 
 export function generateEnvVars() {

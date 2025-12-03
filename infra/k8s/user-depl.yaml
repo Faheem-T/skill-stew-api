@@ -27,6 +27,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: user-config
+            - configMapRef:
+                name: aws-config
           env:
             - name: RABBITMQ_USER
               valueFrom:

@@ -10,14 +10,19 @@ export class AdminMapper {
   static toPersistence(
     admin: Admin,
   ): AdminSchemaType | Omit<AdminSchemaType, "id"> {
-    const { username, passwordHash, id } = admin;
-    const result: Omit<AdminSchemaType, "id"> = {
+    const { username, passwordHash, id, avatarKey } = admin;
+    // const result: Omit<AdminSchemaType, "id"> = {
+    //   password_hash: passwordHash,
+    //   username,
+    // };
+    // if (id) {
+    //   return Object.assign({ id }, result);
+    // }
+    return {
       password_hash: passwordHash,
+      id,
       username,
+      avatar_key: avatarKey ?? null,
     };
-    if (id) {
-      return Object.assign({ id }, result);
-    }
-    return result;
   }
 }
