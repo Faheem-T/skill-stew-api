@@ -7,8 +7,7 @@ export interface UserFilters {
 }
 
 export interface IUserRepository extends IBaseRepository<User> {
-  // getUserById(id: string): Promise<User | null>;
-  getAllUsers({
+  findAll({
     cursor,
     limit,
     filters,
@@ -21,8 +20,7 @@ export interface IUserRepository extends IBaseRepository<User> {
     hasNextPage: boolean;
     nextCursor: string | undefined;
   }>;
-  getUserByEmail(email: string): Promise<User | null>;
-  // save(user: User): Promise<User>;
-  // blockUser(userId: string): Promise<User | null>;
-  // unblockUser(userId: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User | null>;
+  findByUsername(username: string): Promise<User | null>;
+  getAllUsernames(): Promise<string[]>;
 }

@@ -4,7 +4,6 @@ import { IGetCurrentUserProfile } from "../../application/interfaces/user/IGetCu
 import { USER_ROLES, UserRoles } from "../../domain/entities/UserRoles";
 import { ForbiddenError } from "../errors/ForbiddenError";
 import { IGetCurrentExpertProfile } from "../../application/interfaces/expert/IGetCurrentExpertProfile";
-import { IGetCurrentAdminProfile } from "../../application/interfaces/admin/IGetCurrentAdminProfile";
 import { IGeneratePresignedUploadUrl } from "../../application/interfaces/common/IGeneratePresignedUploadUrl";
 import { generatePresignedUploadUrlSchema } from "../../application/dtos/common/GeneratePresignedUploadUrl.dto";
 
@@ -12,7 +11,6 @@ export class CurrentUserProfileController {
   constructor(
     private _getCurrentUserProfile: IGetCurrentUserProfile,
     private _getCurrentExpertProfile: IGetCurrentExpertProfile,
-    private _getCurrentAdminProfile: IGetCurrentAdminProfile,
     private _generatePresignedUploadUrl: IGeneratePresignedUploadUrl,
   ) {}
 
@@ -38,7 +36,7 @@ export class CurrentUserProfileController {
           profile = await this._getCurrentExpertProfile.exec(id);
           break;
         case "ADMIN":
-          profile = await this._getCurrentAdminProfile.exec(id);
+          profile = { role: "ADMIN" }; // TODO: Handle admin profile
           break;
       }
 

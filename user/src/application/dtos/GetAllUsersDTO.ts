@@ -9,17 +9,8 @@ export interface GetAllUsersInputDTO {
 export interface PresentationUser {
   id: string;
   role: string;
-  name: string | undefined;
   username: string | undefined;
   email: string;
-  phone_number: string | undefined;
-  avatar_url: string | undefined;
-  banner_url: string | undefined;
-  timezone: string | undefined;
-  about: string | undefined;
-  social_links: string[];
-  languages: string[];
-  is_subscribed: boolean;
   is_verified: boolean;
   is_blocked: boolean;
   created_at: Date;

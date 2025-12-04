@@ -1,5 +1,5 @@
 export interface IGetCurrentAdminProfile {
   exec(
     adminId: string,
-  ): Promise<{ username: string; role: "ADMIN"; avatarUrl?: string }>;
+  ): Promise<{ username: string; role: "ADMIN"; avatarUrl?: string }>; // TODO: admin profile
 }

@@ -1,25 +1,32 @@
 import { CreateEvent } from "@skillstew/common";
-import { IUserLocation, User } from "../../../domain/entities/User";
-import { PresentationUser } from "../../dtos/GetAllUsersDTO";
-import { UpdateProfileDTO } from "../../dtos/user/UpdateUserProfile.dto";
+import {
+  IUserLocation,
+  UserProfile,
+} from "../../../domain/entities/UserProfile";
+import {
+  UpdateProfileDTO,
+  UpdateProfileOutputDTO,
+} from "../../dtos/user/UpdateUserProfile.dto";
 import { IUpdateUserProfile } from "../../interfaces/user/IUpdateUserProfile";
 import { IProducer } from "../../ports/IProducer";
-import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { UserDTOMapper } from "../../mappers/UserDTOMapper";
 import { ILocationProvider } from "../../ports/ILocationProvider";
+import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
+import { IStorageService } from "../../ports/IStorageService";
 
 export class UpdateUserProfile implements IUpdateUserProfile {
   constructor(
     private _messageProducer: IProducer,
-    private _userRepo: IUserRepository,
+    private _userProfileRepo: IUserProfileRepository,
     private _locationProvider: ILocationProvider,
+    private _storageService: IStorageService,
   ) {}
 
-  exec = async (dto: UpdateProfileDTO): Promise<PresentationUser | null> => {
+  exec = async (
+    dto: UpdateProfileDTO,
+  ): Promise<UpdateProfileOutputDTO | null> => {
     const {
-      id,
+      userId,
       name,
-      username,
       about,
       avatarKey,
       location,
@@ -39,10 +46,9 @@ export class UpdateUserProfile implements IUpdateUserProfile {
       }
     }
 
-    const user: Partial<User> = {
-      id,
+    const profile: Partial<UserProfile> = {
+      userId,
       name,
-      username,
       about,
       avatarKey,
       location: locationDetails,
@@ -51,20 +57,42 @@ export class UpdateUserProfile implements IUpdateUserProfile {
       socialLinks,
       timezone,
     };
-    const savedUser = await this._userRepo.update(id, user);
+    const savedUser = await this._userProfileRepo.updateByUserId(
+      userId,
+      profile,
+    );
     if (!savedUser) return null;
+
+    // emit event
     const event = CreateEvent(
       "user.profileUpdated",
       {
-        id: savedUser.id,
+        id: savedUser.userId,
         name: savedUser.name,
-        username: savedUser.username,
         languages: savedUser.languages,
         location: savedUser.location,
       },
       "user-service",
     );
     this._messageProducer.publish(event);
-    return UserDTOMapper.toPresentation(savedUser);
+
+    const avatarUrl = savedUser.avatarKey
+      ? this._storageService.getPublicUrl(savedUser.avatarKey)
+      : undefined;
+    const bannerUrl = savedUser.bannerKey
+      ? this._storageService.getPublicUrl(savedUser.bannerKey)
+      : undefined;
+
+    return {
+      name: savedUser.name,
+      languages: savedUser.languages,
+      avatarUrl,
+      bannerUrl,
+      location: savedUser.location,
+      phoneNumber: savedUser.phoneNumber,
+      socialLinks: savedUser.socialLinks,
+      timezone: savedUser.timezone,
+      about: savedUser.about,
+    };
   };
 }

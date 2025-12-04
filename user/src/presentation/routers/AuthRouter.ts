@@ -14,6 +14,7 @@ router.post("/logout", authController.logout);
 
 // admin auth routes
 router.post("/admin/create", authController.createAdmin);
-router.post("/admin/login", authController.adminLogin);
+// TODO: Refactor admin login
+// router.post("/admin/login", authController.adminLogin);
 
 export default router;

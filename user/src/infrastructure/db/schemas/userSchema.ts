@@ -1,45 +1,23 @@
-import {
-  pgTable,
-  text,
-  boolean,
-  uuid,
-  timestamp,
-  json,
-} from "drizzle-orm/pg-core";
-import { InferSelectModel, sql } from "drizzle-orm";
+import { pgTable, text, boolean, uuid, pgEnum } from "drizzle-orm/pg-core";
+import { InferSelectModel } from "drizzle-orm";
 import { randomUUID } from "crypto";
-import { IUserLocation } from "../../../domain/entities/User";
+import { USER_ROLES } from "../../../domain/entities/UserRoles";
+import { timestamps } from "./timestamps";
+
+const roleEnum = pgEnum("role", USER_ROLES);
 
 export const userTable = pgTable("users", {
   id: uuid()
     .primaryKey()
     .$default(() => randomUUID()),
-  name: text(),
-  username: text(),
   email: text().unique().notNull(),
-  password_hash: text(),
-  phone_number: text(),
-  avatar_key: text(),
-  banner_key: text(),
-  timezone: text(),
-  about: text(),
-  social_links: text()
-    .array()
-    .notNull()
-    .default(sql`ARRAY[]::text[]`),
-  languages: text()
-    .array()
-    .notNull()
-    .default(sql`ARRAY[]::text[]`),
-  is_subscribed: boolean().default(false).notNull(),
+  role: roleEnum().notNull(),
   is_verified: boolean().default(false).notNull(),
   is_blocked: boolean().default(false).notNull(),
   is_google_login: boolean().default(false).notNull(),
-  location: json().$type<IUserLocation>(),
-  created_at: timestamp({ mode: "date", precision: 3 }).defaultNow().notNull(),
-  updated_at: timestamp({ mode: "date", precision: 3 })
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+  username: text().unique(),
+  password_hash: text(),
+  ...timestamps,
 });
 
 export type UserTableType = InferSelectModel<typeof userTable>;

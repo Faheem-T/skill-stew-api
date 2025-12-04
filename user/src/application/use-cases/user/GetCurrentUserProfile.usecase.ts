@@ -1,3 +1,4 @@
+import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { GetCurrentUserProfileDTO } from "../../dtos/user/GetCurrentUserProfile.dto";
 import { IGetCurrentUserProfile } from "../../interfaces/user/IGetCurrentUserProfile";
@@ -6,14 +7,15 @@ import { IStorageService } from "../../ports/IStorageService";
 export class GetCurrentUserProfile implements IGetCurrentUserProfile {
   constructor(
     private readonly _userRepo: IUserRepository,
+    private readonly _userProfileRepo: IUserProfileRepository,
     private readonly _storageService: IStorageService,
   ) {}
   exec = async (id: string): Promise<GetCurrentUserProfileDTO | null> => {
+    const profile = await this._userProfileRepo.findByUserId(id);
     const user = await this._userRepo.findById(id);
-    if (!user) return null;
+    if (!profile || !user) return null;
     const {
       name,
-      username,
       phoneNumber,
       avatarKey,
       bannerKey,
@@ -22,9 +24,9 @@ export class GetCurrentUserProfile implements IGetCurrentUserProfile {
       about,
       socialLinks,
       languages,
-      email,
-      role,
-    } = user;
+    } = profile;
+
+    const { email, role, username } = user;
 
     const avatarUrl = avatarKey
       ? this._storageService.getPublicUrl(avatarKey)
@@ -36,7 +38,7 @@ export class GetCurrentUserProfile implements IGetCurrentUserProfile {
     return {
       name,
       email,
-      role,
+      role: role as "USER",
       username,
       phoneNumber,
       avatarUrl,

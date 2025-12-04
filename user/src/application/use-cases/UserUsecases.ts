@@ -7,23 +7,9 @@ import { UserDTOMapper } from "../mappers/UserDTOMapper";
 export class UserUsecases implements IUserUsecases {
   constructor(private _userRepo: IUserRepository) {}
 
-  createDummyUsers = async () => {
-    for (const { email, isVerified } of dummyUsers) {
-      const newUser = new User({
-        email,
-        isGoogleLogin: false,
-        passwordHash: "password",
-      });
-      if (isVerified) {
-        newUser.isVerified = true;
-      }
-      await this._userRepo.create(newUser);
-    }
-  };
-
   getAllUsers = async (dto: GetAllUsersInputDTO) => {
     const { users, hasNextPage, nextCursor } =
-      await this._userRepo.getAllUsers(dto);
+      await this._userRepo.findAll(dto);
     const parsedUsers: PresentationUser[] = users.map(
       UserDTOMapper.toPresentation,
     );

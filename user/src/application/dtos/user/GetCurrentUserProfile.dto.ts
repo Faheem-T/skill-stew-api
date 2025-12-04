@@ -18,8 +18,8 @@ export const getCurrentUserProfileSchema = z.object({
     })
     .optional(),
   about: z.string().optional(),
-  socialLinks: z.array(z.string()),
-  languages: z.array(z.string()),
+  socialLinks: z.array(z.string()).optional(),
+  languages: z.array(z.string()).optional(),
 });
 
 export type GetCurrentUserProfileDTO = z.infer<

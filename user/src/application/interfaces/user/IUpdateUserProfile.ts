@@ -1,6 +1,8 @@
-import { PresentationUser } from "../../dtos/GetAllUsersDTO";
-import { UpdateProfileDTO } from "../../dtos/user/UpdateUserProfile.dto";
+import {
+  UpdateProfileDTO,
+  UpdateProfileOutputDTO,
+} from "../../dtos/user/UpdateUserProfile.dto";
 
 export interface IUpdateUserProfile {
-  exec(dto: UpdateProfileDTO): Promise<PresentationUser | null>;
+  exec(dto: UpdateProfileDTO): Promise<UpdateProfileOutputDTO | null>;
 }

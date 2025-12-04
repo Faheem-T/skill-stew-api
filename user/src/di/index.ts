@@ -1,11 +1,9 @@
 import { AuthController } from "../presentation/controllers/AuthController";
-import { AuthUsecases } from "../application/use-cases/AuthUsecases";
 import { UserRepository } from "../infrastructure/repositories/UserRepository";
 import { EmailService } from "../infrastructure/services/EmailService";
 import { JwtService } from "../infrastructure/services/JwtService";
 import { BcryptHasher } from "../infrastructure/services/HashService";
 import { ENV } from "../utils/dotenv";
-import { AdminRepository } from "../infrastructure/repositories/AdminRepository";
 import { UserUsecases } from "../application/use-cases/UserUsecases";
 import { UserController } from "../presentation/controllers/UserController";
 import { Consumer, Producer } from "@skillstew/common";
@@ -17,9 +15,16 @@ import { OnboardingUpdateProfile } from "../application/use-cases/user/Onboardin
 import { GoogleLocationProvider } from "../infrastructure/services/GoogleLocationProvider";
 import { CurrentUserProfileController } from "../presentation/controllers/CurrentUserProfileController";
 import { GetCurrentExpertProfileUsecase } from "../application/use-cases/expert/GetCurrentExpertProfile.usecase";
-import { GetCurrentAdminProfileUsecase } from "../application/use-cases/admin/GetCurrentAdminProfile.usecase";
 import { S3StorageService } from "../infrastructure/services/S3StorageService";
 import { GeneratePresignedUploadUrl } from "../application/use-cases/common/GeneratePresignedUploadUrl.usecase";
+import { UserProfileRepository } from "../infrastructure/repositories/UserProfileRepository";
+import { RegisterUser } from "../application/use-cases/auth/RegisterUser.usecase";
+import { LoginUser } from "../application/use-cases/auth/LoginUser.usecase";
+import { GoogleAuth } from "../application/use-cases/auth/GoogleAuth.usecase";
+import { SendVerificationLink } from "../application/use-cases/auth/SendVerificationLink.usecase";
+import { VerifyUser } from "../application/use-cases/auth/VerifyUser.usecase";
+import { GenerateAccessToken } from "../application/use-cases/auth/GenerateAccessToken.usecase";
+import { CreateAdmin } from "../application/use-cases/admin/CreateAdmin.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -41,40 +46,52 @@ const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 
 // Repositories
 const userRepo = new UserRepository();
-const adminRepo = new AdminRepository();
+const userProfileRepo = new UserProfileRepository();
 
 // RabbitMQ
 export const consumer = new Consumer();
 export const producer = new Producer();
 
 // Usecases
-const authUsecases = new AuthUsecases(
+const registerUserUsecase = new RegisterUser(
   userRepo,
-  emailService,
-  jwtService,
-  hasherService,
-  adminRepo,
+  userProfileRepo,
   producer,
-  oAuthClient,
+  hasherService,
+  jwtService,
 );
+const loginUserUsecase = new LoginUser(userRepo, jwtService, hasherService);
+const googleAuthUsecase = new GoogleAuth(
+  userRepo,
+  userProfileRepo,
+  oAuthClient,
+  producer,
+  jwtService,
+);
+const sendVerificationLinkUsecase = new SendVerificationLink(
+  userRepo,
+  jwtService,
+  emailService,
+);
+const verifyUserUsecase = new VerifyUser(userRepo, jwtService, producer);
+const generateAccessTokenUsecase = new GenerateAccessToken(jwtService);
+const createAdminUsecase = new CreateAdmin(userRepo, hasherService);
 const userUsecases = new UserUsecases(userRepo);
 const updateUserProfileUsecase = new UpdateUserProfile(
   producer,
-  userRepo,
+  userProfileRepo,
   locationProvider,
+  s3StorageService,
 );
 const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
   userRepo,
+  userProfileRepo,
   s3StorageService,
 );
 const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase();
-const getCurrentAdminProfileUsecase = new GetCurrentAdminProfileUsecase(
-  adminRepo,
-  s3StorageService,
-);
 const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
   producer,
-  userRepo,
+  userProfileRepo,
   locationProvider,
 );
 const generatePresignedUploadUrlUsecase = new GeneratePresignedUploadUrl(
@@ -82,7 +99,15 @@ const generatePresignedUploadUrlUsecase = new GeneratePresignedUploadUrl(
 );
 
 // Controllers
-export const authController = new AuthController(authUsecases);
+export const authController = new AuthController(
+  registerUserUsecase,
+  loginUserUsecase,
+  googleAuthUsecase,
+  sendVerificationLinkUsecase,
+  verifyUserUsecase,
+  generateAccessTokenUsecase,
+  createAdminUsecase,
+);
 export const userController = new UserController(
   userUsecases,
   updateUserProfileUsecase,
@@ -93,6 +118,5 @@ export const onboardingController = new UserOnboardingController(
 export const currentUserProfileController = new CurrentUserProfileController(
   getCurrentUserProfileUsecase,
   getCurrentExpertProfileUsecase,
-  getCurrentAdminProfileUsecase,
   generatePresignedUploadUrlUsecase,
 );

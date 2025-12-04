@@ -12,19 +12,6 @@ export class UserController {
     private _updateUserProfile: IUpdateUserProfile,
   ) {}
 
-  createDummyUsers = async (
-    _req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      await this._userUsecases.createDummyUsers();
-      res.status(HttpStatus.OK).json({ message: "Created", success: true });
-    } catch (err) {
-      next(err);
-    }
-  };
-
   getAllUsers = async (
     req: Request<
       {},
