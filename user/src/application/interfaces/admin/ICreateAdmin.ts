@@ -1,3 +1,5 @@
+import { CreateAdminDTO } from "../../dtos/admin/CreateAdmin.dto";
+
 export interface ICreateAdmin {
-  exec(username: string, password: string): Promise<void>;
+  exec(dto: CreateAdminDTO): Promise<void>;
 }

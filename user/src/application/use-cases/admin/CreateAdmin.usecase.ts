@@ -1,5 +1,6 @@
 import { User } from "../../../domain/entities/User";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import { CreateAdminDTO } from "../../dtos/admin/CreateAdmin.dto";
 import { ICreateAdmin } from "../../interfaces/admin/ICreateAdmin";
 import { IHasherService } from "../../ports/IHasherService";
 import { v7 as uuidv7 } from "uuid";
@@ -10,16 +11,16 @@ export class CreateAdmin implements ICreateAdmin {
     private _hasherService: IHasherService,
   ) {}
 
-  exec = async (username: string, password: string): Promise<void> => {
+  exec = async ({ email, password }: CreateAdminDTO): Promise<void> => {
     const passwordHash = this._hasherService.hash(password);
     const newAdmin = new User(
       uuidv7(),
-      "email",
+      email,
       "ADMIN",
       true,
       false,
       false,
-      username,
+      undefined,
       passwordHash,
     );
     await this._userRepo.create(newAdmin);

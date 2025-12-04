@@ -6,7 +6,7 @@ import {
   verifyEmailSchema,
 } from "../validators/UserValidator";
 import { UnauthorizedError } from "../../domain/errors/UnauthorizedError";
-import { createAdminSchema } from "../validators/AdminValidator";
+import { createAdminSchema } from "../../application/dtos/admin/CreateAdmin.dto";
 import { HttpStatus } from "@skillstew/common";
 import { DomainValidationError } from "../../domain/errors/DomainValidationError";
 import { ENV } from "../../utils/dotenv";
@@ -165,8 +165,8 @@ export class AuthController {
     next: NextFunction,
   ) => {
     try {
-      const adminInfo = createAdminSchema.parse(req.body);
-      await this._createAdmin.exec(adminInfo.username, adminInfo.password);
+      const dto = createAdminSchema.parse(req.body);
+      await this._createAdmin.exec(dto);
       res
         .status(HttpStatus.OK)
         .json({ success: true, message: "Admin has been created" });
@@ -175,39 +175,6 @@ export class AuthController {
     }
   };
 
-  // adminLogin = async (
-  //   req: Request,
-  //   res: Response<{
-  //     success: boolean;
-  //     data?: Record<string, any>;
-  //     message?: string;
-  //   }>,
-  //   next: NextFunction,
-  // ) => {
-  //   try {
-  //     const details = adminLoginSchema.parse(req.body);
-  //
-  //     const { refreshToken, accessToken } =
-  //       await this._authUsecases.loginAdmin(details);
-  //
-  //     res
-  //       .status(HttpStatus.OK)
-  //       .cookie("refreshToken", refreshToken, {
-  //         httpOnly: true,
-  //         secure: ENV.NODE_ENV === "production",
-  //         sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
-  //       })
-  //       .json({
-  //         success: true,
-  //         data: {
-  //           accessToken,
-  //         },
-  //       });
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // };
-  //
   googleAuth = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const credential = req.body.credential;
