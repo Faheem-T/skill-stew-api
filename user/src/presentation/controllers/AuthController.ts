@@ -146,7 +146,7 @@ export class AuthController {
       if (!refreshToken) {
         throw new UnauthorizedError();
       }
-      const accessToken = this._generateAccessToken.exec(refreshToken);
+      const accessToken = await this._generateAccessToken.exec(refreshToken);
       res.status(HttpStatus.OK).json({ success: true, data: { accessToken } });
     } catch (err) {
       next(err);
