@@ -1,6 +1,7 @@
 import { UserBlockedError } from "../../../domain/errors/UserBlockedError";
 import { WrongPasswordError } from "../../../domain/errors/WrongPasswordError";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import { LoginDTO } from "../../dtos/auth/Login.dto";
 import { GoogleAuthError } from "../../errors/GoogleAuthErrors";
 import { ILoginUser } from "../../interfaces/auth/ILoginUser";
 import { IHasherService } from "../../ports/IHasherService";
@@ -12,10 +13,13 @@ export class LoginUser implements ILoginUser {
     private _jwtService: IJwtService,
     private _hasherService: IHasherService,
   ) {}
-  exec = async (
-    email: string,
-    password: string,
-  ): Promise<{ refreshToken: string; accessToken: string } | null> => {
+  exec = async ({
+    email,
+    password,
+  }: LoginDTO): Promise<{
+    refreshToken: string;
+    accessToken: string;
+  } | null> => {
     const user = await this._userRepo.findByEmail(email);
     if (!user) {
       return null;

@@ -1,6 +1,7 @@
+import { LoginDTO } from "../../dtos/auth/Login.dto";
+
 export interface ILoginUser {
   exec(
-    email: string,
-    password: string,
+    dto: LoginDTO,
   ): Promise<{ refreshToken: string; accessToken: string } | null>;
 }

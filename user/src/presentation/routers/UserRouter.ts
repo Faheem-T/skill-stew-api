@@ -7,10 +7,13 @@ const router = Router();
 // api/v1/users
 router.get("/", requireRole("ADMIN"), userController.getAllUsers);
 
-router.patch("/:id/block", requireRole("ADMIN"), userController.blockUser);
-router.patch("/:id/unblock", requireRole("ADMIN"), userController.unblockUser);
+router.patch(
+  "/:id/block-status",
+  requireRole("ADMIN"),
+  userController.updateUserBlockStatus,
+);
 
-router.patch("/profile", requireRole("USER"), userController.userProfileUpdate);
+// router.patch("/profile", requireRole("USER"), userController.userProfileUpdate);
 
 router.patch(
   "/onboarding/profile",

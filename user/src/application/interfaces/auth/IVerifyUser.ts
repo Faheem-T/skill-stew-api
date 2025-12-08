@@ -1,3 +1,5 @@
+import { VerifyUserDTO } from "../../dtos/auth/VerifyUser.dto";
+
 export interface IVerifyUser {
-  exec(verificationToken: string): Promise<void>;
+  exec(dto: VerifyUserDTO): Promise<void>;
 }

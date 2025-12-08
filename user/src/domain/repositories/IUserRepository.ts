@@ -2,7 +2,7 @@ import { User } from "../entities/User";
 import { IBaseRepository } from "./IBaseRepository";
 
 export interface UserFilters {
-  query?: string; // to query by name/username/email
+  query?: string; // to query by username/email
   isVerified?: boolean;
 }
 

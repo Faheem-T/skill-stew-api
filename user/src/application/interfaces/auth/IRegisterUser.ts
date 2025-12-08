@@ -1,5 +1,5 @@
-import { RegisterOutputDTO } from "../../dtos/RegisterDTO";
+import { RegisterDTO, RegisterOutputDTO } from "../../dtos/auth/Register.dto";
 
 export interface IRegisterUser {
-  exec(email: string, password: string): Promise<RegisterOutputDTO>;
+  exec(dto: RegisterDTO): Promise<RegisterOutputDTO>;
 }

@@ -1,6 +1,5 @@
 import { Producer } from "@skillstew/common";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { RegisterOutputDTO } from "../../dtos/RegisterDTO";
 import { IRegisterUser } from "../../interfaces/auth/IRegisterUser";
 import { IHasherService } from "../../ports/IHasherService";
 import { CreateEvent } from "@skillstew/common";
@@ -9,6 +8,7 @@ import { v7 as uuidv7 } from "uuid";
 import { IJwtService } from "../../ports/IJwtService";
 import { UserProfile } from "../../../domain/entities/UserProfile";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
+import { RegisterDTO, RegisterOutputDTO } from "../../dtos/auth/Register.dto";
 
 export class RegisterUser implements IRegisterUser {
   constructor(
@@ -18,10 +18,10 @@ export class RegisterUser implements IRegisterUser {
     private _hasherService: IHasherService,
     private _jwtService: IJwtService,
   ) {}
-  exec = async (
-    email: string,
-    password: string,
-  ): Promise<RegisterOutputDTO> => {
+  exec = async ({
+    email,
+    password,
+  }: RegisterDTO): Promise<RegisterOutputDTO> => {
     const existingUser = await this._userRepo.findByEmail(email);
     if (existingUser) {
       return { success: false, userAlreadyExists: true };

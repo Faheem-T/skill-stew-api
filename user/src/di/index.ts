@@ -4,7 +4,6 @@ import { EmailService } from "../infrastructure/services/EmailService";
 import { JwtService } from "../infrastructure/services/JwtService";
 import { BcryptHasher } from "../infrastructure/services/HashService";
 import { ENV } from "../utils/dotenv";
-import { UserUsecases } from "../application/use-cases/UserUsecases";
 import { UserController } from "../presentation/controllers/UserController";
 import { Consumer, Producer } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
@@ -25,6 +24,8 @@ import { SendVerificationLink } from "../application/use-cases/auth/SendVerifica
 import { VerifyUser } from "../application/use-cases/auth/VerifyUser.usecase";
 import { GenerateAccessToken } from "../application/use-cases/auth/GenerateAccessToken.usecase";
 import { CreateAdmin } from "../application/use-cases/admin/CreateAdmin.usecase";
+import { UpdateUserBlockStatus } from "../application/use-cases/admin/UpdateUserBlockStatus.usecase";
+import { GetUsers } from "../application/use-cases/admin/GetUsers.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -76,7 +77,6 @@ const sendVerificationLinkUsecase = new SendVerificationLink(
 const verifyUserUsecase = new VerifyUser(userRepo, jwtService, producer);
 const generateAccessTokenUsecase = new GenerateAccessToken(jwtService);
 const createAdminUsecase = new CreateAdmin(userRepo, hasherService);
-const userUsecases = new UserUsecases(userRepo);
 const updateUserProfileUsecase = new UpdateUserProfile(
   producer,
   userProfileRepo,
@@ -97,6 +97,8 @@ const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
 const generatePresignedUploadUrlUsecase = new GeneratePresignedUploadUrl(
   s3StorageService,
 );
+const updateUserBlockStatusUsecase = new UpdateUserBlockStatus(userRepo);
+const getUsersUsecase = new GetUsers(userRepo);
 
 // Controllers
 export const authController = new AuthController(
@@ -109,8 +111,9 @@ export const authController = new AuthController(
   createAdminUsecase,
 );
 export const userController = new UserController(
-  userUsecases,
   updateUserProfileUsecase,
+  getUsersUsecase,
+  updateUserBlockStatusUsecase,
 );
 export const onboardingController = new UserOnboardingController(
   onboardingUpdateUserProfileUsecase,

@@ -4,6 +4,7 @@ import { IVerifyUser } from "../../interfaces/auth/IVerifyUser";
 import { IJwtService } from "../../ports/IJwtService";
 import { UserNotFoundError } from "../../../domain/errors/UserNotFoundError";
 import { DomainValidationError } from "../../../domain/errors/DomainValidationError";
+import { VerifyUserDTO } from "../../dtos/auth/VerifyUser.dto";
 
 export class VerifyUser implements IVerifyUser {
   constructor(
@@ -11,9 +12,8 @@ export class VerifyUser implements IVerifyUser {
     private _jwtService: IJwtService,
     private _messageProducer: Producer,
   ) {}
-  exec = async (verificationToken: string): Promise<void> => {
-    const payload =
-      this._jwtService.verifyEmailVerificationJwt(verificationToken);
+  exec = async ({ token }: VerifyUserDTO): Promise<void> => {
+    const payload = this._jwtService.verifyEmailVerificationJwt(token);
     const email = payload.email;
     const user = await this._userRepo.findByEmail(email);
     if (!user) {

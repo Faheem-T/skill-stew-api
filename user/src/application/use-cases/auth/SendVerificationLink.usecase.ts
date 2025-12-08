@@ -1,6 +1,7 @@
 import { DomainValidationError } from "../../../domain/errors/DomainValidationError";
 import { UserNotFoundError } from "../../../domain/errors/UserNotFoundError";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import { SendVerificationLinkDTO } from "../../dtos/auth/SendVerificationLink.dto";
 import { ISendVerificationLink } from "../../interfaces/auth/ISendVerificationLink";
 import { IEmailService } from "../../ports/IEmailService";
 import { IJwtService } from "../../ports/IJwtService";
@@ -11,7 +12,7 @@ export class SendVerificationLink implements ISendVerificationLink {
     private _jwtService: IJwtService,
     private _emailService: IEmailService,
   ) {}
-  exec = async (email: string): Promise<void> => {
+  exec = async ({ email }: SendVerificationLinkDTO): Promise<void> => {
     const user = await this._userRepo.findByEmail(email);
     if (!user) {
       throw new UserNotFoundError();

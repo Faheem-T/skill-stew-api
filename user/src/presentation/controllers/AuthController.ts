@@ -1,10 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import {
-  loginSchema,
-  registerSchema,
-  resendVerifyEmailSchema,
-  verifyEmailSchema,
-} from "../validators/UserValidator";
 import { UnauthorizedError } from "../../domain/errors/UnauthorizedError";
 import { createAdminSchema } from "../../application/dtos/admin/CreateAdmin.dto";
 import { HttpStatus } from "@skillstew/common";
@@ -18,6 +12,10 @@ import { ISendVerificationLink } from "../../application/interfaces/auth/ISendVe
 import { IVerifyUser } from "../../application/interfaces/auth/IVerifyUser";
 import { IGenerateAccessToken } from "../../application/interfaces/auth/IGenerateAccessToken";
 import { ICreateAdmin } from "../../application/interfaces/admin/ICreateAdmin";
+import { registerSchema } from "../../application/dtos/auth/Register.dto";
+import { loginSchema } from "../../application/dtos/auth/Login.dto";
+import { verifyUserSchema } from "../../application/dtos/auth/VerifyUser.dto";
+import { sendVerificationLinkSchema } from "../../application/dtos/auth/SendVerificationLink.dto";
 
 export class AuthController {
   constructor(
@@ -32,8 +30,8 @@ export class AuthController {
 
   registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, password } = registerSchema.parse(req.body);
-      const result = await this._registerUser.exec(email, password);
+      const dto = registerSchema.parse(req.body);
+      const result = await this._registerUser.exec(dto);
 
       if (!result.success) {
         const { userAlreadyExists } = result;
@@ -43,7 +41,7 @@ export class AuthController {
         return;
       }
 
-      await this._sendVerificationLink.exec(email);
+      await this._sendVerificationLink.exec({ email: dto.email });
 
       const { accessToken, refreshToken } = result;
 
@@ -66,8 +64,8 @@ export class AuthController {
 
   verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = verifyEmailSchema.parse(req.body);
-      await this._verifyUser.exec(result.token);
+      const dto = verifyUserSchema.parse(req.body);
+      await this._verifyUser.exec(dto);
       res.status(HttpStatus.OK).json({
         success: true,
         message: "User has been verified.",
@@ -89,9 +87,9 @@ export class AuthController {
     next: NextFunction,
   ) => {
     try {
-      const { email } = resendVerifyEmailSchema.parse(req.body);
+      const dto = sendVerificationLinkSchema.parse(req.body);
 
-      await this._sendVerificationLink.exec(email);
+      await this._sendVerificationLink.exec(dto);
       res
         .status(HttpStatus.OK)
         .json({ success: true, message: "Email has been resent" });
@@ -102,8 +100,8 @@ export class AuthController {
 
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = loginSchema.parse(req.body);
-      const tokens = await this._loginUser.exec(result.email, result.password);
+      const dto = loginSchema.parse(req.body);
+      const tokens = await this._loginUser.exec(dto);
 
       if (!tokens) {
         res
