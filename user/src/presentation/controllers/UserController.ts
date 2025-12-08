@@ -66,7 +66,7 @@ export class UserController {
     try {
       const dto = updateUserBlockStatusSchema.parse({
         ...req.body,
-        id: req.params.id,
+        userId: req.params.id,
       });
 
       const updatedUser = await this._updateUserBlockStatus.exec(dto);
