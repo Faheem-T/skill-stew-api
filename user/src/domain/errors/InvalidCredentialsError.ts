@@ -1,8 +1,8 @@
 import { DomainError } from "./DomainError.abstract";
 
-export class UnauthorizedError extends DomainError {
+export class InvalidCredentialsError extends DomainError {
   constructor() {
-    super("UNAUTHORIZED");
+    super("INVALID_CREDENTIALS", "Invalid credentials.");
   }
 
   toJSON(): { errors: { message: string; field?: string }[] } {

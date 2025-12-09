@@ -1,8 +1,8 @@
 import { DomainError } from "./DomainError.abstract";
 
-export class UnauthorizedError extends DomainError {
+export class BlockedUserError extends DomainError {
   constructor() {
-    super("UNAUTHORIZED");
+    super("BLOCKED_USER", "User is blocked.");
   }
 
   toJSON(): { errors: { message: string; field?: string }[] } {

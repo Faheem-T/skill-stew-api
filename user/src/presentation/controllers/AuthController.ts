@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "../../domain/errors/UnauthorizedError";
 import { createAdminSchema } from "../../application/dtos/admin/CreateAdmin.dto";
 import { HttpStatus } from "@skillstew/common";
-import { DomainValidationError } from "../../domain/errors/DomainValidationError";
 import { ENV } from "../../utils/dotenv";
 import { GoogleAuthError } from "../../application/errors/GoogleAuthErrors";
 import { IRegisterUser } from "../../application/interfaces/auth/IRegisterUser";
@@ -71,12 +70,6 @@ export class AuthController {
         message: "User has been verified.",
       });
     } catch (err) {
-      if (err instanceof DomainValidationError) {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: err.message });
-        return;
-      }
       next(err);
     }
   };

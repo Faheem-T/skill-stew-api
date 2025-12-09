@@ -1,11 +1,12 @@
-import { UserBlockedError } from "../../../domain/errors/UserBlockedError";
-import { WrongPasswordError } from "../../../domain/errors/WrongPasswordError";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { LoginDTO } from "../../dtos/auth/Login.dto";
 import { GoogleAuthError } from "../../errors/GoogleAuthErrors";
 import { ILoginUser } from "../../interfaces/auth/ILoginUser";
 import { IHasherService } from "../../ports/IHasherService";
 import { IJwtService } from "../../ports/IJwtService";
+import { NotFoundError } from "../../../domain/errors/NotFoundError";
+import { InvalidCredentialsError } from "../../../domain/errors/InvalidCredentialsError";
+import { BlockedUserError } from "../../../domain/errors/BlockedUserError";
 
 export class LoginUser implements ILoginUser {
   constructor(
@@ -22,16 +23,16 @@ export class LoginUser implements ILoginUser {
   } | null> => {
     const user = await this._userRepo.findByEmail(email);
     if (!user) {
-      return null;
+      throw new NotFoundError("User");
     }
     if (user.isGoogleLogin) {
       throw new GoogleAuthError("GOOGLE_ACCOUNT_EXISTS");
     }
     if (!this._hasherService.compare(password, user.passwordHash!)) {
-      throw new WrongPasswordError();
+      throw new InvalidCredentialsError();
     }
     if (user.isBlocked) {
-      throw new UserBlockedError();
+      throw new BlockedUserError();
     }
 
     const role = user.role;

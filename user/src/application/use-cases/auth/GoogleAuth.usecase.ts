@@ -6,7 +6,7 @@ import { ENV } from "../../../utils/dotenv";
 import { v7 as uuidv7 } from "uuid";
 import { User } from "../../../domain/entities/User";
 import { Producer, CreateEvent } from "@skillstew/common";
-import { UserBlockedError } from "../../../domain/errors/UserBlockedError";
+import { BlockedUserError } from "../../../domain/errors/BlockedUserError";
 import { IJwtService } from "../../ports/IJwtService";
 import { UserProfile } from "../../../domain/entities/UserProfile";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
@@ -80,7 +80,7 @@ export class GoogleAuth implements IGoogleAuth {
         throw new GoogleAuthError("LOCAL_ACCOUNT_EXISTS");
       }
       if (user.isBlocked) {
-        throw new UserBlockedError();
+        throw new BlockedUserError();
       }
     }
 

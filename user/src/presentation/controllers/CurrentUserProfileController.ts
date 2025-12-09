@@ -2,7 +2,7 @@ import { HttpStatus } from "@skillstew/common";
 import { NextFunction, Request, Response } from "express";
 import { IGetCurrentUserProfile } from "../../application/interfaces/user/IGetCurrentUserProfile";
 import { USER_ROLES, UserRoles } from "../../domain/entities/UserRoles";
-import { ForbiddenError } from "../errors/ForbiddenError";
+import { ForbiddenError } from "../../domain/errors/ForbiddenError";
 import { IGetCurrentExpertProfile } from "../../application/interfaces/expert/IGetCurrentExpertProfile";
 import { IGeneratePresignedUploadUrl } from "../../application/interfaces/common/IGeneratePresignedUploadUrl";
 import { generatePresignedUploadUrlSchema } from "../../application/dtos/common/GeneratePresignedUploadUrl.dto";

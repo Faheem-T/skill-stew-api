@@ -1,5 +1,5 @@
-import { RequestUser } from "../../3-presentation/types/RequestType";
-import { UserRoles } from "../../0-domain/entities/UserRoles";
+import { RequestUser } from "../../presentation/types/RequestType";
+import { UserRoles } from "../../domain/entities/UserRoles";
 
 export interface RequestUser {
   id: string | number;

@@ -1,8 +1,8 @@
 import { DomainError } from "./DomainError.abstract";
 
-export class UnauthorizedError extends DomainError {
+export class SessionExpiredError extends DomainError {
   constructor() {
-    super("UNAUTHORIZED");
+    super("SESSION_EXPIRED", "Session expired");
   }
 
   toJSON(): { errors: { message: string; field?: string }[] } {
