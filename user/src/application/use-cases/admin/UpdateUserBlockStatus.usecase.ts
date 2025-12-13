@@ -7,13 +7,13 @@ export class UpdateUserBlockStatus implements IUpdateUserBlockStatus {
   constructor(private _userRepo: IUserRepository) {}
   exec = async (
     dto: UpdateUserBlockStatusDTO,
-  ): Promise<AdminGetUserOutputDTO | null> => {
+  ): Promise<AdminGetUserOutputDTO> => {
     const { userId, newBlockStatus } = dto;
 
     const user = await this._userRepo.update(userId, {
       isBlocked: newBlockStatus,
     });
 
-    return user ?? null;
+    return user;
   };
 }

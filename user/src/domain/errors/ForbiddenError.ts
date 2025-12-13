@@ -1,8 +1,9 @@
 import { DomainError } from "./DomainError.abstract";
+import { DomainErrorCodes } from "./DomainErrorCodes";
 
 export class ForbiddenError extends DomainError {
   constructor() {
-    super("FORBIDDEN", "Forbidden.");
+    super(DomainErrorCodes.FORBIDDEN, "Forbidden.");
   }
 
   toJSON(): { errors: { message: string; field?: string }[] } {

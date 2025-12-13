@@ -3,7 +3,6 @@ import { UnauthorizedError } from "../../domain/errors/UnauthorizedError";
 import { createAdminSchema } from "../../application/dtos/admin/CreateAdmin.dto";
 import { HttpStatus } from "@skillstew/common";
 import { ENV } from "../../utils/dotenv";
-import { GoogleAuthError } from "../../application/errors/GoogleAuthErrors";
 import { IRegisterUser } from "../../application/interfaces/auth/IRegisterUser";
 import { ILoginUser } from "../../application/interfaces/auth/ILoginUser";
 import { IGoogleAuth } from "../../application/interfaces/auth/IGoogleAuth";
@@ -119,16 +118,6 @@ export class AuthController {
           },
         });
     } catch (err) {
-      if (err instanceof GoogleAuthError) {
-        const status =
-          err.code === "LOCAL_ACCOUNT_EXISTS"
-            ? HttpStatus.CONFLICT
-            : HttpStatus.BAD_REQUEST;
-        res
-          .status(status)
-          .json({ success: false, message: err.message, error: err.code });
-        return;
-      }
       next(err);
     }
   };
@@ -194,16 +183,6 @@ export class AuthController {
           },
         });
     } catch (err) {
-      if (err instanceof GoogleAuthError) {
-        const status =
-          err.code === "LOCAL_ACCOUNT_EXISTS"
-            ? HttpStatus.CONFLICT
-            : HttpStatus.BAD_REQUEST;
-        res
-          .status(status)
-          .json({ success: false, message: err.message, error: err.code });
-        return;
-      }
       next(err);
     }
   };

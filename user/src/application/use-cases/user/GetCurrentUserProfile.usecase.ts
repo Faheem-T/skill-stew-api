@@ -10,10 +10,9 @@ export class GetCurrentUserProfile implements IGetCurrentUserProfile {
     private readonly _userProfileRepo: IUserProfileRepository,
     private readonly _storageService: IStorageService,
   ) {}
-  exec = async (id: string): Promise<GetCurrentUserProfileDTO | null> => {
+  exec = async (id: string): Promise<GetCurrentUserProfileDTO> => {
     const profile = await this._userProfileRepo.findByUserId(id);
     const user = await this._userRepo.findById(id);
-    if (!profile || !user) return null;
     const {
       name,
       phoneNumber,

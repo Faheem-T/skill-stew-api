@@ -4,5 +4,5 @@ import {
 } from "../../dtos/user/UpdateUserProfile.dto";
 
 export interface IUpdateUserProfile {
-  exec(dto: UpdateProfileDTO): Promise<UpdateProfileOutputDTO | null>;
+  exec(dto: UpdateProfileDTO): Promise<UpdateProfileOutputDTO>;
 }

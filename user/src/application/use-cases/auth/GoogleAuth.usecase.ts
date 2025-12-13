@@ -1,7 +1,6 @@
 import { OAuth2Client } from "google-auth-library";
 import { IGoogleAuth } from "../../interfaces/auth/IGoogleAuth";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { GoogleAuthError } from "../../errors/GoogleAuthErrors";
 import { ENV } from "../../../utils/dotenv";
 import { v7 as uuidv7 } from "uuid";
 import { User } from "../../../domain/entities/User";
@@ -10,6 +9,8 @@ import { BlockedUserError } from "../../../domain/errors/BlockedUserError";
 import { IJwtService } from "../../ports/IJwtService";
 import { UserProfile } from "../../../domain/entities/UserProfile";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
+import { InvalidCredentialsError } from "../../../domain/errors/InvalidCredentialsError";
+import { AccountAuthProviderConflictError } from "../../../domain/errors/AccountAuthProviderConflictError";
 
 export class GoogleAuth implements IGoogleAuth {
   constructor(
@@ -28,7 +29,7 @@ export class GoogleAuth implements IGoogleAuth {
     });
     const payload = ticket.getPayload();
     if (!payload || !payload["email"]) {
-      throw new GoogleAuthError("INVALID_GOOGLE_AUTH_CREDENTIAL");
+      throw new InvalidCredentialsError();
     }
 
     const email = payload["email"];
@@ -77,7 +78,11 @@ export class GoogleAuth implements IGoogleAuth {
       // Handle existing user
 
       if (!user.isGoogleLogin) {
-        throw new GoogleAuthError("LOCAL_ACCOUNT_EXISTS");
+        throw new AccountAuthProviderConflictError(
+          user.email,
+          "local",
+          "google",
+        );
       }
       if (user.isBlocked) {
         throw new BlockedUserError();

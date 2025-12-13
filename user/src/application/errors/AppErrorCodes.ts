@@ -1,3 +1,17 @@
-export const AppErrorCodes = {} as const;
+export const AppErrorCodes = {
+  CONFLICT: "CONFLICT",
+  INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
+
+  // Infra errors
+  INFRA_AUTH_FAILED: "INFRA_AUTH_FAILED",
+  INFRA_UNAVAILABLE: "INFRA_UNAVAILABLE",
+
+  // DB errors
+  DB_UNIQUE_CONSTRAINT: "DB_UNIQUE_CONSTRAINT",
+  DB_FOREIGN_KEY_CONSTRAINT: "DB_FOREIGN_KEY_CONSTRAINT",
+  DB_QUERY_ERROR: "DB_QUERY_ERROR",
+  DB_CONNECTION_ERROR: "DB_CONNECTION_ERROR",
+  DB_TIMEOUT: "DB_TIMEOUT",
+} as const;
 
 export type AppErrorCodes = keyof typeof AppErrorCodes;

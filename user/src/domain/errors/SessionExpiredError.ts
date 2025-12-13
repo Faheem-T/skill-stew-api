@@ -1,8 +1,9 @@
 import { DomainError } from "./DomainError.abstract";
+import { DomainErrorCodes } from "./DomainErrorCodes";
 
 export class SessionExpiredError extends DomainError {
   constructor() {
-    super("SESSION_EXPIRED", "Session expired");
+    super(DomainErrorCodes.SESSION_EXPIRED, "Session expired");
   }
 
   toJSON(): { errors: { message: string; field?: string }[] } {

@@ -20,7 +20,7 @@ export interface IUserRepository extends IBaseRepository<User> {
     hasNextPage: boolean;
     nextCursor: string | undefined;
   }>;
-  findByEmail(email: string): Promise<User | null>;
-  findByUsername(username: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User>;
+  findByUsername(username: string): Promise<User>;
   getAllUsernames(): Promise<string[]>;
 }

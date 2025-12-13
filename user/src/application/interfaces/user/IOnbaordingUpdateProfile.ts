@@ -6,5 +6,5 @@ import {
 export interface IOnboardingUpdateUserProfile {
   exec(
     dto: OnboardingUpdateUserProfileDTO,
-  ): Promise<OnboardingUpdateUserProfileOutputDTO | null>;
+  ): Promise<OnboardingUpdateUserProfileOutputDTO>;
 }

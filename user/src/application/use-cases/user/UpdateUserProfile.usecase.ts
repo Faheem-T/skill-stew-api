@@ -21,9 +21,7 @@ export class UpdateUserProfile implements IUpdateUserProfile {
     private _storageService: IStorageService,
   ) {}
 
-  exec = async (
-    dto: UpdateProfileDTO,
-  ): Promise<UpdateProfileOutputDTO | null> => {
+  exec = async (dto: UpdateProfileDTO): Promise<UpdateProfileOutputDTO> => {
     const {
       userId,
       name,
@@ -61,7 +59,6 @@ export class UpdateUserProfile implements IUpdateUserProfile {
       userId,
       profile,
     );
-    if (!savedUser) return null;
 
     // emit event
     const event = CreateEvent(

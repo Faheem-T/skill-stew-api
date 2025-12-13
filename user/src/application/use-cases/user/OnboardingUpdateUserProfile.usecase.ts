@@ -18,7 +18,7 @@ export class OnboardingUpdateProfile implements IOnboardingUpdateUserProfile {
 
   exec = async (
     dto: OnboardingUpdateUserProfileDTO,
-  ): Promise<OnboardingUpdateUserProfileOutputDTO | null> => {
+  ): Promise<OnboardingUpdateUserProfileOutputDTO> => {
     const { userId, name, avatarKey, location, languages } = dto;
 
     const locationDetails = location?.placeId
@@ -37,8 +37,6 @@ export class OnboardingUpdateProfile implements IOnboardingUpdateUserProfile {
       userId,
       profile,
     );
-
-    if (!savedProfile) return null;
 
     const event = CreateEvent(
       "user.profileUpdated",

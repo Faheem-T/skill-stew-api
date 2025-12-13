@@ -5,11 +5,12 @@ import {
 } from "../../domain/repositories/IUserRepository";
 import { db } from "../../start";
 import { decodeCursor, encodeCursor } from "../../utils/dbCursor";
-import { DatabaseError } from "../errors/DatabaseError";
 import { UserMapper } from "../mappers/UserMapper";
 import { userTable } from "../db/schemas/userSchema";
 import { and, eq, ilike, gt, or, isNotNull } from "drizzle-orm";
 import { BaseRepository } from "./BaseRepository";
+import { NotFoundError } from "../../domain/errors/NotFoundError";
+import { mapDrizzleError } from "../mappers/ErrorMapper";
 
 export class UserRepository
   extends BaseRepository<User, typeof userTable>
@@ -63,58 +64,69 @@ export class UserRepository
 
     const where = conditions.length > 0 ? and(...conditions) : undefined;
 
+    let rows;
     try {
-      const rows = await db
+      rows = await db
         .select()
         .from(userTable)
         .where(where)
         .orderBy(userTable.created_at, userTable.id)
         .limit(limit + 1);
-
-      const hasNextPage = rows.length > limit;
-      const sliced = hasNextPage ? rows.slice(0, -1) : rows;
-
-      const users = sliced.map(this.mapper.toDomain);
-
-      return {
-        users,
-        hasNextPage,
-        nextCursor: hasNextPage
-          ? encodeCursor(
-              users[users.length - 1].createdAt!,
-              users[users.length - 1].id!,
-            )
-          : undefined,
-      };
     } catch (err) {
-      throw new DatabaseError(err);
+      throw mapDrizzleError(err);
     }
+
+    const hasNextPage = rows.length > limit;
+    const sliced = hasNextPage ? rows.slice(0, -1) : rows;
+
+    const users = sliced.map(this.mapper.toDomain);
+
+    return {
+      users,
+      hasNextPage,
+      nextCursor: hasNextPage
+        ? encodeCursor(
+            users[users.length - 1].createdAt!,
+            users[users.length - 1].id!,
+          )
+        : undefined,
+    };
   };
 
-  findByEmail = async (email: string): Promise<User | null> => {
+  findByEmail = async (email: string): Promise<User> => {
+    let row;
     try {
-      const [user] = await db
+      const rows = await db
         .select()
         .from(userTable)
         .where(eq(userTable.email, email));
-      if (!user) return null;
-      return this.mapper.toDomain(user);
+      row = rows[0];
     } catch (err) {
-      throw new DatabaseError(err);
+      throw mapDrizzleError(err);
     }
+
+    if (!row) {
+      throw new NotFoundError("User");
+    }
+
+    return this.mapper.toDomain(row);
   };
 
-  findByUsername = async (username: string): Promise<User | null> => {
+  findByUsername = async (username: string): Promise<User> => {
+    let row;
     try {
-      const [user] = await db
+      const rows = await db
         .select()
         .from(userTable)
         .where(eq(userTable.username, username));
-      if (!user) return null;
-      return this.mapper.toDomain(user);
+      row = rows[0];
     } catch (err) {
-      throw new DatabaseError(err);
+      throw mapDrizzleError(err);
     }
+    if (!row) {
+      throw new NotFoundError("User");
+    }
+    return this.mapper.toDomain(row);
   };
 
   getAllUsernames = async (): Promise<string[]> => {
@@ -125,7 +137,7 @@ export class UserRepository
         .where(isNotNull(userTable.username));
       return rows.map((row) => row.username!);
     } catch (err) {
-      throw new DatabaseError(err);
+      throw mapDrizzleError(err);
     }
   };
 }

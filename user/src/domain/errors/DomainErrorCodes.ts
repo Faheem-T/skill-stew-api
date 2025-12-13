@@ -6,6 +6,8 @@ export const DomainErrorCodes = {
   SESSION_EXPIRED: "SESSION_EXPIRED",
   FORBIDDEN: "FORBIDDEN",
   VERIFIED_USER: "VERIFIED_USER",
+  ALREADY_EXISTS: "ALREADY_EXISTS",
+  AUTH_PROVIDER_CONFLICT: "AUTH_PROVIDER_CONFLICT",
 } as const;
 
 export type DomainErrorCodes = keyof typeof DomainErrorCodes;
