@@ -1,6 +1,7 @@
 export const AppErrorCodes = {
-  CONFLICT: "CONFLICT",
+  // App errors
   INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
+  INVALID_AUTH_TOKEN: "INVALID_AUTH_TOKEN",
 
   // Infra errors
   INFRA_AUTH_FAILED: "INFRA_AUTH_FAILED",
