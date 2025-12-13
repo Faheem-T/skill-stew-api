@@ -4,8 +4,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import amqp from "amqplib";
 import { consumer, producer } from "./di";
-import { UserRegisteredEvent } from "@skillstew/common";
 import { logger } from "./presentation/logger";
+import { mapDrizzleError } from "./infrastructure/mappers/ErrorMapper";
 
 const { Pool } = pg;
 
@@ -23,6 +23,7 @@ async function start() {
     logger.info("Successfully pinged database");
   } catch (err) {
     logger.error("Error while pinging database", err);
+    throw mapDrizzleError(err);
   }
   logger.info("Connected to database");
 
@@ -49,13 +50,5 @@ async function initializeMessageQueue() {
   await producer.init(channel, "stew_exchange");
   await consumer.init(channel, "stew_exchange", "user", INTERESTED_EVENTS);
 
-  // for testing
-  consumer.registerHandler(
-    "user.registered",
-    async (event: UserRegisteredEvent) => {
-      logger.info("Received user.registered event: \n", event);
-      return { success: true };
-    },
-  );
   logger.info("Producer and Consumer setup complete.");
 }
