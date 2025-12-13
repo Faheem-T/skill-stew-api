@@ -9,7 +9,6 @@ export const ErrorCodeToStatusCodeMap: Record<AllErrorCodes, number> = {
   [DomainErrorCodes.FORBIDDEN]: HttpStatus.FORBIDDEN,
   [DomainErrorCodes.INVALID_CREDENTIALS]: HttpStatus.BAD_REQUEST,
   [DomainErrorCodes.NOT_FOUND_ERROR]: HttpStatus.NOT_FOUND,
-  [DomainErrorCodes.SESSION_EXPIRED]: HttpStatus.UNAUTHORIZED,
   [DomainErrorCodes.VERIFIED_USER]: HttpStatus.CONFLICT,
   [DomainErrorCodes.UNAUTHORIZED]: HttpStatus.UNAUTHORIZED,
   [DomainErrorCodes.ALREADY_EXISTS]: HttpStatus.CONFLICT,
