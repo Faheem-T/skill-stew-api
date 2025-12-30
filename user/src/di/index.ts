@@ -26,6 +26,8 @@ import { GenerateAccessToken } from "../application/use-cases/auth/GenerateAcces
 import { CreateAdmin } from "../application/use-cases/admin/CreateAdmin.usecase";
 import { UpdateUserBlockStatus } from "../application/use-cases/admin/UpdateUserBlockStatus.usecase";
 import { GetUsers } from "../application/use-cases/admin/GetUsers.usecase";
+import amqp from "amqplib";
+import { EventConsumer } from "../infrastructure/services/EventConsumer";
 
 // Services
 const emailService = new EmailService();
@@ -50,8 +52,13 @@ const userRepo = new UserRepository();
 const userProfileRepo = new UserProfileRepository();
 
 // RabbitMQ
-export const consumer = new Consumer();
-export const producer = new Producer();
+// export const consumer = new Consumer();
+// export const producer = new Producer();
+const connection = await amqp.connect(
+  `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
+);
+const channel = await connection.createChannel();
+export const consumer = new EventConsumer();
 
 // Usecases
 const registerUserUsecase = new RegisterUser(
