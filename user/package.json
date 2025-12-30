@@ -2,6 +2,7 @@
   "name": "user",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "tsx watch --clear-screen=false --include './src/**/*.ts' ./src/start.ts",
     "syncDb": "drizzle-kit push --config=./src/utils/drizzleConfig.ts",
