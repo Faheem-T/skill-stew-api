@@ -1,4 +1,3 @@
-import { Producer } from "@skillstew/common";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { IRegisterUser } from "../../interfaces/auth/IRegisterUser";
 import { IHasherService } from "../../ports/IHasherService";
@@ -9,12 +8,13 @@ import { IJwtService } from "../../ports/IJwtService";
 import { UserProfile } from "../../../domain/entities/UserProfile";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
 import { RegisterDTO, RegisterOutputDTO } from "../../dtos/auth/Register.dto";
+import { IProducer } from "../../ports/IProducer";
 
 export class RegisterUser implements IRegisterUser {
   constructor(
     private _userRepo: IUserRepository,
     private _userProfileRepo: IUserProfileRepository,
-    private _messageProducer: Producer,
+    private _messageProducer: IProducer,
     private _hasherService: IHasherService,
     private _jwtService: IJwtService,
   ) {}

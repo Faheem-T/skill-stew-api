@@ -1,16 +1,17 @@
-import { CreateEvent, Producer } from "@skillstew/common";
+import { CreateEvent } from "@skillstew/common";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { IVerifyUser } from "../../interfaces/auth/IVerifyUser";
 import { IJwtService } from "../../ports/IJwtService";
 import { VerifyUserDTO } from "../../dtos/auth/VerifyUser.dto";
 import { NotFoundError } from "../../../domain/errors/NotFoundError";
 import { VerifiedUserError } from "../../../domain/errors/VerifiedUserError";
+import { IProducer } from "../../ports/IProducer";
 
 export class VerifyUser implements IVerifyUser {
   constructor(
     private _userRepo: IUserRepository,
     private _jwtService: IJwtService,
-    private _messageProducer: Producer,
+    private _messageProducer: IProducer,
   ) {}
   exec = async ({ token }: VerifyUserDTO): Promise<void> => {
     const payload = this._jwtService.verifyEmailVerificationJwt(token);

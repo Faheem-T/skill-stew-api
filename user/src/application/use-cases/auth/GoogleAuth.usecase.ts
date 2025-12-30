@@ -4,20 +4,21 @@ import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { ENV } from "../../../utils/dotenv";
 import { v7 as uuidv7 } from "uuid";
 import { User } from "../../../domain/entities/User";
-import { Producer, CreateEvent } from "@skillstew/common";
+import { CreateEvent } from "@skillstew/common";
 import { BlockedUserError } from "../../../domain/errors/BlockedUserError";
 import { IJwtService } from "../../ports/IJwtService";
 import { UserProfile } from "../../../domain/entities/UserProfile";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
 import { InvalidCredentialsError } from "../../../domain/errors/InvalidCredentialsError";
 import { AccountAuthProviderConflictError } from "../../../domain/errors/AccountAuthProviderConflictError";
+import { IProducer } from "../../ports/IProducer";
 
 export class GoogleAuth implements IGoogleAuth {
   constructor(
     private _userRepo: IUserRepository,
     private _userProfileRepo: IUserProfileRepository,
     private _OAuthClient: OAuth2Client,
-    private _messageProducer: Producer,
+    private _messageProducer: IProducer,
     private _jwtService: IJwtService,
   ) {}
   exec = async (

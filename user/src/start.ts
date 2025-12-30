@@ -2,8 +2,6 @@ import { ENV } from "./utils/dotenv";
 import { app } from "./app";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
-import amqp from "amqplib";
-import { consumer, producer } from "./di";
 import { logger } from "./presentation/logger";
 import { mapDrizzleError } from "./infrastructure/mappers/ErrorMapper";
 
@@ -12,9 +10,6 @@ const { Pool } = pg;
 export const db = drizzle({
   client: new Pool({ connectionString: ENV.DATABASE_URL }),
 });
-
-// Events that this service is interested in
-const INTERESTED_EVENTS = ["user.registered"];
 
 async function start() {
   try {
@@ -27,8 +22,6 @@ async function start() {
   }
   logger.info("Connected to database");
 
-  await initializeMessageQueue();
-
   app.listen(ENV.PORT, () => {
     logger.info(`Listening on port ${ENV.PORT}`);
   });
@@ -40,15 +33,3 @@ process.on("exit", async () => {
   await db.$client.end();
   logger.info("Disconnected from database");
 });
-
-async function initializeMessageQueue() {
-  const connection = await amqp.connect(
-    `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
-  );
-  const channel = await connection.createChannel();
-
-  await producer.init(channel, "stew_exchange");
-  await consumer.init(channel, "stew_exchange", "user", INTERESTED_EVENTS);
-
-  logger.info("Producer and Consumer setup complete.");
-}

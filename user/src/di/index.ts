@@ -5,7 +5,6 @@ import { JwtService } from "../infrastructure/services/JwtService";
 import { BcryptHasher } from "../infrastructure/services/HashService";
 import { ENV } from "../utils/dotenv";
 import { UserController } from "../presentation/controllers/UserController";
-import { Consumer, Producer } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
 import { UpdateUserProfile } from "../application/use-cases/user/UpdateUserProfile.usecase";
 import { GetCurrentUserProfile } from "../application/use-cases/user/GetCurrentUserProfile.usecase";
@@ -28,6 +27,7 @@ import { UpdateUserBlockStatus } from "../application/use-cases/admin/UpdateUser
 import { GetUsers } from "../application/use-cases/admin/GetUsers.usecase";
 import amqp from "amqplib";
 import { EventConsumer } from "../infrastructure/services/EventConsumer";
+import { EventProducer } from "../infrastructure/services/EventProducer";
 
 // Services
 const emailService = new EmailService();
@@ -52,13 +52,17 @@ const userRepo = new UserRepository();
 const userProfileRepo = new UserProfileRepository();
 
 // RabbitMQ
-// export const consumer = new Consumer();
-// export const producer = new Producer();
 const connection = await amqp.connect(
   `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
 );
 const channel = await connection.createChannel();
-export const consumer = new EventConsumer();
+
+export const consumer = new EventConsumer(
+  channel,
+  "user-service-queue",
+  "stew_exchange",
+);
+const producer = new EventProducer(channel, "stew_exchange");
 
 // Usecases
 const registerUserUsecase = new RegisterUser(
