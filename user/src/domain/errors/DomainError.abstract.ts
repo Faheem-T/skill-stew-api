@@ -11,7 +11,6 @@ export abstract class DomainError extends Error {
     if (cause?.stack && this.stack) {
       this.stack = `${this.stack}\nCaused by: ${cause.stack}`;
     }
-    Object.setPrototypeOf(this, DomainError.prototype);
   }
 
   abstract toJSON(): { errors: { message: string; field?: string }[] };

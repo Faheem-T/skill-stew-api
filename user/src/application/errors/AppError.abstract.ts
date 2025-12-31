@@ -12,7 +12,6 @@ export abstract class AppError extends Error {
     if (cause?.stack && this.stack) {
       this.stack = `${this.stack}\nCaused by: ${cause.stack}`;
     }
-    Object.setPrototypeOf(this, AppError.prototype);
   }
 
   abstract toJSON(): { errors: { message: string; field?: string }[] };
