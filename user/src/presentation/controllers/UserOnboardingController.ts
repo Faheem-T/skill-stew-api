@@ -15,7 +15,10 @@ export class UserOnboardingController {
   ) => {
     try {
       const id = req.headers["x-user-id"];
-      const dto = onboardingUpdateUserProfileSchema.parse({ id, ...req.body });
+      const dto = onboardingUpdateUserProfileSchema.parse({
+        userId: id,
+        ...req.body,
+      });
       const updatedUser = await this._onboardingUpdateUserProfile.exec(dto);
       if (updatedUser === null) {
         res
