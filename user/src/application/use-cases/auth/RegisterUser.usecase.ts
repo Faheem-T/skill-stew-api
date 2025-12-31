@@ -9,6 +9,7 @@ import { UserProfile } from "../../../domain/entities/UserProfile";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
 import { RegisterDTO, RegisterOutputDTO } from "../../dtos/auth/Register.dto";
 import { IProducer } from "../../ports/IProducer";
+import { NotFoundError } from "../../../domain/errors/NotFoundError";
 
 export class RegisterUser implements IRegisterUser {
   constructor(
@@ -22,9 +23,15 @@ export class RegisterUser implements IRegisterUser {
     email,
     password,
   }: RegisterDTO): Promise<RegisterOutputDTO> => {
-    const existingUser = await this._userRepo.findByEmail(email);
-    if (existingUser) {
-      return { success: false, userAlreadyExists: true };
+    try {
+      const existingUser = await this._userRepo.findByEmail(email);
+      if (existingUser) {
+        return { success: false, userAlreadyExists: true };
+      }
+    } catch (err) {
+      if (!(err instanceof NotFoundError)) {
+        throw err;
+      }
     }
     const passwordHash = this._hasherService.hash(password);
     const user = new User(
