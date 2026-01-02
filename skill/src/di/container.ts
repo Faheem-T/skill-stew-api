@@ -1,13 +1,28 @@
-import { Producer } from "@skillstew/common";
 import { SkillController } from "../controllers/SkillController";
 import { SkillProfileController } from "../controllers/SkillProfileController";
 import { SkillProfileRepository } from "../repositories/SkillProfileRepository";
 import { SkillRepository } from "../repositories/SkillRepository";
 import { SkillProfileService } from "../services/SkillProfileService";
 import { SkillService } from "../services/SkillService";
+import { MessageProducer } from "../adapters/MessageProducer";
+import { ENV } from "../utils/dotenv";
+import amqp from "amqplib";
 
-// Message Producer
-export const messageProducer = new Producer();
+// RabbitMQ
+const EXCHANGE_NAME = "stew_exchange";
+const QUEUE_NAME = "user_service_queue";
+const connection = await amqp.connect(
+  `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
+);
+const channel = await connection.createChannel();
+await channel.assertExchange(EXCHANGE_NAME, "topic", {
+  durable: true,
+});
+const queue = await channel.assertQueue(QUEUE_NAME, {
+  durable: true,
+});
+
+export const messageProducer = new MessageProducer(channel, EXCHANGE_NAME);
 
 const skillRepo = new SkillRepository();
 const skillService = new SkillService(skillRepo, messageProducer);
