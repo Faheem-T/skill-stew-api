@@ -57,12 +57,6 @@ ServiceConfigs.forEach((service) => {
           if (user) {
             proxyReq.setHeader("x-user-id", user.id);
             proxyReq.setHeader("x-user-role", user.role);
-            if (user.username) {
-              proxyReq.setHeader("x-user-username", user.username);
-            }
-            if (user.email) {
-              proxyReq.setHeader("x-user-email", user.email);
-            }
           }
         },
         proxyRes: (proxyRes, req, res) => {},
