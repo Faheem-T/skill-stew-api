@@ -1,4 +1,4 @@
-import { CreateSkillDTO, SkillResponseDTO } from "../../dtos/skill.dto";
+import type { CreateSkillDTO, SkillResponseDTO } from "../../dtos/skill.dto";
 
 export interface ISkillService {
   createSkill(data: CreateSkillDTO): Promise<SkillResponseDTO>;

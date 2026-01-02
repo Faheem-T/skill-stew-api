@@ -1,5 +1,5 @@
-import { NextFunction, Response, Request } from "express";
-import { ISkillProfileService } from "../interfaces/service-interfaces/ISkillProfileService";
+import type { NextFunction, Response, Request } from "express";
+import type { ISkillProfileService } from "../interfaces/service-interfaces/ISkillProfileService";
 import { saveSkillProfileDTO } from "../dtos/skillProfile.dto";
 import { HttpStatus } from "../constants/HttpStatusCodes";
 
@@ -16,13 +16,11 @@ export class SkillProfileController {
       const { id, wanted, offered, createdAt, updatedAt } =
         await this._skillProfileService.saveProfile(dto);
 
-      res
-        .status(HttpStatus.OK)
-        .json({
-          success: true,
-          message: "Skill profile updated",
-          data: { id, wanted, offered, createdAt, updatedAt },
-        });
+      res.status(HttpStatus.OK).json({
+        success: true,
+        message: "Skill profile updated",
+        data: { id, wanted, offered, createdAt, updatedAt },
+      });
     } catch (err) {
       next(err);
     }

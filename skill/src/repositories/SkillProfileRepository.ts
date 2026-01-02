@@ -1,8 +1,8 @@
 import { SkillProfile } from "../entities/SkillProfile";
-import { ISkillProfileRepository } from "../interfaces/repository-interfaces/ISkillProfileRepository";
+import type { ISkillProfileRepository } from "../interfaces/repository-interfaces/ISkillProfileRepository";
 import {
-  SkillProfileAttr,
-  SkillProfileDoc,
+  type SkillProfileAttr,
+  type SkillProfileDoc,
   SkillProfileModel,
 } from "../models/skillProfileModel";
 

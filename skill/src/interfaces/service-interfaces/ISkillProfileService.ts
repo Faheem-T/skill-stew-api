@@ -1,4 +1,4 @@
-import {
+import type {
   SaveSkillProfileDTO,
   SkillProfileResponseDTO,
 } from "../../dtos/skillProfile.dto";

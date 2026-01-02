@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import { ISkillService } from "../interfaces/service-interfaces/ISkillService";
+import type { NextFunction, Request, Response } from "express";
+import type { ISkillService } from "../interfaces/service-interfaces/ISkillService";
 import { HttpStatus } from "../constants/HttpStatusCodes";
 import { ResponseMessages } from "../constants/ResponseMessages";
 import { createSkillDTO } from "../dtos/skill.dto";
@@ -9,7 +9,7 @@ export class SkillController {
 
   getSkill = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = req.params.id.trim();
+      const id = req.params.id?.trim();
       if (!id) {
         res
           .status(HttpStatus.BAD_REQUEST)

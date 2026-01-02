@@ -1,6 +1,10 @@
 import { Skill } from "../entities/Skill";
-import { ISkillRepository } from "../interfaces/repository-interfaces/ISkillRepository";
-import { SkillAttr, SkillDoc, SkillModel } from "../models/skillModel";
+import type { ISkillRepository } from "../interfaces/repository-interfaces/ISkillRepository";
+import {
+  type SkillAttr,
+  type SkillDoc,
+  SkillModel,
+} from "../models/skillModel";
 
 export class SkillRepository implements ISkillRepository {
   save = async (skill: Skill): Promise<Skill> => {

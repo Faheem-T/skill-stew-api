@@ -1,12 +1,12 @@
 import { CreateEvent } from "@skillstew/common";
-import {
+import type {
   SaveSkillProfileDTO,
   SkillProfileResponseDTO,
 } from "../dtos/skillProfile.dto";
 import { SkillProfile } from "../entities/SkillProfile";
-import { ISkillProfileRepository } from "../interfaces/repository-interfaces/ISkillProfileRepository";
-import { ISkillProfileService } from "../interfaces/service-interfaces/ISkillProfileService";
-import { IMessageProducer } from "../ports/IMessageProducer";
+import type { ISkillProfileRepository } from "../interfaces/repository-interfaces/ISkillProfileRepository";
+import type { ISkillProfileService } from "../interfaces/service-interfaces/ISkillProfileService";
+import type { IMessageProducer } from "../ports/IMessageProducer";
 
 export class SkillProfileService implements ISkillProfileService {
   constructor(

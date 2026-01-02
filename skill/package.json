@@ -2,23 +2,24 @@
   "name": "skill",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "bun --watch --no-clear-screen ./src/start.ts",
     "seed": "bun ./src/config/seedSkillData.ts",
     "_start": "tsx watch --clear-screen=false --include './src/**/*.ts' ./src/start.ts",
     "_seed": "tsx ./src/config/seedSkillData.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "private": true,
   "devDependencies": {
+    "@types/bun": "latest",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/morgan": "^1.9.10",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "tsx": "^4.20.6"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
   },
   "dependencies": {
     "@skillstew/common": "^1.0.24",
