@@ -1,26 +1,26 @@
 import amqp from "amqplib";
 import { ENV } from "../utils/dotenv";
 import { logger } from "../utils/logger";
-import { Consumer } from "@skillstew/common";
 import { skillService, userService } from "../di/container";
+import { MessageConsumer } from "../infrastructure/adapters/MessageConsumer";
 
 export async function startConsumer() {
+  const QUEUE_NAME = "es_proxy_queue";
+  const EXCHANGE_NAME = "stew_exchange";
   const connection = await amqp.connect(
     `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
   );
   const channel = await connection.createChannel();
 
-  const consumer = new Consumer();
+  await channel.assertExchange(EXCHANGE_NAME, "topic", {
+    durable: true,
+  });
+  const queue = await channel.assertQueue(QUEUE_NAME, {
+    durable: true,
+  });
 
-  await consumer.init(channel, "stew_exchange", "es_proxy", [
-    "user.registered",
-    "user.verified",
-    "user.profileUpdated",
-    "skill.profileUpdated",
-    "skill.created",
-    "skill.updated",
-    "skill.deleted",
-  ]);
+  const consumer = new MessageConsumer(channel, queue.queue, EXCHANGE_NAME);
+
   logger.info("Event consumer set up.");
 
   consumer.registerHandler("user.registered", async (event) => {
