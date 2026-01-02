@@ -10,6 +10,8 @@ import { updateUserBlockStatusSchema } from "../../application/dtos/admin/Update
 import { IUpdateUserBlockStatus } from "../../application/interfaces/admin/IUpdateUserBlockStatus";
 import { checkUsernameAvailabilitySchema } from "../../application/dtos/common/CheckUsernameAvailability.dto";
 import { ICheckUsernameAvailability } from "../../application/interfaces/common/ICheckUsernameAvailability";
+import { updateUsernameSchema } from "../../application/dtos/common/UpdateUsername.dto";
+import { IUpdateUsername } from "../../application/interfaces/common/IUpdateUsername";
 
 export class UserController {
   constructor(
@@ -17,6 +19,7 @@ export class UserController {
     private _getUsers: IGetUsers,
     private _updateUserBlockStatus: IUpdateUserBlockStatus,
     private _checkUsernameAvailability: ICheckUsernameAvailability,
+    private _updateUsername: IUpdateUsername,
   ) {}
 
   getAllUsers = async (
@@ -88,16 +91,36 @@ export class UserController {
   };
 
   usernameAvailabilityCheck = async (
-    req: Request,
+    req: Request<{}, {}, {}, { username: string }>,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const dto = checkUsernameAvailabilitySchema.parse(req.body);
+      console.log(req.query);
+      const dto = checkUsernameAvailabilitySchema.parse({
+        username: req.query.username,
+      });
 
       const { available } = await this._checkUsernameAvailability.exec(dto);
 
       res.status(HttpStatus.OK).json({ data: { available } });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  updateUsername = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dto = updateUsernameSchema.parse({
+        userId: req.headers["x-user-id"],
+        username: req.body.username,
+      });
+
+      await this._updateUsername.exec(dto);
+
+      res
+        .status(HttpStatus.OK)
+        .json({ success: true, message: "Your username has been changed." });
     } catch (err) {
       next(err);
     }

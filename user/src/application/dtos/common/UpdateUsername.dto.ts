@@ -1,6 +1,7 @@
 import z from "zod";
 
-export const checkUsernameAvailabilitySchema = z.object({
+export const updateUsernameSchema = z.object({
+  userId: z.string(),
   username: z
     .string()
     .min(5)
@@ -17,6 +18,4 @@ export const checkUsernameAvailabilitySchema = z.object({
     }),
 });
 
-export type CheckUsernameAvailabilityDTO = z.infer<
-  typeof checkUsernameAvailabilitySchema
->;
+export type UpdateUsernameDTO = z.infer<typeof updateUsernameSchema>;

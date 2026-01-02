@@ -21,6 +21,6 @@ router.patch(
   onboardingController.onboardingUserProfileUpdate,
 );
 
-router.get("/username/availability", userController.usernameAvailabilityCheck);
+router.get("/username-availability", userController.usernameAvailabilityCheck);
 
 export default router;

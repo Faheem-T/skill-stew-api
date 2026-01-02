@@ -31,6 +31,7 @@ import { EventProducer } from "../infrastructure/services/EventProducer";
 import { BloomFilter } from "../infrastructure/services/BloomFilter";
 import { CheckUsernameAvailability } from "../application/use-cases/common/CheckUsernameAvailability.usecase";
 import { logger } from "../presentation/logger";
+import { UpdateUsername } from "../application/use-cases/common/UpdateUsername.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -130,6 +131,12 @@ const checkUsernameAvailabilityUsecase = new CheckUsernameAvailability(
   usernameBloomFilter,
   logger,
 );
+const updateUsernameUsecase = new UpdateUsername(
+  userRepo,
+  checkUsernameAvailabilityUsecase,
+  usernameBloomFilter,
+  logger,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -146,6 +153,7 @@ export const userController = new UserController(
   getUsersUsecase,
   updateUserBlockStatusUsecase,
   checkUsernameAvailabilityUsecase,
+  updateUsernameUsecase,
 );
 export const onboardingController = new UserOnboardingController(
   onboardingUpdateUserProfileUsecase,

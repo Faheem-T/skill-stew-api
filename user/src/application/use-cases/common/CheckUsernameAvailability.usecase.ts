@@ -15,7 +15,7 @@ export class CheckUsernameAvailability implements ICheckUsernameAvailability {
   exec = async (
     dto: CheckUsernameAvailabilityDTO,
   ): Promise<{ available: boolean }> => {
-    if (!this._usernameBloomFilter.has(dto.desiredUsername)) {
+    if (!this._usernameBloomFilter.has(dto.username)) {
       this._logger.info("Username not in bloom filter. Skipping DB call.");
       return { available: true };
     }
@@ -23,7 +23,7 @@ export class CheckUsernameAvailability implements ICheckUsernameAvailability {
     this._logger.info("Username found in bloom filter. Performing DB call.");
     // Query db only if bloom filter returns true
     try {
-      this._userRepo.findByUsername(dto.desiredUsername);
+      this._userRepo.findByUsername(dto.username);
     } catch (err) {
       if (err instanceof NotFoundError) {
         return { available: true };
