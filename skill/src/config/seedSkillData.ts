@@ -4,7 +4,8 @@ import { readFile } from "fs/promises";
 import { logger } from "../utils/logger";
 import { Skill } from "../entities/Skill";
 import { SkillModel } from "../models/skillModel";
-import { CreateEvent, Producer } from "@skillstew/common";
+import { CreateEvent } from "@skillstew/common";
+import { MessageProducer } from "../adapters/MessageProducer";
 import amqp from "amqplib";
 
 async function seedData() {
@@ -27,13 +28,16 @@ async function seedData() {
   const data: Skill[] = JSON.parse(rawData);
   await SkillModel.insertMany(data);
 
+  const EXCHANGE_NAME = "stew_exchange";
   const connection = await amqp.connect(
     `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
   );
   const channel = await connection.createChannel();
+  await channel.assertExchange(EXCHANGE_NAME, "topic", {
+    durable: true,
+  });
 
-  const messageProducer = new Producer();
-  await messageProducer.init(channel, "stew_exchange");
+  const messageProducer = new MessageProducer(channel, EXCHANGE_NAME);
   data.forEach((skill) => {
     logger.info(`Publishing event for ${skill.name}`);
     messageProducer.publish(
