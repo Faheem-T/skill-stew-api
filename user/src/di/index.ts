@@ -28,6 +28,9 @@ import { GetUsers } from "../application/use-cases/admin/GetUsers.usecase";
 import amqp from "amqplib";
 import { EventConsumer } from "../infrastructure/services/EventConsumer";
 import { EventProducer } from "../infrastructure/services/EventProducer";
+import { BloomFilter } from "../infrastructure/services/BloomFilter";
+import { CheckUsernameAvailability } from "../application/use-cases/common/CheckUsernameAvailability.usecase";
+import { logger } from "../presentation/logger";
 
 // Services
 const emailService = new EmailService();
@@ -43,6 +46,14 @@ const jwtService = new JwtService({
 const hasherService = new BcryptHasher();
 const locationProvider = new GoogleLocationProvider();
 const s3StorageService = new S3StorageService();
+
+const expectedNumberOfUsers = 1000000; // 1 M
+const desiredErrorRate = 0.01; // 1%
+
+const usernameBloomFilter = new BloomFilter(
+  expectedNumberOfUsers,
+  desiredErrorRate,
+);
 
 // OAuthClient
 const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
@@ -114,6 +125,11 @@ const generatePresignedUploadUrlUsecase = new GeneratePresignedUploadUrl(
 );
 const updateUserBlockStatusUsecase = new UpdateUserBlockStatus(userRepo);
 const getUsersUsecase = new GetUsers(userRepo);
+const checkUsernameAvailabilityUsecase = new CheckUsernameAvailability(
+  userRepo,
+  usernameBloomFilter,
+  logger,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -129,6 +145,7 @@ export const userController = new UserController(
   updateUserProfileUsecase,
   getUsersUsecase,
   updateUserBlockStatusUsecase,
+  checkUsernameAvailabilityUsecase,
 );
 export const onboardingController = new UserOnboardingController(
   onboardingUpdateUserProfileUsecase,

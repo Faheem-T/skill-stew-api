@@ -8,12 +8,15 @@ import { IGetUsers } from "../../application/interfaces/admin/IGetUsers";
 import { getUsersSchema } from "../../application/dtos/admin/GetUsers.dto";
 import { updateUserBlockStatusSchema } from "../../application/dtos/admin/UpdateUserBlockStatus.dto";
 import { IUpdateUserBlockStatus } from "../../application/interfaces/admin/IUpdateUserBlockStatus";
+import { checkUsernameAvailabilitySchema } from "../../application/dtos/common/CheckUsernameAvailability.dto";
+import { ICheckUsernameAvailability } from "../../application/interfaces/common/ICheckUsernameAvailability";
 
 export class UserController {
   constructor(
     private _updateUserProfile: IUpdateUserProfile,
     private _getUsers: IGetUsers,
     private _updateUserBlockStatus: IUpdateUserBlockStatus,
+    private _checkUsernameAvailability: ICheckUsernameAvailability,
   ) {}
 
   getAllUsers = async (
@@ -79,6 +82,22 @@ export class UserController {
       }
 
       res.status(HttpStatus.OK).json({ data: updatedUser });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  usernameAvailabilityCheck = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = checkUsernameAvailabilitySchema.parse(req.body);
+
+      const { available } = await this._checkUsernameAvailability.exec(dto);
+
+      res.status(HttpStatus.OK).json({ data: { available } });
     } catch (err) {
       next(err);
     }
