@@ -1,23 +1,24 @@
 import { eq } from "drizzle-orm";
-import { UserProfile } from "../../domain/entities/UserProfile";
-import { IUserProfileRepository } from "../../domain/repositories/IUserProfileRepository";
-import { db } from "../../start";
-import { userProfileTable } from "../db/schemas/userProfileSchema";
-import { UserProfileMapper } from "../mappers/UserProfileMapper";
-import { BaseRepository } from "./BaseRepository";
+import { AdminProfile } from "../../domain/entities/AdminProfile";
 import { NotFoundError } from "../../domain/errors/NotFoundError";
+import { IAdminProfileRepository } from "../../domain/repositories/IAdminProfileRepository";
+import { db } from "../../start";
+import { adminProfileTable } from "../db/schemas/adminProfileSchema";
+import { AdminProfileMapper } from "../mappers/AdminProfileMapper";
 import { mapDrizzleError } from "../mappers/ErrorMapper";
+import { BaseRepository } from "./BaseRepository";
 
-export class UserProfileRepository
-  extends BaseRepository<UserProfile, typeof userProfileTable>
-  implements IUserProfileRepository
+export class AdminProfileRepository
+  extends BaseRepository<AdminProfile, typeof adminProfileTable>
+  implements IAdminProfileRepository
 {
   constructor() {
-    super(userProfileTable);
+    super(adminProfileTable);
   }
 
-  mapper = new UserProfileMapper();
-  findByUserId = async (userId: string): Promise<UserProfile> => {
+  mapper = new AdminProfileMapper();
+
+  findByUserId = async (userId: string): Promise<AdminProfile> => {
     let row;
     try {
       const res = await db
@@ -29,7 +30,7 @@ export class UserProfileRepository
       throw mapDrizzleError(err);
     }
     if (!row) {
-      throw new NotFoundError("user profile");
+      throw new NotFoundError("admin profile");
     }
 
     return this.mapper.toDomain(row);
@@ -37,8 +38,8 @@ export class UserProfileRepository
 
   updateByUserId = async (
     userId: string,
-    partial: Partial<UserProfile>,
-  ): Promise<UserProfile> => {
+    partial: Partial<AdminProfile>,
+  ): Promise<AdminProfile> => {
     const data = this.mapper.toPersistencePartial(partial);
 
     let row;
@@ -53,7 +54,7 @@ export class UserProfileRepository
       throw mapDrizzleError(err);
     }
     if (!row) {
-      throw new NotFoundError("profile");
+      throw new NotFoundError("admin profile");
     }
 
     return this.mapper.toDomain(row);
