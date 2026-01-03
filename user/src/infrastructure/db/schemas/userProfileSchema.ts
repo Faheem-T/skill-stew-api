@@ -28,6 +28,7 @@ export const userProfileTable = pgTable("user_profiles", {
     .default(sql`ARRAY[]::text[]`),
   is_subscribed: boolean().default(false).notNull(),
   location: json().$type<IUserLocation>(),
+  is_onboarding_complete: boolean().notNull(),
   ...timestamps,
 });
 

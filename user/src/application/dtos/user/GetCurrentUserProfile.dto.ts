@@ -20,6 +20,7 @@ export const getCurrentUserProfileSchema = z.object({
   about: z.string().optional(),
   socialLinks: z.array(z.string()).optional(),
   languages: z.array(z.string()).optional(),
+  isOnboardingComplete: z.boolean(),
 });
 
 export type GetCurrentUserProfileDTO = z.infer<

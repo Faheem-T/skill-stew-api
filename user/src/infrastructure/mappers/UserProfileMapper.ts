@@ -20,6 +20,7 @@ export class UserProfileMapper implements Mapper<
       phone_number,
       social_links,
       timezone,
+      is_onboarding_complete,
       created_at,
       updated_at,
     } = raw;
@@ -36,6 +37,7 @@ export class UserProfileMapper implements Mapper<
       social_links ?? undefined,
       languages ?? undefined,
       location ?? undefined,
+      is_onboarding_complete ?? undefined,
       created_at,
       updated_at ?? undefined,
     );
@@ -57,6 +59,7 @@ export class UserProfileMapper implements Mapper<
       location = null,
       createdAt = new Date(),
       updatedAt = new Date(),
+      isOnboardingComplete,
     } = entity;
 
     return {
@@ -72,6 +75,7 @@ export class UserProfileMapper implements Mapper<
       social_links: socialLinks,
       languages,
       location,
+      is_onboarding_complete: isOnboardingComplete,
       created_at: createdAt,
       updated_at: updatedAt,
     };
@@ -93,6 +97,7 @@ export class UserProfileMapper implements Mapper<
       socialLinks,
       languages,
       location,
+      isOnboardingComplete,
       createdAt,
       updatedAt,
     } = partial;
@@ -112,6 +117,8 @@ export class UserProfileMapper implements Mapper<
     if (location !== undefined) result.location = location;
     if (createdAt !== undefined) result.created_at = createdAt;
     if (updatedAt !== undefined) result.updated_at = updatedAt;
+    if (isOnboardingComplete !== undefined)
+      result.is_onboarding_complete = isOnboardingComplete;
 
     return result;
   }

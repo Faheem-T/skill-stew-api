@@ -23,6 +23,7 @@ export class GetCurrentUserProfile implements IGetCurrentUserProfile {
       about,
       socialLinks,
       languages,
+      isOnboardingComplete,
     } = profile;
 
     const { email, role, username } = user;
@@ -47,6 +48,7 @@ export class GetCurrentUserProfile implements IGetCurrentUserProfile {
       about,
       socialLinks,
       languages,
+      isOnboardingComplete,
     };
   };
 }

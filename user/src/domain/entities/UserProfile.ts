@@ -12,6 +12,7 @@ export class UserProfile {
     public socialLinks?: string[],
     public languages?: string[],
     public location?: IUserLocation,
+    public isOnboardingComplete: boolean = false,
     public createdAt?: Date,
     public updatedAt?: Date,
   ) {}
