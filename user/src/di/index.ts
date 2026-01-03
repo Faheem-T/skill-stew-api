@@ -33,6 +33,8 @@ import { CheckUsernameAvailability } from "../application/use-cases/common/Check
 import { logger } from "../presentation/logger";
 import { UpdateUsername } from "../application/use-cases/common/UpdateUsername.usecase";
 import { InitializeUsernameBloomfilter } from "../application/use-cases/internal/InitializeUsernameBloomfilter";
+import { GetCurrentAdminProfile } from "../application/use-cases/admin/GetCurrentAdminProfile.usecase";
+import { AdminProfileRepository } from "../infrastructure/repositories/AdminProfileRepository";
 
 // Services
 const emailService = new EmailService();
@@ -63,6 +65,7 @@ const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 // Repositories
 const userRepo = new UserRepository();
 const userProfileRepo = new UserProfileRepository();
+const adminProfileRepo = new AdminProfileRepository();
 
 // RabbitMQ
 const EXCHANGE_NAME = "stew_exchange";
@@ -138,6 +141,11 @@ const updateUsernameUsecase = new UpdateUsername(
   usernameBloomFilter,
   logger,
 );
+const getCurrentAdminProfileUsecase = new GetCurrentAdminProfile(
+  userRepo,
+  adminProfileRepo,
+  s3StorageService,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -163,6 +171,7 @@ export const currentUserProfileController = new CurrentUserProfileController(
   getCurrentUserProfileUsecase,
   getCurrentExpertProfileUsecase,
   generatePresignedUploadUrlUsecase,
+  getCurrentExpertProfileUsecase,
 );
 
 // Internal Usecases
