@@ -23,7 +23,7 @@ export class CheckUsernameAvailability implements ICheckUsernameAvailability {
     this._logger.info("Username found in bloom filter. Performing DB call.");
     // Query db only if bloom filter returns true
     try {
-      this._userRepo.findByUsername(dto.username);
+      await this._userRepo.findByUsername(dto.username);
     } catch (err) {
       if (err instanceof NotFoundError) {
         return { available: true };
