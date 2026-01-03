@@ -32,6 +32,7 @@ import { BloomFilter } from "../infrastructure/services/BloomFilter";
 import { CheckUsernameAvailability } from "../application/use-cases/common/CheckUsernameAvailability.usecase";
 import { logger } from "../presentation/logger";
 import { UpdateUsername } from "../application/use-cases/common/UpdateUsername.usecase";
+import { InitializeUsernameBloomfilter } from "../application/use-cases/internal/InitializeUsernameBloomfilter";
 
 // Services
 const emailService = new EmailService();
@@ -163,3 +164,7 @@ export const currentUserProfileController = new CurrentUserProfileController(
   getCurrentExpertProfileUsecase,
   generatePresignedUploadUrlUsecase,
 );
+
+// Internal Usecases
+export const initializeUsernameBloomfilterUsecase =
+  new InitializeUsernameBloomfilter(userRepo, usernameBloomFilter, logger);

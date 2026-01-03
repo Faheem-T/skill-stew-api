@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import { logger } from "./presentation/logger";
 import { mapDrizzleError } from "./infrastructure/mappers/ErrorMapper";
+import { initializeUsernameBloomfilterUsecase } from "./di";
 
 const { Pool } = pg;
 
@@ -21,6 +22,8 @@ async function start() {
     throw mapDrizzleError(err);
   }
   logger.info("Connected to database");
+
+  await initializeUsernameBloomfilterUsecase.exec();
 
   app.listen(ENV.PORT, () => {
     logger.info(`Listening on port ${ENV.PORT}`);
