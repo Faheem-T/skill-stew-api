@@ -53,6 +53,7 @@ ServiceConfigs.forEach((service) => {
           const user = (req as any).user;
           logger.info(`Request for ${service.name}`, {
             ...(user ? { userId: user.id, role: user.role } : {}),
+            path: (req as any).path,
           });
           if (user) {
             proxyReq.setHeader("x-user-id", user.id);
