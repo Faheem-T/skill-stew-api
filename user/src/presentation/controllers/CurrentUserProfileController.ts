@@ -6,12 +6,14 @@ import { ForbiddenError } from "../../domain/errors/ForbiddenError";
 import { IGetCurrentExpertProfile } from "../../application/interfaces/expert/IGetCurrentExpertProfile";
 import { IGeneratePresignedUploadUrl } from "../../application/interfaces/common/IGeneratePresignedUploadUrl";
 import { generatePresignedUploadUrlSchema } from "../../application/dtos/common/GeneratePresignedUploadUrl.dto";
+import { IGetCurrentAdminProfile } from "../../application/interfaces/admin/IGetCurrentAdminProfile";
 
 export class CurrentUserProfileController {
   constructor(
     private _getCurrentUserProfile: IGetCurrentUserProfile,
     private _getCurrentExpertProfile: IGetCurrentExpertProfile,
     private _generatePresignedUploadUrl: IGeneratePresignedUploadUrl,
+    private _getCurrentAdminProfile: IGetCurrentAdminProfile,
   ) {}
 
   getCurrentUserProfile = async (
@@ -36,7 +38,7 @@ export class CurrentUserProfileController {
           profile = await this._getCurrentExpertProfile.exec(id);
           break;
         case "ADMIN":
-          profile = { role: "ADMIN" }; // TODO: Handle admin profile
+          profile = await this._getCurrentAdminProfile.exec(id);
           break;
       }
 

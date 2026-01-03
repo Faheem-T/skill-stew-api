@@ -1,5 +1,5 @@
+import { GetCurrentAdminProfileDTO } from "../../dtos/admin/GetCurrentAdminProfile.dto";
+
 export interface IGetCurrentAdminProfile {
-  exec(
-    adminId: string,
-  ): Promise<{ username: string; role: "ADMIN"; avatarUrl?: string }>; // TODO: admin profile
+  exec(adminId: string): Promise<GetCurrentAdminProfileDTO>;
 }
