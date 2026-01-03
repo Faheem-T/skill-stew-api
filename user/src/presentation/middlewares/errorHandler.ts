@@ -4,6 +4,8 @@ import { DomainError } from "../../domain/errors/DomainError.abstract";
 import { AppError } from "../../application/errors/AppError.abstract";
 import { ErrorCodeToStatusCodeMap } from "../errors/ErrorCodeToStatusCodeMap";
 import { HttpStatus } from "@skillstew/common";
+import { ZodError } from "zod";
+import { ValidationError } from "../../application/errors/ValidationError";
 
 export const errorHandler = (
   error: Error,
@@ -14,6 +16,10 @@ export const errorHandler = (
   }>,
   _next: NextFunction,
 ) => {
+  if (error instanceof ZodError) {
+    error = mapZodErrorToValidationError(error);
+  }
+
   const errorChain = getFullErrorChain(error);
 
   logger.error({
@@ -93,4 +99,20 @@ function getFullErrorChain(error: Error): Array<{
   }
 
   return chain;
+}
+
+/**
+ * Maps a Zod error to a ValidationError instance
+ * @param zodError - The ZodError thrown or returned from Zod validation
+ * @returns ValidationError instance
+ */
+export function mapZodErrorToValidationError(
+  zodError: ZodError,
+): ValidationError {
+  const errors = zodError.issues.map((issue) => ({
+    message: issue.message,
+    field: issue.path.length > 0 ? issue.path.join(".") : undefined,
+  }));
+
+  return new ValidationError(errors, zodError);
 }

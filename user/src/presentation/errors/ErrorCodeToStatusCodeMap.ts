@@ -17,6 +17,7 @@ export const ErrorCodeToStatusCodeMap: Record<AllErrorCodes, number> = {
   // App Error Codes
   [AppErrorCodes.INTERNAL_SERVER_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
   [AppErrorCodes.INVALID_AUTH_TOKEN]: HttpStatus.BAD_REQUEST,
+  [AppErrorCodes.VALIDATION_ERROR]: HttpStatus.BAD_REQUEST,
 
   // Infra Error Codes
   [AppErrorCodes.INFRA_AUTH_FAILED]: HttpStatus.BAD_REQUEST,
