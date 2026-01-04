@@ -18,6 +18,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: gateway-config
+            - secretRef:
+                name: infisical-secrets
           # env:
           #   - name: RABBITMQ_USER
           #     valueFrom:
