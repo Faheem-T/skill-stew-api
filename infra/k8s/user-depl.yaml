@@ -26,9 +26,9 @@ spec:
           image: faheem222/user
           envFrom:
             - configMapRef:
-                name: user-config
-            - configMapRef:
                 name: aws-config
+            - secretRef:
+                name: infisical-secrets
           env:
             - name: RABBITMQ_USER
               valueFrom:
