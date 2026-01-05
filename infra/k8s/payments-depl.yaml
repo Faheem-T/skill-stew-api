@@ -25,8 +25,8 @@ spec:
         - name: payments
           image: faheem222/payments
           envFrom:
-            - configMapRef:
-                name: payments-config
+            - secretRef:
+                name: infisical-secrets
 
 ---
 apiVersion: v1
