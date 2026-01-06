@@ -5,9 +5,18 @@ import { HttpStatus } from "@skillstew/common";
 export class SkillController {
   constructor(private _skillService: ISkillService) {}
 
-  search = async (req: Request, res: Response, next: NextFunction) => {
+  search = async (
+    req: Request<{}, any, any, { query: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      console.log(req.query.query);
+      if (!req.query.query) {
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, message: "`query` is required." });
+        return;
+      }
       const skills = await this._skillService.search(req.query.query as string);
       res.status(HttpStatus.OK).json({ data: skills });
     } catch (err) {
