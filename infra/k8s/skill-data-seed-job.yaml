@@ -15,11 +15,12 @@ spec:
               "timeout 60 sh -c 'until nc -z mongo-srv 27017; do echo waiting for db; sleep 2; done'",
             ]
       containers:
-        - name: skill
+        - name: seed-skill-job
           image: faheem222/skill
+          imagePullPolicy: IfNotPresent
           envFrom:
-            - configMapRef:
-                name: skill-config
+            - secretRef:
+                name: infisical-secrets
           env:
             - name: RABBITMQ_USER
               valueFrom:
@@ -31,6 +32,6 @@ spec:
                 secretKeyRef:
                   name: my-rabbit-default-user # created by operator
                   key: password
-          command: ["bun", "run", "seed"]
+          command: ["/bin/bash", "./scripts/seed-skill-docker-entrypoint.sh"]
       restartPolicy: Never
   backoffLimit: 2
