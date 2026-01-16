@@ -10,6 +10,7 @@ export interface UserDoc {
   name?: string;
   username?: string;
   location?: { lat: number; lon: number };
+  formattedAddress?: string;
   languages?: string[];
   isVerified?: boolean;
 

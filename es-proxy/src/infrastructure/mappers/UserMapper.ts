@@ -22,8 +22,31 @@ export class UserMapper implements Mapper<User, UserDoc> {
   }
 
   toDomain(raw: UserDoc) {
-    const {} = raw;
-    const user = new User(raw.id);
+    const {
+      id,
+      name,
+      username,
+      location,
+      formattedAddress,
+      isVerified,
+      languages,
+      offeredSkills,
+      wantedSkills,
+    } = raw;
+    const user = new User(id);
+    user.name = name;
+    user.username = username;
+    if (location && formattedAddress) {
+      user.location = {
+        latitude: location.lat,
+        longitude: location.lon,
+        formattedAddress,
+      };
+    }
+    user.isVerified = isVerified;
+    user.languages = languages;
+    user.offeredSkills = offeredSkills;
+    user.wantedSkills = wantedSkills;
     return user;
   }
 
