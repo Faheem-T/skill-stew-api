@@ -12,6 +12,7 @@ import { IUserProfileRepository } from "../../../domain/repositories/IUserProfil
 import { InvalidCredentialsError } from "../../../domain/errors/InvalidCredentialsError";
 import { AccountAuthProviderConflictError } from "../../../domain/errors/AccountAuthProviderConflictError";
 import { IProducer } from "../../ports/IProducer";
+import { NotFoundError } from "../../../domain/errors/NotFoundError";
 
 export class GoogleAuth implements IGoogleAuth {
   constructor(
@@ -35,49 +36,55 @@ export class GoogleAuth implements IGoogleAuth {
 
     const email = payload["email"];
 
-    let user = await this._userRepo.findByEmail(email);
+    let user;
+    try {
+      user = await this._userRepo.findByEmail(email);
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        // Handle new user
 
-    if (!user) {
-      // Handle new user
+        const { name, picture: _picture } = payload;
 
-      const { name, picture: _picture } = payload;
+        // Insert new user in db
+        const newUser = new User(uuidv7(), email, "USER", true, false, true);
 
-      // Insert new user in db
-      const newUser = new User(uuidv7(), email, "USER", true, false, true);
+        user = await this._userRepo.create(newUser);
 
-      user = await this._userRepo.create(newUser);
+        // Insert new user profile in db
+        const newUserProfile = new UserProfile(uuidv7(), user.id, false, name);
 
-      // Insert new user profile in db
-      const newUserProfile = new UserProfile(uuidv7(), user.id, false, name);
+        const userProfile = await this._userProfileRepo.create(newUserProfile);
 
-      const userProfile = await this._userProfileRepo.create(newUserProfile);
+        // emit events
+        this._messageProducer.publish(
+          CreateEvent(
+            "user.registered",
+            { id: user.id, email: user.email },
+            "user-service",
+          ),
+        );
 
-      // emit events
-      this._messageProducer.publish(
-        CreateEvent(
-          "user.registered",
-          { id: user.id, email: user.email },
-          "user-service",
-        ),
-      );
+        this._messageProducer.publish(
+          CreateEvent("user.verified", { id: user.id }, "user-service"),
+        );
 
-      this._messageProducer.publish(
-        CreateEvent("user.verified", { id: user.id }, "user-service"),
-      );
+        this._messageProducer.publish(
+          CreateEvent(
+            "user.profileUpdated",
+            {
+              id: userProfile.userId,
+              name: userProfile.name,
+            },
+            "user-service",
+          ),
+        );
+      } else {
+        throw err;
+      }
+    }
 
-      this._messageProducer.publish(
-        CreateEvent(
-          "user.profileUpdated",
-          {
-            id: userProfile.userId,
-            name: userProfile.name,
-          },
-          "user-service",
-        ),
-      );
-    } else {
+    if (user) {
       // Handle existing user
-
       if (!user.isGoogleLogin) {
         throw new AccountAuthProviderConflictError(
           user.email,
