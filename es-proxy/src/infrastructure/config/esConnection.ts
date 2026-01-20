@@ -3,6 +3,7 @@ import { ENV } from "../../utils/dotenv";
 import { logger } from "../../utils/logger";
 import { MappingTypeMapping } from "@elastic/elasticsearch/lib/api/types";
 import deepEqual from "fast-deep-equal";
+import { mapESError } from "../mappers/ErrorMapper";
 
 export const INDEXES: { name: string; mappings: MappingTypeMapping }[] = [
   {
@@ -71,7 +72,7 @@ export async function setupES() {
     logger.info("Connected to Elasticsearch");
   } catch (err) {
     logger.error("Failed to connect to Elasticsearch", err);
-    throw err;
+    throw mapESError(err);
   }
 
   for (const { name: aliasName, mappings } of INDEXES) {

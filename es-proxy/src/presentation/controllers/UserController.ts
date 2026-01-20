@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { IUserService } from "../../application/interfaces/IUserService";
 import { HttpStatus } from "@skillstew/common";
+import { ValidationError } from "../../application/errors/ValidationError";
 
 export class UserController {
   constructor(private _userService: IUserService) {}
@@ -13,10 +14,10 @@ export class UserController {
     try {
       const userId = req.headers["x-user-id"];
       if (!userId || typeof userId !== "string") {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: "User ID is required." });
-        return;
+        throw new ValidationError([{
+          message: "User ID is required and must be a string",
+          field: "x-user-id"
+        }]);
       }
 
       const recommendedUsers =

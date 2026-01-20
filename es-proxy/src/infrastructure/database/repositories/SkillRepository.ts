@@ -3,6 +3,7 @@ import { Skill } from "../../../domain/entities/Skill";
 import { ISkillRepository } from "../../../domain/repositories/ISkillRepository";
 import { SkillMapper } from "../../mappers/SkillMapper";
 import { BaseRepository } from "./BaseRepository";
+import { mapESError } from "../../mappers/ErrorMapper";
 
 export interface SkillDoc {
   id: string;
@@ -19,28 +20,36 @@ export class SkillRepository
   }
   protected mapper = new SkillMapper();
 
-  search = async (query: string): Promise<Skill[]> => {
-    const docs = await this._es.search<SkillDoc>({
-      index: this._indexName,
-      query: {
-        bool: {
-          should: [
-            {
-              match_bool_prefix: {
-                name: query,
-              },
-            },
-            { match_bool_prefix: { alternateNames: query } },
-          ],
-        },
-      },
-    });
+  protected getEntityName(): string {
+    return "Skill";
+  }
 
-    return docs.hits.hits
-      .map((val) => {
-        if (!val._source) return;
-        return this.mapper.toDomain(val._source);
-      })
-      .filter((val) => val !== undefined);
+  search = async (query: string): Promise<Skill[]> => {
+    try {
+      const docs = await this._es.search<SkillDoc>({
+        index: this._indexName,
+        query: {
+          bool: {
+            should: [
+              {
+                match_bool_prefix: {
+                  name: query,
+                },
+              },
+              { match_bool_prefix: { alternateNames: query } },
+            ],
+          },
+        },
+      });
+
+      return docs.hits.hits
+        .map((val) => {
+          if (!val._source) return;
+          return this.mapper.toDomain(val._source);
+        })
+        .filter((val) => val !== undefined);
+    } catch (err) {
+      throw mapESError(err);
+    }
   };
 }

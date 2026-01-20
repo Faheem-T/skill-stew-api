@@ -4,6 +4,8 @@ import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { BaseRepository } from "./BaseRepository";
 import { UserMapper } from "../../mappers/UserMapper";
 import { QueryDslQueryContainer } from "@elastic/elasticsearch/lib/api/types";
+import { InvalidSearchCriteriaError } from "../../../domain/errors/InvalidSearchCriteriaError";
+import { mapESError } from "../../mappers/ErrorMapper";
 
 export interface UserDoc {
   id: string;
@@ -28,6 +30,10 @@ export class UserRepository
   }
 
   protected mapper = new UserMapper();
+
+  protected getEntityName(): string {
+    return "User";
+  }
 
   findRecommendedUsers = async ({
     languages,
@@ -79,7 +85,7 @@ export class UserRepository
       let query: QueryDslQueryContainer;
 
       if (shouldClauses.length === 0 && !location) {
-        throw new Error("At least one search criteria must be provided");
+        throw new InvalidSearchCriteriaError("At least one search criteria must be provided");
       }
 
       if (shouldClauses.length > 0) {
@@ -146,9 +152,12 @@ export class UserRepository
         })
         .filter((entity) => entity !== undefined);
     } catch (error) {
-      throw new Error(
-        `Recommendation search failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-      );
+      // If it's our domain error, rethrow it
+      if (error instanceof InvalidSearchCriteriaError) {
+        throw error;
+      }
+      // Otherwise map as Elasticsearch error
+      throw mapESError(error);
     }
   };
 }
