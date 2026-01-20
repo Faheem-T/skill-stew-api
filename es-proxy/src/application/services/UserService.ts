@@ -1,5 +1,6 @@
 import { User } from "../../domain/entities/User";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
+import { GetRecommendedUsersOutputDTO } from "../dtos/GetRecommendedUsersDTO";
 import {
   SaveUserDTO,
   UpdateUserProfileDTO,
@@ -31,6 +32,7 @@ export class UserService implements IUserService {
 
     await this._userRepo.update(id, user);
   };
+
   updateUserSkillProfile = async (
     dto: UpdateUserSkillProfileDTO,
   ): Promise<void> => {
@@ -39,5 +41,31 @@ export class UserService implements IUserService {
     user.offeredSkills = offeredSkills;
     user.wantedSkills = wantedSkills;
     await this._userRepo.update(id, user);
+  };
+
+  getRecommendedUsers = async (
+    userId: string,
+  ): Promise<GetRecommendedUsersOutputDTO> => {
+    const user = await this._userRepo.findById(userId);
+
+    const location = user.location
+      ? { lat: user.location.latitude, lon: user.location.longitude }
+      : undefined;
+
+    const recommendedUsers = await this._userRepo.findRecommendedUsers({
+      languages: user.languages,
+      location,
+      offeredSkills: user.wantedSkills,
+      wantedSkills: user.offeredSkills,
+    });
+
+    const filteredUsers = recommendedUsers.filter(
+      (recommendedUser) => recommendedUser.id !== userId,
+    );
+
+    return filteredUsers.map((user) => ({
+      ...user,
+      location: user.location?.formattedAddress,
+    }));
   };
 }

@@ -1,3 +1,4 @@
+import { GetRecommendedUsersOutputDTO } from "../dtos/GetRecommendedUsersDTO";
 import {
   SaveUserDTO,
   UpdateUserProfileDTO,
@@ -9,4 +10,5 @@ export interface IUserService {
   verifyUser(id: string): Promise<void>;
   updateUserProfile(dto: UpdateUserProfileDTO): Promise<void>;
   updateUserSkillProfile(dto: UpdateUserSkillProfileDTO): Promise<void>;
+  getRecommendedUsers(userId: string): Promise<GetRecommendedUsersOutputDTO>;
 }

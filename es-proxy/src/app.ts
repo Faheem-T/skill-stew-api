@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { httpLogger } from "./presentation/middlewares/httpLogger";
 import { skillRouter } from "./presentation/routers/SkillRouter";
 import { errorHandler } from "./presentation/middlewares/errorHandler";
+import { userRouter } from "./presentation/routers/UserRouter";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cors({ credentials: true }));
 
 // Routes
 app.use("/api/v1/search/skills", skillRouter);
+app.use("/api/v1/search/users", userRouter);
 
 app.use(errorHandler);
 

@@ -15,6 +15,7 @@ const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
   GET: [
     { path: "/api/v1/users", roles: ["ADMIN"] },
     { path: "/api/v1/me", roles: ["USER", "ADMIN", "EXPERT"] },
+    { path: "/api/v1/search/users/recommended", roles: ["USER"] },
   ],
   POST: [
     { path: "/api/v1/payments/subscriptions", roles: ["ADMIN"] },
