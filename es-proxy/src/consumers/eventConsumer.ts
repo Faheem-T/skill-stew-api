@@ -27,6 +27,7 @@ export async function startConsumer() {
     logger.info(`Handling ${event.eventName}`);
     const { id } = event.data;
     await userService.create({ id });
+    logger.info(`Handled ${event.eventName} successfully`);
     return { success: true };
   });
 
@@ -41,12 +42,15 @@ export async function startConsumer() {
       return { success: false, retryable: true };
     }
 
+    logger.info(`Handled ${event.eventName} successfully`);
+
     return { success: true };
   });
 
   consumer.registerHandler("user.profileUpdated", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     await userService.updateUserProfile(event.data);
+    logger.info(`Handled ${event.eventName} successfully`);
     return { success: true };
   });
 
