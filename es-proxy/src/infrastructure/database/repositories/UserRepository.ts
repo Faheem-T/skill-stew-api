@@ -4,7 +4,7 @@ import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { BaseRepository } from "./BaseRepository";
 import { UserMapper } from "../../mappers/UserMapper";
 import { QueryDslQueryContainer } from "@elastic/elasticsearch/lib/api/types";
-import { InvalidSearchCriteriaError } from "../../../domain/errors/InvalidSearchCriteriaError";
+import { ValidationError } from "../../../application/errors/ValidationError";
 import { mapESError } from "../../mappers/ErrorMapper";
 
 export interface UserDoc {
@@ -85,7 +85,10 @@ export class UserRepository
       let query: QueryDslQueryContainer;
 
       if (shouldClauses.length === 0 && !location) {
-        throw new InvalidSearchCriteriaError("At least one search criteria must be provided");
+        throw new ValidationError([{
+          message: "At least one search criteria must be provided",
+          field: "searchCriteria"
+        }]);
       }
 
       if (shouldClauses.length > 0) {
@@ -152,8 +155,8 @@ export class UserRepository
         })
         .filter((entity) => entity !== undefined);
     } catch (error) {
-      // If it's our domain error, rethrow it
-      if (error instanceof InvalidSearchCriteriaError) {
+      // If it's our ValidationError, rethrow it
+      if (error instanceof ValidationError) {
         throw error;
       }
       // Otherwise map as Elasticsearch error

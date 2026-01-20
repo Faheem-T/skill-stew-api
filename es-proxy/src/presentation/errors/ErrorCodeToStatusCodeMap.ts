@@ -6,7 +6,6 @@ import { AppErrorCodes } from "../../application/errors/AppErrorCodes";
 export const ErrorCodeToStatusCodeMap: Record<AllErrorCodes, number> = {
   // Domain Error Codes
   [DomainErrorCodes.NOT_FOUND_ERROR]: HttpStatus.NOT_FOUND,
-  [DomainErrorCodes.INVALID_SEARCH_CRITERIA]: HttpStatus.BAD_REQUEST,
 
   // App Error Codes
   [AppErrorCodes.INTERNAL_SERVER_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
