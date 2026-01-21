@@ -22,7 +22,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@skillstew/common": "^1.0.24",
+    "@skillstew/common": "^1.0.27",
     "@types/amqplib": "^0.10.8",
     "amqplib": "^0.10.9",
     "cookie-parser": "^1.4.7",

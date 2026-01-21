@@ -1,11 +1,12 @@
-import { AnyAppEvent, AppEvent, DomainError } from "@skillstew/common";
+import { AnyAppEvent, AppEvent } from "@skillstew/common";
 import {
   EventName,
   EventSchemas,
 } from "@skillstew/common/build/events/EventMap";
 import { IConsumer } from "../../application/ports/IConsumer";
-import { Channel, ConsumeMessage, Replies } from "amqplib";
+import { Channel, ConsumeMessage } from "amqplib";
 import { AppError } from "../../application/errors/AppError.abstract";
+import { DomainError } from "../../domain/errors/DomainError.abstract";
 import { logger } from "../../presentation/logger";
 
 type EventHandler<T extends EventName> = (

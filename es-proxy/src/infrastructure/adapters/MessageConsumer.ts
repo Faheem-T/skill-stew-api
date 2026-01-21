@@ -1,10 +1,11 @@
-import { AnyAppEvent, AppEvent, DomainError } from "@skillstew/common";
+import { AnyAppEvent, AppEvent } from "@skillstew/common";
 import {
   EventName,
   EventSchemas,
 } from "@skillstew/common/build/events/EventMap";
 import { Channel, ConsumeMessage } from "amqplib";
 import { AppError } from "../../application/errors/AppError.abstract";
+import { DomainError } from "../../domain/errors/DomainError.abstract";
 import { logger } from "../../utils/logger";
 import { IMessageConsumer } from "../../application/ports/IMessageConsumer";
 
