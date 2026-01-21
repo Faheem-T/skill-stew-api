@@ -6,6 +6,7 @@ import { UserMapper } from "../../mappers/UserMapper";
 import { QueryDslQueryContainer } from "@elastic/elasticsearch/lib/api/types";
 import { ValidationError } from "../../../application/errors/ValidationError";
 import { mapESError } from "../../mappers/ErrorMapper";
+import { inspect } from "node:util";
 
 export interface UserDoc {
   id: string;
@@ -85,10 +86,12 @@ export class UserRepository
       let query: QueryDslQueryContainer;
 
       if (shouldClauses.length === 0 && !location) {
-        throw new ValidationError([{
-          message: "At least one search criteria must be provided",
-          field: "searchCriteria"
-        }]);
+        throw new ValidationError([
+          {
+            message: "At least one search criteria must be provided",
+            field: "searchCriteria",
+          },
+        ]);
       }
 
       if (shouldClauses.length > 0) {
@@ -101,7 +104,6 @@ export class UserRepository
       } else {
         query = { match_all: {} };
       }
-
       if (location) {
         const geoFunction = {
           gauss: {
@@ -113,14 +115,19 @@ export class UserRepository
               offset: `${radius / 2}km`,
               scale: `${radius}km`,
               decay: 0.5,
-              boost: 1.8,
             },
           },
         };
 
         if (shouldClauses.length > 0) {
-          (query as any).bool.functions = [geoFunction];
-          (query as any).bool.boost_mode = "sum";
+          // Wrap the bool query inside function_score
+          query = {
+            function_score: {
+              query: query, // Your existing bool query
+              functions: [geoFunction],
+              boost_mode: "sum",
+            },
+          };
         } else {
           query = {
             function_score: {
@@ -137,7 +144,7 @@ export class UserRepository
         sort: ["_score"],
       });
 
-      console.log(test.hits.hits);
+      console.log(inspect(test.hits.hits, false, null, true));
 
       const docs = await this._es.search<UserDoc>({
         index: this._indexName,
