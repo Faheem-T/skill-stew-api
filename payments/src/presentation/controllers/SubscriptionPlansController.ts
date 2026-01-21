@@ -1,10 +1,11 @@
-import { NextFunction, Request, Response } from "express-serve-static-core";
+import { NextFunction, Request, Response } from "express";
 import { ISubscriptionPlansUsecases } from "../../application/interfaces/ISubscriptionPlansUsecases";
 import {
   createSubscriptionPlanSchema,
   editSubscriptionPlanSchema,
 } from "../../application/dtos/SubscriptionPlansDtos";
 import { HttpStatus } from "@skillstew/common";
+import { ValidationError } from "../../application/errors/ValidationError";
 
 export class SubscriptionPlansController {
   constructor(private _plansUsecases: ISubscriptionPlansUsecases) {}
@@ -39,10 +40,10 @@ export class SubscriptionPlansController {
       const dto = editSubscriptionPlanSchema.parse(req.body);
       const id = req.params.id?.trim();
       if (!id) {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: "id is required" });
-        return;
+        throw new ValidationError([{
+          message: "id is required",
+          field: "id"
+        }]);
       }
       const updatedPlan = await this._plansUsecases.editPlan(id, dto);
       if (!updatedPlan) {
@@ -69,10 +70,10 @@ export class SubscriptionPlansController {
     try {
       const id = req.params.id?.trim();
       if (!id) {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: "id is required" });
-        return;
+        throw new ValidationError([{
+          message: "id is required",
+          field: "id"
+        }]);
       }
       const deletedPlan = await this._plansUsecases.deletePlan(id);
       if (!deletedPlan) {

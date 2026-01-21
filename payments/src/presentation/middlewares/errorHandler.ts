@@ -1,85 +1,118 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodError } from "zod";
-import {
-  HttpStatus,
-  DomainError,
-  InfrastructureError,
-  UnauthorizedError,
-  AccessTokenVerifyError,
-  ForbiddenError,
-  ApplicationError,
-} from "@skillstew/common";
 import { logger } from "../logger";
+import { DomainError } from "../../domain/errors/DomainError.abstract";
+import { AppError } from "../../application/errors/AppError.abstract";
+import { ErrorCodeToStatusCodeMap } from "../errors/ErrorCodeToStatusCodeMap";
+import { HttpStatus } from "@skillstew/common";
+import { ZodError } from "zod";
+import { ValidationError } from "../../application/errors/ValidationError";
 
 export const errorHandler = (
-  err: Error,
-  _req: Request,
+  error: Error,
+  req: Request,
   res: Response<{
     success: false;
-    error: string;
-    message: string;
-    errors?: { error: string; field?: string }[];
+    errors: { message: string; field?: string }[];
   }>,
   _next: NextFunction,
 ) => {
-  logger.error(err);
-  if (err instanceof DomainError) {
-    if (err instanceof UnauthorizedError) {
-      res.status(HttpStatus.UNAUTHORIZED).json({
-        success: false,
-        error: err.code,
-        message: err.message,
-      });
-      return;
-    }
-    res.status(HttpStatus.BAD_REQUEST).json({
-      success: false,
-      error: "validation_error",
-      message: err.message,
-    });
-  } else if (err instanceof ApplicationError) {
-    if (err instanceof ForbiddenError) {
-      res.status(HttpStatus.FORBIDDEN).json({
-        success: false,
-        message: "Forbidden",
-        error: "FORBIDDEN_ERROR",
-      });
-      return;
-    }
-    res.status(HttpStatus.BAD_REQUEST).json({
-      success: false,
-      message: "Application error",
-      error: "APPLICATION_ERROR",
-    });
-  } else if (err instanceof InfrastructureError) {
-    if (err instanceof AccessTokenVerifyError) {
-      res.status(HttpStatus.UNAUTHORIZED).json({
-        success: false,
-        error: "AUTHORIZATION_ERROR",
-        message: "Unauthorized",
-      });
-      return;
-    }
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      error: "SERVER_ERROR",
-      message: "Internal server error",
-    });
-  } else if (err instanceof ZodError) {
-    res.status(HttpStatus.BAD_REQUEST).json({
-      success: false,
-      error: "validation_error",
-      message: "Invalid Input",
-      errors: err.issues.map((issue) => ({
-        ...(issue.path.length > 0 && { field: issue.path.join(".") }),
-        error: issue.message,
-      })),
-    });
-  } else {
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      error: "unexpected_error",
-      message: "Something unexpected happened",
-    });
+  if (error instanceof ZodError) {
+    error = mapZodErrorToValidationError(error);
   }
+
+  const errorChain = getFullErrorChain(error);
+
+  logger.error({
+    message: "Application error occurred",
+    error: {
+      name: error.name,
+      message: error.message,
+      code:
+        error instanceof DomainError || error instanceof AppError
+          ? error.code
+          : undefined,
+      stack: error.stack,
+      chain: errorChain,
+    },
+    request: {
+      method: req.method,
+      url: req.url,
+      ip: req.ip,
+      userId: req.headers["x-user-id"],
+      userRole: req.headers["x-user-role"],
+    },
+    timestamp: new Date().toISOString(),
+  });
+
+  let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+  let userResponse: {
+    success: false;
+    errors: { message: string; field?: string }[];
+  };
+
+  if (error instanceof DomainError || error instanceof AppError) {
+    statusCode = ErrorCodeToStatusCodeMap[error.code];
+    userResponse = { ...error.toJSON(), success: false };
+  } else {
+    // Unknown/unexpected error
+    statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+    userResponse = {
+      errors: [
+        {
+          message:
+            process.env.NODE_ENV === "development"
+              ? error.message
+              : "An unexpected error occurred",
+        },
+      ],
+      success: false,
+    };
+  }
+
+  res.status(statusCode).json(userResponse);
 };
+
+// Helper to extract full error chain
+function getFullErrorChain(error: Error): Array<{
+  name: string;
+  message: string;
+  stack?: string;
+}> {
+  const chain = [];
+  let currentError: Error | undefined = error;
+
+  while (currentError) {
+    chain.push({
+      name: currentError.name,
+      message: currentError.message,
+      // Only include stack in development
+      stack:
+        process.env.NODE_ENV === "development" ? currentError.stack : undefined,
+    });
+
+    // Get the next error in the chain
+    if ("cause" in currentError && currentError.cause instanceof Error) {
+      currentError = currentError.cause;
+    } else {
+      break;
+    }
+  }
+
+  return chain;
+}
+
+/**
+ * Maps a Zod error to a ValidationError instance
+ * @param zodError - The ZodError thrown or returned from Zod validation
+ * @returns ValidationError instance
+ */
+export function mapZodErrorToValidationError(
+  zodError: ZodError,
+): ValidationError {
+  const errors = zodError.issues.map((issue) => ({
+    message: issue.message,
+    field: issue.path.length > 0 ? issue.path.join(".") : undefined,
+  }));
+
+  return new ValidationError(errors, zodError);
+}

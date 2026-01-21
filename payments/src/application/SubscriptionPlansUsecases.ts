@@ -6,6 +6,8 @@ import {
 } from "./dtos/SubscriptionPlansDtos";
 import { ISubscriptionPlansUsecases } from "./interfaces/ISubscriptionPlansUsecases";
 import { SubscriptionPlansDTOMapper } from "./mapper/SubscriptionPlansDTOMapper";
+import { NotFoundError } from "../domain/errors/NotFoundError";
+import { PlanAlreadyExistsError } from "../domain/errors/PlanAlreadyExistsError";
 
 export class SubscriptionPlansUsecases implements ISubscriptionPlansUsecases {
   constructor(private _plansRepo: ISubscriptionPlansRepository) {}
@@ -29,9 +31,18 @@ export class SubscriptionPlansUsecases implements ISubscriptionPlansUsecases {
       active,
     });
 
-    const savedPlan = await this._plansRepo.save(plan);
-    if (!savedPlan) return null;
-    return SubscriptionPlansDTOMapper.toPresentation(savedPlan);
+    try {
+      const savedPlan = await this._plansRepo.save(plan);
+      if (!savedPlan) throw new PlanAlreadyExistsError(name);
+      return SubscriptionPlansDTOMapper.toPresentation(savedPlan);
+    } catch (err) {
+      // If it's our domain error, rethrow it
+      if (err instanceof PlanAlreadyExistsError) {
+        throw err;
+      }
+      // Otherwise rethrow as NotFoundError (repository returns null)
+      throw new NotFoundError("Subscription Plan");
+    }
   };
 
   getPlans = async () => {
@@ -41,13 +52,13 @@ export class SubscriptionPlansUsecases implements ISubscriptionPlansUsecases {
 
   editPlan = async (id: string, dto: EditSubscriptionPlanDto) => {
     const editedPlan = await this._plansRepo.update(id, dto);
-    if (!editedPlan) return null;
+    if (!editedPlan) throw new NotFoundError("Subscription Plan");
     return SubscriptionPlansDTOMapper.toPresentation(editedPlan);
   };
 
   deletePlan = async (id: string) => {
     const deletedPlan = await this._plansRepo.delete(id);
-    if (!deletedPlan) return null;
+    if (!deletedPlan) throw new NotFoundError("Subscription Plan");
     return SubscriptionPlansDTOMapper.toPresentation(deletedPlan);
   };
 }
