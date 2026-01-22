@@ -12,11 +12,13 @@ export const skillUpdatedSchema = skillCreatedSchema;
 
 export const skillDeletedSchema = z.object({ id: z.uuid() });
 
-export const skillProfileUpdatedSchema = z.object({
-  userId: z.uuid(),
-  offered: z.array(z.string()),
-  wanted: z.array(z.string()),
-});
+export const skillProfileUpdatedSchema = z
+  .object({
+    userId: z.uuid(),
+    offered: z.array(z.object({ id: z.string(), name: z.string() })),
+    wanted: z.array(z.object({ id: z.string(), name: z.string() })),
+  })
+  .strict();
 
 export const SkillsEventSchemas = {
   "skill.created": skillCreatedSchema,
