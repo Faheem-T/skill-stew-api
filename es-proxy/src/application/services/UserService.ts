@@ -7,9 +7,14 @@ import {
   UpdateUserSkillProfileDTO,
 } from "../dtos/UserDTO";
 import { IUserService } from "../interfaces/IUserService";
+import { IStorageService } from "../ports/IStorageService";
 
 export class UserService implements IUserService {
-  constructor(private _userRepo: IUserRepository) {}
+  constructor(
+    private _userRepo: IUserRepository,
+    private _storageService: IStorageService,
+  ) {}
+
   create = async (dto: SaveUserDTO): Promise<void> => {
     const user = new User(dto.id);
     await this._userRepo.create(user.id, user);
@@ -64,9 +69,30 @@ export class UserService implements IUserService {
       (recommendedUser) => recommendedUser.id !== userId,
     );
 
-    return filteredUsers.map((user) => ({
-      ...user,
-      location: user.location?.formattedAddress,
-    }));
+    return filteredUsers.map(
+      ({
+        id,
+        name,
+        username,
+        isVerified,
+        languages,
+        avatarKey,
+        location,
+        offeredSkills,
+        wantedSkills,
+      }) => ({
+        id,
+        name,
+        username,
+        languages,
+        wantedSkills,
+        offeredSkills,
+        location: location?.formattedAddress,
+
+        ...(avatarKey
+          ? { avatarUrl: this._storageService.getPublicUrl(avatarKey) }
+          : {}),
+      }),
+    );
   };
 }
