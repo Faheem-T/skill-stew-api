@@ -140,7 +140,9 @@ const updateUsernameUsecase = new UpdateUsername(
   checkUsernameAvailabilityUsecase,
   usernameBloomFilter,
   logger,
+  producer,
 );
+
 const getCurrentAdminProfileUsecase = new GetCurrentAdminProfile(
   userRepo,
   adminProfileRepo,
