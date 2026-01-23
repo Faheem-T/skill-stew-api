@@ -22,10 +22,16 @@ export class SkillProfileService implements ISkillProfileService {
       "skill.profileUpdated",
       {
         userId: savedProfile.id,
-        offered: savedProfile.offered.map((skill) => skill.skillId),
-        wanted: savedProfile.wanted.map((skill) => skill.skillId),
+        offered: dto.offered.map((skill) => ({
+          id: skill.skillId,
+          name: skill.skillName,
+        })),
+        wanted: dto.wanted.map((skill) => ({
+          id: skill.skillId,
+          name: skill.skillName,
+        })),
       },
-      "skill",
+      "skill-service",
     );
     this._messageProducer.publish(event);
     const { id, wanted, offered, createdAt, updatedAt } = savedProfile;
