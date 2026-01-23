@@ -3,6 +3,8 @@ const envVars = [
   "RABBITMQ_PASSWORD",
   "ES_URL",
   "PORT",
+  "S3_BUCKET_NAME",
+  "CDN_DOMAIN_NAME",
 ] as const;
 
 export function generateEnvVars() {
