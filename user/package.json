@@ -32,7 +32,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.962.0",
     "@aws-sdk/s3-request-presigner": "^3.962.0",
-    "@skillstew/common": "^1.0.27",
+    "@skillstew/common": "^1.0.29",
     "amqplib": "^0.10.9",
     "bcrypt": "^6.0.0",
     "bloom-filters": "^3.0.4",

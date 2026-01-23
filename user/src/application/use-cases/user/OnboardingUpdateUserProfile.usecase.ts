@@ -45,6 +45,7 @@ export class OnboardingUpdateProfile implements IOnboardingUpdateUserProfile {
         name: savedProfile.name,
         languages: savedProfile.languages,
         location: savedProfile.location,
+        avatarKey: savedProfile.avatarKey,
       },
       "user-service",
     );

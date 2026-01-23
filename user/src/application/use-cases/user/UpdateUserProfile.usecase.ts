@@ -68,6 +68,7 @@ export class UpdateUserProfile implements IUpdateUserProfile {
         name: savedUser.name,
         languages: savedUser.languages,
         location: savedUser.location,
+        avatarKey: savedUser.avatarKey,
       },
       "user-service",
     );
