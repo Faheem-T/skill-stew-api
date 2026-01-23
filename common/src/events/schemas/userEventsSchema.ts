@@ -21,6 +21,7 @@ export const userProfileUpdatedSchema = z.object({
     })
     .optional(),
   languages: z.array(z.string()).optional(),
+  avatarKey: z.string().optional(),
 });
 
 export const UserEventSchemas = {
