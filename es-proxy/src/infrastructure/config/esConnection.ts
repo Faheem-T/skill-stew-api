@@ -17,6 +17,7 @@ export const INDEXES: { name: string; mappings: MappingTypeMapping }[] = [
         formattedAddress: { type: "text" },
         location: { type: "geo_point" },
         languages: { type: "keyword" },
+        avatarKey: { type: "keyword" },
         offeredSkills: { type: "nested" },
         wantedSkills: { type: "nested" },
       },

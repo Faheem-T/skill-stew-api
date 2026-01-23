@@ -22,13 +22,14 @@ export class UserService implements IUserService {
   };
 
   updateUserProfile = async (dto: UpdateUserProfileDTO): Promise<void> => {
-    const { id, languages, location, name, username } = dto;
+    const { id, languages, location, name, username, avatarKey } = dto;
 
     const user = new User(id);
     user.name = name;
     user.username = username;
     user.location = location;
     user.languages = languages;
+    user.avatarKey = avatarKey;
 
     await this._userRepo.update(id, user);
   };

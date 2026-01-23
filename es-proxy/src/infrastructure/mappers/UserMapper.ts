@@ -30,12 +30,16 @@ export class UserMapper implements Mapper<User, UserDoc> {
       formattedAddress,
       isVerified,
       languages,
+      avatarKey,
       offeredSkills,
       wantedSkills,
     } = raw;
+
     const user = new User(id);
+
     user.name = name;
     user.username = username;
+
     if (location && formattedAddress) {
       user.location = {
         latitude: location.lat,
@@ -47,6 +51,7 @@ export class UserMapper implements Mapper<User, UserDoc> {
     user.languages = languages;
     user.offeredSkills = offeredSkills;
     user.wantedSkills = wantedSkills;
+    user.avatarKey = avatarKey;
     return user;
   }
 

@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^9.2.0",
-    "@skillstew/common": "^1.0.28",
+    "@skillstew/common": "^1.0.29",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "amqplib": "^0.10.9",

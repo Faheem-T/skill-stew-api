@@ -17,6 +17,7 @@ export interface UserDoc {
   formattedAddress?: string;
   languages?: string[];
   isVerified?: boolean;
+  avatarKey?: string;
 
   offeredSkills?: { skillId: string; skillName: string }[];
   wantedSkills?: { skillId: string; skillName: string }[];

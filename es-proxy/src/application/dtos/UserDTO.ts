@@ -18,6 +18,7 @@ export const updateUserProfileDTO = z.object({
     })
     .optional(),
   languages: z.array(z.string()).optional(),
+  avatarKey: z.string().optional(),
 });
 
 export type UpdateUserProfileDTO = z.infer<typeof updateUserProfileDTO>;
