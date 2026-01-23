@@ -60,8 +60,14 @@ export async function startConsumer() {
 
     await userService.updateUserSkillProfile({
       id: userId,
-      offeredSkills: offered,
-      wantedSkills: wanted,
+      offeredSkills: offered.map((skill) => ({
+        skillId: skill.id,
+        skillName: skill.name,
+      })),
+      wantedSkills: wanted.map((skill) => ({
+        skillId: skill.id,
+        skillName: skill.name,
+      })),
     });
 
     return { success: true };

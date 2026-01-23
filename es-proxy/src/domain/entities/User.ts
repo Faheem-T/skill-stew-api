@@ -7,8 +7,8 @@ export class User {
   languages?: string[];
   isVerified?: boolean;
 
-  offeredSkills?: string[];
-  wantedSkills?: string[];
+  offeredSkills?: { skillId: string; skillName: string }[];
+  wantedSkills?: { skillId: string; skillName: string }[];
 
   constructor(id: string) {
     this.id = id;

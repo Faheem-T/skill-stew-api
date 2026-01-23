@@ -55,8 +55,8 @@ export class UserService implements IUserService {
     const recommendedUsers = await this._userRepo.findRecommendedUsers({
       languages: user.languages,
       location,
-      offeredSkills: user.wantedSkills,
-      wantedSkills: user.offeredSkills,
+      offeredSkills: user.wantedSkills?.map((skill) => skill.skillId),
+      wantedSkills: user.offeredSkills?.map((skill) => skill.skillId),
     });
 
     const filteredUsers = recommendedUsers.filter(

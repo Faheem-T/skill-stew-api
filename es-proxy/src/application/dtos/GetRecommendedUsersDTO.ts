@@ -4,7 +4,7 @@ export type GetRecommendedUsersOutputDTO = {
   username?: string;
   location?: string;
   languages?: string[];
-  offeredSkills?: string[];
-  wantedSkills?: string[];
+  offeredSkills?: { skillId: string; skillName: string }[];
+  wantedSkills?: { skillId: string; skillName: string }[];
   avatarUrl?: string;
 }[];

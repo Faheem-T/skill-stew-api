@@ -22,11 +22,17 @@ export const updateUserProfileDTO = z.object({
 
 export type UpdateUserProfileDTO = z.infer<typeof updateUserProfileDTO>;
 
-export const updateUserSkillProfileDTO = z.object({
-  id: z.uuid(),
-  offeredSkills: z.array(z.string()),
-  wantedSkills: z.array(z.string()),
-});
+export const updateUserSkillProfileDTO = z
+  .object({
+    id: z.uuid(),
+    offeredSkills: z.array(
+      z.object({ skillId: z.string(), skillName: z.string() }),
+    ),
+    wantedSkills: z.array(
+      z.object({ skillId: z.string(), skillName: z.string() }),
+    ),
+  })
+  .strict();
 
 export type UpdateUserSkillProfileDTO = z.infer<
   typeof updateUserSkillProfileDTO

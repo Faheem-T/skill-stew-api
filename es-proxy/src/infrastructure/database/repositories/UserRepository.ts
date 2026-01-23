@@ -18,8 +18,8 @@ export interface UserDoc {
   languages?: string[];
   isVerified?: boolean;
 
-  offeredSkills?: string[];
-  wantedSkills?: string[];
+  offeredSkills?: { skillId: string; skillName: string }[];
+  wantedSkills?: { skillId: string; skillName: string }[];
 }
 
 export class UserRepository
