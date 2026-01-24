@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { httpLogger } from "./middlewares/httpLogger";
-import { skillRouter } from "./routes/skillRoutes";
-import { errorHandler } from "./middlewares/errorHandler";
-import { skillProfileRouter } from "./routes/skillProfileRoutes";
+import { httpLogger } from "./presentation/middlewares/httpLogger";
+import { skillProfileRouter } from "./presentation/routes/skillProfileRoutes";
+import { skillRouter } from "./presentation/routes/skillRoutes";
+import { errorHandler } from "./presentation/middlewares/errorHandler";
 
 const app = express();
 

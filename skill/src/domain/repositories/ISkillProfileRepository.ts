@@ -1,0 +1,6 @@
+import { SkillProfile } from "../entities/SkillProfile";
+
+export interface ISkillProfileRepository {
+  save(profile: SkillProfile): Promise<Required<SkillProfile>>;
+  getById(id: string): Promise<SkillProfile | null>;
+}

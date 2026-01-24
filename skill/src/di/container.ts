@@ -1,10 +1,10 @@
-import { SkillController } from "../controllers/SkillController";
-import { SkillProfileController } from "../controllers/SkillProfileController";
-import { SkillProfileRepository } from "../repositories/SkillProfileRepository";
-import { SkillRepository } from "../repositories/SkillRepository";
-import { SkillProfileService } from "../services/SkillProfileService";
-import { SkillService } from "../services/SkillService";
-import { MessageProducer } from "../adapters/MessageProducer";
+import { SkillProfileService } from "../application/services/SkillProfileService";
+import { SkillService } from "../application/services/SkillService";
+import { MessageProducer } from "../infrastructure/adapters/MessageProducer";
+import { SkillProfileRepository } from "../infrastructure/repositories/SkillProfileRepository";
+import { SkillRepository } from "../infrastructure/repositories/SkillRepository";
+import { SkillController } from "../presentation/controllers/SkillController";
+import { SkillProfileController } from "../presentation/controllers/SkillProfileController";
 import { ENV } from "../utils/dotenv";
 import amqp from "amqplib";
 

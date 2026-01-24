@@ -1,5 +1,5 @@
 import { app } from "./app";
-import { connectDB } from "./config/mongoConnection";
+import { connectDB } from "./infrastructure/config/mongoConnection";
 import { ENV } from "./utils/dotenv";
 import { logger } from "./utils/logger";
 

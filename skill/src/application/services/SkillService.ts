@@ -1,0 +1,56 @@
+import { CreateEvent } from "@skillstew/common";
+import type { CreateSkillDTO, SkillResponseDTO } from "../dtos/skill.dto";
+import { Skill } from "../../domain/entities/Skill";
+import type { ISkillService } from "../interfaces/ISkillService";
+import type { ISkillRepository } from "../../domain/repositories/ISkillRepository";
+import type { IMessageProducer } from "../ports/IMessageProducer";
+
+export class SkillService implements ISkillService {
+  constructor(
+    private _skillRepo: ISkillRepository,
+    private messageProducer: IMessageProducer,
+  ) {}
+
+  createSkill = async ({
+    name,
+    alternateNames,
+    description,
+    status,
+    category,
+  }: CreateSkillDTO): Promise<SkillResponseDTO> => {
+    const skill = new Skill({
+      name,
+      alternateNames,
+      description,
+      status,
+      category,
+    });
+    const savedSkill = await this._skillRepo.save(skill);
+    const event = CreateEvent("skill.created", { ...savedSkill }, "skill");
+    this.messageProducer.publish(event);
+    return {
+      id: savedSkill.id,
+      name: savedSkill.name,
+      normalizedName: savedSkill.normalizedName,
+      description: savedSkill.description,
+      category: savedSkill.category,
+      alternateNames: savedSkill.alternateNames,
+      status: savedSkill.status,
+    };
+  };
+
+  getSkillById = async (id: string): Promise<SkillResponseDTO | null> => {
+    const skill = await this._skillRepo.getById(id);
+    if (!skill) return null;
+
+    return {
+      id: skill.id,
+      name: skill.name,
+      normalizedName: skill.normalizedName,
+      description: skill.description,
+      category: skill.category,
+      alternateNames: skill.alternateNames,
+      status: skill.status,
+    };
+  };
+}
