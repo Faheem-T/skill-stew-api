@@ -10,5 +10,5 @@ export const logger = winston.createLogger({
     colorize({ all: true }),
   ),
   transports: [new winston.transports.Console()],
-  defaultMeta: { service: "users" },
+  defaultMeta: { service: "skill-service" },
 });
