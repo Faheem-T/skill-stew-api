@@ -133,10 +133,16 @@ export class User {
 ```
 
 ### Error Handling
-Use custom domain errors with error codes:
 
+The user service implements a comprehensive three-layer error handling architecture:
+
+#### Error Classification
+- **Domain Errors** (`domain/errors/`): Business logic violations (InvalidCredentials, NotFound, BlockedUser, etc.)
+- **Application Errors** (`application/errors/`): Infrastructure and technical errors (ValidationError, Database errors, Auth errors)
+
+#### Error Hierarchy
 ```typescript
-// Abstract base error
+// Domain Error Abstract Base Class
 export abstract class DomainError extends Error {
   constructor(
     public readonly code: DomainErrorCodes,
@@ -152,19 +158,109 @@ export abstract class DomainError extends Error {
   abstract toJSON(): { errors: { message: string; field?: string }[] };
 }
 
-// Specific error implementation
-export class InvalidCredentialsError extends DomainError {
-  constructor() {
-    super(DomainErrorCodes.INVALID_CREDENTIALS, "Invalid credentials");
+// Application Error Abstract Base Class (includes retryable flag)
+export abstract class AppError extends Error {
+  constructor(
+    public readonly code: AppErrorCodes,
+    message: string,
+    public readonly cause?: Error,
+    public readonly retryable: boolean = false,
+  ) {
+    super(message);
+    if (cause?.stack && this.stack) {
+      this.stack = `${this.stack}\nCaused by: ${cause.stack}`;
+    }
   }
 
-  toJSON() {
-    return {
-      errors: [{ message: "Invalid credentials" }]
-    };
+  abstract toJSON(): { errors: { message: string; field?: string }[] };
+}
+
+// Specific Domain Error Implementation
+export class InvalidCredentialsError extends DomainError {
+  constructor() {
+    super(DomainErrorCodes.INVALID_CREDENTIALS, "Invalid credentials.");
+  }
+
+  toJSON(): { errors: { message: string; field?: string }[] } {
+    return { errors: [{ message: this.message }] };
+  }
+}
+
+// Validation Error (Application Error)
+export class ValidationError extends AppError {
+  public readonly errors: Array<{ message: string; field?: string }>;
+
+  constructor(
+    errors: Array<{ message: string; field?: string }>,
+    error?: Error,
+  ) {
+    super(AppErrorCodes.VALIDATION_ERROR, "Validation Error", error, false);
+    this.errors = errors;
+  }
+
+  toJSON(): { errors: { message: string; field?: string }[] } {
+    return { errors: this.errors };
   }
 }
 ```
+
+#### Centralized Error Management
+```typescript
+// Error Code Consolidation
+export const AllErrorCodes = {
+  ...DomainErrorCodes,
+  ...AppErrorCodes,
+};
+
+// HTTP Status Code Mapping
+export const ErrorCodeToStatusCodeMap: Record<AllErrorCodes, number> = {
+  [DomainErrorCodes.INVALID_CREDENTIALS]: HttpStatus.BAD_REQUEST,
+  [DomainErrorCodes.NOT_FOUND_ERROR]: HttpStatus.NOT_FOUND,
+  [DomainErrorCodes.BLOCKED_USER]: HttpStatus.FORBIDDEN,
+  [AppErrorCodes.VALIDATION_ERROR]: HttpStatus.BAD_REQUEST,
+  [AppErrorCodes.DB_CONNECTION_ERROR]: HttpStatus.SERVICE_UNAVAILABLE,
+  // ... etc
+};
+```
+
+#### Global Error Handler
+```typescript
+export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction) => {
+  // Auto-map Zod validation errors
+  if (error instanceof ZodError) {
+    error = mapZodErrorToValidationError(error);
+  }
+
+  // Extract full error chain for logging
+  const errorChain = getFullErrorChain(error);
+
+  // Structured logging with request context
+  logger.error({
+    message: "Application error occurred",
+    error: { name: error.name, message: error.message, code: error.code, chain: errorChain },
+    request: { method: req.method, url: req.url, userId: req.headers["x-user-id"] },
+  });
+
+  // Map to HTTP response
+  if (error instanceof DomainError || error instanceof AppError) {
+    const statusCode = ErrorCodeToStatusCodeMap[error.code];
+    res.status(statusCode).json({ ...error.toJSON(), success: false });
+  } else {
+    // Unknown errors get generic response (except in development)
+    res.status(500).json({
+      success: false,
+      errors: [{ message: process.env.NODE_ENV === "development" ? error.message : "An unexpected error occurred" }],
+    });
+  }
+};
+```
+
+#### Key Principles
+- **Error Chaining**: Use `cause` parameter to preserve error context
+- **Field-Specific Validation**: Validation errors include field paths for UI feedback
+- **Environment-Aware**: Detailed messages in development, safe messages in production
+- **Consistent Response Format**: Always `{ success: boolean, errors: Array<{message, field?}> }`
+- **Structured Logging**: Include request context and full error chain
 
 ### Database Patterns
 
