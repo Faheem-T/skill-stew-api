@@ -136,7 +136,7 @@ function isTimeoutError(mongoError: any): boolean {
 
 function isDuplicateKeyError(mongoError: any): boolean {
   // MongoDB duplicate key error code
-  return mongoError.code === 11000 || mongoError.code === 11001;
+  return mongoError.code === 11000;
 }
 
 function isWriteConflictError(mongoError: any): boolean {
