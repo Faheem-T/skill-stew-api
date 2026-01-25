@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import type { ISkillService } from "../../application/interfaces/ISkillService";
 import { HttpStatus } from "../../constants/HttpStatusCodes";
-import { ResponseMessages } from "../../constants/ResponseMessages";
 import { createSkillDTO } from "../../application/dtos/skill.dto";
+import { NotFoundError } from "../../domain/errors/NotFoundError";
 
 export class SkillController {
   constructor(private _skillService: ISkillService) {}
@@ -11,18 +11,16 @@ export class SkillController {
     try {
       const id = req.params.id?.trim();
       if (!id) {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: ResponseMessages.ID_REQUIRED });
+        res.status(HttpStatus.BAD_REQUEST).json({
+          success: false,
+          errors: [{ message: "Skill ID is required", field: "id" }],
+        });
         return;
       }
 
       const skill = await this._skillService.getSkillById(id);
       if (!skill) {
-        res
-          .status(HttpStatus.NOT_FOUND)
-          .json({ success: false, message: ResponseMessages.SKILL_NOT_FOUND });
-        return;
+        throw new NotFoundError("Skill");
       }
 
       res.status(HttpStatus.OK).json({ success: true, data: skill });

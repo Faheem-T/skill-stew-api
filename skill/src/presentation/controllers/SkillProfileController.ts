@@ -1,7 +1,7 @@
 import type { NextFunction, Response, Request } from "express";
 import type { ISkillProfileService } from "../../application/interfaces/ISkillProfileService";
 import { saveSkillProfileDTO } from "../../application/dtos/skillProfile.dto";
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatusCodes";
 
 export class SkillProfileController {
   constructor(private _skillProfileService: ISkillProfileService) {}

@@ -5,19 +5,28 @@ import {
   type SkillDoc,
   SkillModel,
 } from "../models/skillModel";
+import { mapMongooseError } from "../mappers/ErrorMapper";
 
 export class SkillRepository implements ISkillRepository {
   save = async (skill: Skill): Promise<Skill> => {
-    const attrs = this.toPersistence(skill);
-    const newSkill = SkillModel.build(attrs);
-    const savedSkill = await newSkill.save();
-    return this.toDomain(savedSkill);
+    try {
+      const attrs = this.toPersistence(skill);
+      const newSkill = SkillModel.build(attrs);
+      const savedSkill = await newSkill.save();
+      return this.toDomain(savedSkill);
+    } catch (error) {
+      throw mapMongooseError(error);
+    }
   };
 
   getById = async (id: string): Promise<Skill | null> => {
-    const doc = await SkillModel.findById(id);
-    if (!doc) return null;
-    return this.toDomain(doc);
+    try {
+      const doc = await SkillModel.findById(id);
+      if (!doc) return null;
+      return this.toDomain(doc);
+    } catch (error) {
+      throw mapMongooseError(error);
+    }
   };
 
   private toPersistence = (skill: Skill): SkillAttr => {

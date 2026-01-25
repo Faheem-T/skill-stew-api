@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "bun --watch --no-clear-screen ./src/start.ts",
-    "seed": "bun ./src/config/seedSkillData.ts",
+    "seed": "bun ./src/infrastructure/config/seedSkillData.ts",
     "_start": "tsx watch --clear-screen=false --include './src/**/*.ts' ./src/start.ts",
-    "_seed": "tsx ./src/config/seedSkillData.ts"
+    "_seed": "tsx ./src/infrastructure/config/seedSkillData.ts"
   },
   "private": true,
   "devDependencies": {

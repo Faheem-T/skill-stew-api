@@ -5,23 +5,33 @@ import {
   type SkillProfileDoc,
   SkillProfileModel,
 } from "../models/skillProfileModel";
+import { mapMongooseError } from "../mappers/ErrorMapper";
+import mongoose from "mongoose";
 
 export class SkillProfileRepository implements ISkillProfileRepository {
   save = async (profile: SkillProfile): Promise<Required<SkillProfile>> => {
-    const attrs = this.toPersistence(profile);
-    const newProfile = SkillProfileModel.build(attrs);
-    const savedProfile = await SkillProfileModel.findByIdAndUpdate(
-      attrs._id,
-      newProfile,
-      { upsert: true, new: true },
-    );
-    return this.toDomain(savedProfile);
+    try {
+      const attrs = this.toPersistence(profile);
+      const newProfile = SkillProfileModel.build(attrs);
+      const savedProfile = await SkillProfileModel.findByIdAndUpdate(
+        attrs._id,
+        newProfile,
+        { upsert: true, new: true },
+      );
+      return this.toDomain(savedProfile);
+    } catch (error) {
+      throw mapMongooseError(error);
+    }
   };
 
   getById = async (id: string): Promise<SkillProfile | null> => {
-    const doc = await SkillProfileModel.findById(id);
-    if (!doc) return null;
-    return this.toDomain(doc);
+    try {
+      const doc = await SkillProfileModel.findById(id);
+      if (!doc) return null;
+      return this.toDomain(doc);
+    } catch (error) {
+      throw mapMongooseError(error);
+    }
   };
 
   private toPersistence = (profile: SkillProfile): SkillProfileAttr => {

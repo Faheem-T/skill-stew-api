@@ -4,3 +4,4 @@ node_modules
 base service setup
 build
 *.secrets.yaml
+Session.vim
