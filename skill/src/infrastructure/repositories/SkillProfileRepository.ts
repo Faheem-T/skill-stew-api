@@ -6,7 +6,7 @@ import {
   SkillProfileModel,
 } from "../models/skillProfileModel";
 import { mapMongooseError } from "../mappers/ErrorMapper";
-import mongoose from "mongoose";
+import { NotFoundError } from "../../domain/errors";
 
 export class SkillProfileRepository implements ISkillProfileRepository {
   save = async (profile: SkillProfile): Promise<Required<SkillProfile>> => {
@@ -24,10 +24,10 @@ export class SkillProfileRepository implements ISkillProfileRepository {
     }
   };
 
-  getById = async (id: string): Promise<SkillProfile | null> => {
+  getById = async (id: string): Promise<SkillProfile> => {
     try {
       const doc = await SkillProfileModel.findById(id);
-      if (!doc) return null;
+      if (!doc) throw new NotFoundError("Skill profile");
       return this.toDomain(doc);
     } catch (error) {
       throw mapMongooseError(error);

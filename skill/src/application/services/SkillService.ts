@@ -43,7 +43,10 @@ export class SkillService implements ISkillService {
       };
     } catch (error) {
       // Handle duplicate key errors from ErrorMapper
-      if (error instanceof AppError && error.code === AppErrorCodes.DB_UNIQUE_CONSTRAINT) {
+      if (
+        error instanceof AppError &&
+        error.code === AppErrorCodes.DB_UNIQUE_CONSTRAINT
+      ) {
         throw new AlreadyExistsError(`Skill '${name}'`);
       }
 
@@ -52,9 +55,8 @@ export class SkillService implements ISkillService {
     }
   };
 
-  getSkillById = async (id: string): Promise<SkillResponseDTO | null> => {
+  getSkillById = async (id: string): Promise<SkillResponseDTO> => {
     const skill = await this._skillRepo.getById(id);
-    if (!skill) return null;
 
     return {
       id: skill.id,
