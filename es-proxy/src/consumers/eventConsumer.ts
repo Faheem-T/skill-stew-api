@@ -7,9 +7,7 @@ import { MessageConsumer } from "../infrastructure/adapters/MessageConsumer";
 export async function startConsumer() {
   const QUEUE_NAME = "es_proxy_queue";
   const EXCHANGE_NAME = "stew_exchange";
-  const connection = await amqp.connect(
-    `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
-  );
+  const connection = await amqp.connect(ENV.RABBIT_MQ_CONNECTION_STRING);
   const channel = await connection.createChannel();
 
   await channel.assertExchange(EXCHANGE_NAME, "topic", {

@@ -14,13 +14,12 @@ const envVars = [
   "NODE_MAILER_GMAIL_APP_PASSWORD",
   "BASE_SERVER_URL",
   "BASE_FRONTEND_URL",
-  "RABBITMQ_USER",
-  "RABBITMQ_PASSWORD",
   "NODE_ENV",
   "GOOGLE_CLIENT_ID",
   "GOOGLE_MAPS_API_KEY",
   "S3_BUCKET_NAME",
   "CDN_DOMAIN_NAME",
+  "RABBIT_MQ_CONNECTION_STRING",
 ] as const;
 
 export function generateEnvVars() {

@@ -70,9 +70,7 @@ const adminProfileRepo = new AdminProfileRepository();
 // RabbitMQ
 const EXCHANGE_NAME = "stew_exchange";
 const QUEUE_NAME = "user_service_queue";
-const connection = await amqp.connect(
-  `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
-);
+const connection = await amqp.connect(ENV.RABBIT_MQ_CONNECTION_STRING);
 const channel = await connection.createChannel();
 await channel.assertExchange(EXCHANGE_NAME, "topic", {
   durable: true,

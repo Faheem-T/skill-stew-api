@@ -11,6 +11,8 @@ import type { Skill } from "../../domain/entities/Skill";
 async function seedData() {
   try {
     await mongoose.connect(ENV.DATABASE_URL);
+    await mongoose.connection.db?.admin().command({ ping: 1 });
+    console.log("Pinged deployment. Successfully connected to MongoDB!");
 
     const count = await SkillModel.countDocuments();
     if (count > 0) {
@@ -22,16 +24,17 @@ async function seedData() {
     throw err;
   }
 
-  const rawData = await readFile("/app/src/config/skillSeedData.json", {
-    encoding: "utf8",
-  });
+  const rawData = await readFile(
+    "/app/src/infrastructure/config/skillSeedData.json",
+    {
+      encoding: "utf8",
+    },
+  );
   const data: Skill[] = JSON.parse(rawData);
   await SkillModel.insertMany(data);
 
   const EXCHANGE_NAME = "stew_exchange";
-  const connection = await amqp.connect(
-    `amqp://${ENV.RABBITMQ_USER}:${ENV.RABBITMQ_PASSWORD}@my-rabbit`,
-  );
+  const connection = await amqp.connect(ENV.RABBIT_MQ_CONNECTION_STRING);
   const channel = await connection.createChannel();
   await channel.assertExchange(EXCHANGE_NAME, "topic", {
     durable: true,

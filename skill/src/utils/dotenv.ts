@@ -1,8 +1,7 @@
 const envVars = [
   "PORT",
   "DATABASE_URL",
-  "RABBITMQ_USER",
-  "RABBITMQ_PASSWORD",
+  "RABBIT_MQ_CONNECTION_STRING",
 ] as const;
 
 export function generateEnvVars() {

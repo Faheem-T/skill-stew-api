@@ -21,17 +21,6 @@ spec:
           envFrom:
             - secretRef:
                 name: infisical-secrets
-          env:
-            - name: RABBITMQ_USER
-              valueFrom:
-                secretKeyRef:
-                  name: my-rabbit-default-user # created by operator
-                  key: username
-            - name: RABBITMQ_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: my-rabbit-default-user # created by operator
-                  key: password
           command: ["/bin/bash", "./scripts/seed-skill-docker-entrypoint.sh"]
       restartPolicy: Never
   backoffLimit: 2
