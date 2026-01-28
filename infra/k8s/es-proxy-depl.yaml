@@ -12,15 +12,6 @@ spec:
       labels:
         app: es-proxy
     spec:
-      initContainers:
-        - name: wait-for-dependencies
-          image: busybox
-          command:
-            [
-              "sh",
-              "-c",
-              "timeout 60 sh -c 'until nc -z my-rabbit 5672; do echo waiting for rabbitmq; sleep 2; done'",
-            ]
       containers:
         - name: es-proxy
           image: faheem222/es-proxy
