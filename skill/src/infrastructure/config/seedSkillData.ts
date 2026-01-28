@@ -7,21 +7,47 @@ import { CreateEvent } from "@skillstew/common";
 import { MessageProducer } from "../adapters/MessageProducer";
 import amqp from "amqplib";
 import type { Skill } from "../../domain/entities/Skill";
+import { mapMongooseError } from "../mappers/ErrorMapper";
+
+const RETRY_ATTEMPTS = 3;
+const INITIAL_BACKOFF_MS = 1000;
+
+const delay = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 async function seedData() {
-  try {
-    await mongoose.connect(ENV.DATABASE_URL);
-    await mongoose.connection.db?.admin().command({ ping: 1 });
-    console.log("Pinged deployment. Successfully connected to MongoDB!");
+  let lastError: unknown;
 
-    const count = await SkillModel.countDocuments();
-    if (count > 0) {
-      logger.info("Seeding has be done before... skipping.");
-      return;
+  for (let attempt = 1; attempt <= RETRY_ATTEMPTS; attempt++) {
+    try {
+      await mongoose.connect(ENV.DATABASE_URL);
+      await mongoose.connection.db?.admin().command({ ping: 1 });
+      logger.info("Pinged deployment. Successfully connected to MongoDB!");
+
+      const count = await SkillModel.countDocuments();
+      if (count > 0) {
+        logger.info("Seeding has be done before... skipping.");
+        return;
+      }
+      break;
+    } catch (err) {
+      lastError = err;
+      if (attempt < RETRY_ATTEMPTS) {
+        const backoffMs = INITIAL_BACKOFF_MS * Math.pow(2, attempt - 1);
+        logger.warn(
+          `MongoDB connection attempt ${attempt}/${RETRY_ATTEMPTS} failed. Retrying in ${backoffMs}ms...`,
+        );
+        await delay(backoffMs);
+      } else {
+        logger.error(
+          `MongoDB connection failed after ${RETRY_ATTEMPTS} attempts.`,
+        );
+        err = mapMongooseError(err);
+        logger.error("Couldn't connect to mongodb", err);
+        throw err;
+      }
     }
-  } catch (err) {
-    logger.error("Couldn't connect to mongodb", err);
-    throw err;
   }
 
   const rawData = await readFile(
