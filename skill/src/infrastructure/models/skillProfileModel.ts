@@ -40,7 +40,11 @@ const skillProfileSchema = new mongoose.Schema<SkillProfileDoc>(
     offered: {
       type: [
         {
-          skillId: { type: String, required: true },
+          skillId: {
+            type: String,
+            ref: "Skill",
+            required: true,
+          },
           proficiency: {
             type: String,
             enum: skillProficiencies,
@@ -53,7 +57,11 @@ const skillProfileSchema = new mongoose.Schema<SkillProfileDoc>(
     wanted: {
       type: [
         {
-          skillId: { type: String, required: true },
+          skillId: {
+            type: String,
+            ref: "Skill",
+            required: true,
+          },
           hoursLearned: { type: Number, default: 0 },
         },
       ],
