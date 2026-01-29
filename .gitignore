@@ -5,3 +5,4 @@ base service setup
 build
 *.secrets.yaml
 Session.vim
+.infisical.json
