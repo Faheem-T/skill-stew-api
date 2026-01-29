@@ -4,7 +4,7 @@ import { logger } from "../../utils/logger";
 import { mapMongooseError } from "../mappers/ErrorMapper";
 
 const RETRY_ATTEMPTS = 3;
-const INITIAL_BACKOFF_MS = 1000;
+const INITIAL_BACKOFF_MS = 3000;
 
 const delay = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
