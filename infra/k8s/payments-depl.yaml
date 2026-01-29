@@ -12,15 +12,6 @@ spec:
       labels:
         app: payments
     spec:
-      initContainers:
-        - name: wait-for-dependencies
-          image: busybox
-          command:
-            [
-              "sh",
-              "-c",
-              "timeout 60 sh -c 'until nc -z pg-srv 5432; do echo waiting for db; sleep 2; done'",
-            ]
       containers:
         - name: payments
           image: faheem222/payments
