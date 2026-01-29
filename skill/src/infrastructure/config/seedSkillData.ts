@@ -50,12 +50,9 @@ async function seedData() {
     }
   }
 
-  const rawData = await readFile(
-    "/app/src/infrastructure/config/skillSeedData.json",
-    {
-      encoding: "utf8",
-    },
-  );
+  const rawData = await readFile(`${import.meta.dir}/skillSeedData.json`, {
+    encoding: "utf8",
+  });
   const data: Skill[] = JSON.parse(rawData);
   await SkillModel.insertMany(data);
 
