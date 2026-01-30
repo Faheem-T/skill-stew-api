@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { ENV } from "../../utils/dotenv";
 import { readFile } from "fs/promises";
 import { logger } from "../../utils/logger";
-import { SkillModel } from "../models/skillModel";
+import { SkillModel, type SkillAttr } from "../models/skillModel";
 import { CreateEvent } from "@skillstew/common";
 import { MessageProducer } from "../adapters/MessageProducer";
 import amqp from "amqplib";
@@ -53,7 +53,7 @@ async function seedData() {
   const rawData = await readFile(`${import.meta.dir}/skillSeedData.json`, {
     encoding: "utf8",
   });
-  const data: Skill[] = JSON.parse(rawData);
+  const data: SkillAttr[] = JSON.parse(rawData);
   await SkillModel.insertMany(data);
 
   const EXCHANGE_NAME = "stew_exchange";
@@ -67,7 +67,17 @@ async function seedData() {
   data.forEach((skill) => {
     logger.info(`Publishing event for ${skill.name}`);
     messageProducer.publish(
-      CreateEvent("skill.created", { ...skill }, "skill"),
+      CreateEvent(
+        "skill.created",
+        {
+          id: skill._id,
+          name: skill.name,
+          alternateNames: skill.alternateNames,
+          normalizedName: skill.normalizedName,
+          status: skill.status,
+        },
+        "skill",
+      ),
     );
   });
   await channel.close();
