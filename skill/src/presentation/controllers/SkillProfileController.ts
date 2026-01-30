@@ -25,4 +25,25 @@ export class SkillProfileController {
       next(err);
     }
   };
+
+  getCurrentUserProfile = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userId = req.headers["x-user-id"];
+      if (!userId || typeof userId !== "string") {
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, message: "User ID is required." });
+        return;
+      }
+
+      const profile = await this._skillProfileService.getProfile(userId);
+      res.status(HttpStatus.OK).json({ success: true, data: profile });
+    } catch (err) {
+      next(err);
+    }
+  };
 }

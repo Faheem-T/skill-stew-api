@@ -55,6 +55,6 @@ skillSchema.statics.build = (attrs: SkillAttr) => {
 };
 
 export const SkillModel = mongoose.model<SkillDoc, SkillModel>(
-  "Skill",
+  "skills",
   skillSchema,
 );

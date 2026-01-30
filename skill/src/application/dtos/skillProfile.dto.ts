@@ -42,3 +42,12 @@ export const skillProfileResponseDTO = z.object({
 });
 
 export type SkillProfileResponseDTO = z.infer<typeof skillProfileResponseDTO>;
+
+export type GetSkillProfileResponseDTO = {
+  offered: {
+    skill: { id: string; name: string };
+    proficiency: typeof skillProficiencies;
+    hoursTaught: number;
+  }[];
+  wanted: { skill: { id: string; name: string }; hoursLearned: number }[];
+};
