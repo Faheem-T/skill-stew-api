@@ -8,6 +8,8 @@ import { Channel, ConsumeMessage } from "amqplib";
 import { AppError } from "../../application/errors/AppError.abstract";
 import { DomainError } from "../../domain/errors/DomainError.abstract";
 import { logger } from "../../presentation/logger";
+import { ILogger } from "../../application/ports/ILogger";
+import { ISetOnboardingComplete } from "../../application/interfaces/user/ISetOnboardingComplete.usecase";
 
 type EventHandler<T extends EventName> = (
   event: AppEvent<T>,
@@ -20,8 +22,14 @@ export class EventConsumer implements IConsumer {
     private _channel: Channel,
     private _queueName: string,
     private _exchangeName: string,
+    private _logger: ILogger,
+    private _setOnboardingCompleteUsecase: ISetOnboardingComplete,
   ) {
     this._channel.consume(this._queueName, this.handleEvent);
+    this.registerHandler("skill.profileUpdated", async (event) => {
+      await this._setOnboardingCompleteUsecase.exec(event.data.userId);
+      return { success: true };
+    });
   }
 
   registerHandler = async <T extends EventName>(
@@ -34,6 +42,7 @@ export class EventConsumer implements IConsumer {
       eventName,
     );
     this._handlers.set(eventName, handler as EventHandler<EventName>);
+    this._logger.info(`Registered handler for ${eventName}`);
   };
 
   private handleEvent = async (msg: ConsumeMessage | null) => {

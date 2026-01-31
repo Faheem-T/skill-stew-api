@@ -35,6 +35,7 @@ import { UpdateUsername } from "../application/use-cases/common/UpdateUsername.u
 import { InitializeUsernameBloomfilter } from "../application/use-cases/internal/InitializeUsernameBloomfilter";
 import { GetCurrentAdminProfile } from "../application/use-cases/admin/GetCurrentAdminProfile.usecase";
 import { AdminProfileRepository } from "../infrastructure/repositories/AdminProfileRepository";
+import { SetOnboardingComplete } from "../application/use-cases/user/SetOnboardingComplete.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -79,7 +80,15 @@ const queue = await channel.assertQueue(QUEUE_NAME, {
   durable: true,
 });
 
-export const consumer = new EventConsumer(channel, queue.queue, EXCHANGE_NAME);
+export const setOnboardingComplete = new SetOnboardingComplete(userProfileRepo);
+
+export const consumer = new EventConsumer(
+  channel,
+  queue.queue,
+  EXCHANGE_NAME,
+  logger,
+  setOnboardingComplete,
+);
 const producer = new EventProducer(channel, "stew_exchange");
 
 // Usecases
