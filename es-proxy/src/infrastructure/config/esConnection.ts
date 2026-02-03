@@ -18,8 +18,20 @@ export const INDEXES: { name: string; mappings: MappingTypeMapping }[] = [
         location: { type: "geo_point" },
         languages: { type: "keyword" },
         avatarKey: { type: "keyword" },
-        offeredSkills: { type: "nested" },
-        wantedSkills: { type: "nested" },
+        offeredSkills: {
+          type: "nested",
+          properties: {
+            skillId: { type: "keyword" },
+            skillName: { type: "text" },
+          },
+        },
+        wantedSkills: {
+          type: "nested",
+          properties: {
+            skillId: { type: "keyword" },
+            skillName: { type: "text" },
+          },
+        },
       },
     },
   },

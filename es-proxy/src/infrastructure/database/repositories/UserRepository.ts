@@ -68,8 +68,14 @@ export class UserRepository
 
       if (offeredSkills && offeredSkills.length > 0) {
         shouldClauses.push({
-          terms: {
-            offeredSkills,
+          nested: {
+            path: "offeredSkills",
+            query: {
+              terms: {
+                "offeredSkills.skillId": offeredSkills,
+              },
+            },
+            score_mode: "sum",
             boost: 2.0,
           },
         });
@@ -77,8 +83,14 @@ export class UserRepository
 
       if (wantedSkills && wantedSkills.length > 0) {
         shouldClauses.push({
-          terms: {
-            wantedSkills,
+          nested: {
+            path: "wantedSkills",
+            query: {
+              terms: {
+                "wantedSkills.skillId": wantedSkills,
+              },
+            },
+            score_mode: "sum",
             boost: 2.0,
           },
         });
@@ -124,7 +136,7 @@ export class UserRepository
           // Wrap the bool query inside function_score
           query = {
             function_score: {
-              query: query, // Your existing bool query
+              query: query, // existing bool query
               functions: [geoFunction],
               boost_mode: "sum",
             },
@@ -140,21 +152,12 @@ export class UserRepository
         }
       }
 
-      const test = await this._es.search<UserDoc>({
-        index: this._indexName,
-        sort: ["_score"],
-      });
-
-      console.log(inspect(test.hits.hits, false, null, true));
-
       const docs = await this._es.search<UserDoc>({
         index: this._indexName,
         query,
         size,
         sort: ["_score"],
       });
-
-      console.log(docs);
 
       return docs.hits.hits
         .map((hit) => {
