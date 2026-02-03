@@ -1,9 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "@skillstew/common";
-// import { IDSchema } from "../validators/IdValidator";
 import { UserFilters } from "../../domain/repositories/IUserRepository";
-import { updateProfileSchema } from "../../application/dtos/user/UpdateUserProfile.dto";
-import { IUpdateUserProfile } from "../../application/interfaces/user/IUpdateUserProfile";
 import { IGetUsers } from "../../application/interfaces/admin/IGetUsers";
 import { getUsersSchema } from "../../application/dtos/admin/GetUsers.dto";
 import { updateUserBlockStatusSchema } from "../../application/dtos/admin/UpdateUserBlockStatus.dto";
@@ -15,7 +12,6 @@ import { IUpdateUsername } from "../../application/interfaces/common/IUpdateUser
 
 export class UserController {
   constructor(
-    private _updateUserProfile: IUpdateUserProfile,
     private _getUsers: IGetUsers,
     private _updateUserBlockStatus: IUpdateUserBlockStatus,
     private _checkUsernameAvailability: ICheckUsernameAvailability,
@@ -125,29 +121,4 @@ export class UserController {
       next(err);
     }
   };
-
-  // userProfileUpdate = async (
-  //   req: Request,
-  //   res: Response,
-  //   next: NextFunction,
-  // ) => {
-  //   try {
-  //     const id = req.headers["x-user-id"];
-  //     const dto = updateProfileSchema.parse({ id, ...req.body });
-  //     const updatedUser = await this._updateUserProfile.exec(dto);
-  //     if (updatedUser === null) {
-  //       res
-  //         .status(HttpStatus.NOT_FOUND)
-  //         .json({ success: false, message: "User not found" });
-  //       return;
-  //     }
-  //     res.status(HttpStatus.OK).json({
-  //       success: true,
-  //       message: "User profile updated",
-  //       data: updatedUser,
-  //     });
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // };
 }

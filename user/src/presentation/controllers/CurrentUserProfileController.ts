@@ -7,6 +7,8 @@ import { IGetCurrentExpertProfile } from "../../application/interfaces/expert/IG
 import { IGeneratePresignedUploadUrl } from "../../application/interfaces/common/IGeneratePresignedUploadUrl";
 import { generatePresignedUploadUrlSchema } from "../../application/dtos/common/GeneratePresignedUploadUrl.dto";
 import { IGetCurrentAdminProfile } from "../../application/interfaces/admin/IGetCurrentAdminProfile";
+import { updateProfileSchema } from "../../application/dtos/user/UpdateUserProfile.dto";
+import { IUpdateUserProfile } from "../../application/interfaces/user/IUpdateUserProfile";
 
 export class CurrentUserProfileController {
   constructor(
@@ -14,6 +16,7 @@ export class CurrentUserProfileController {
     private _getCurrentExpertProfile: IGetCurrentExpertProfile,
     private _generatePresignedUploadUrl: IGeneratePresignedUploadUrl,
     private _getCurrentAdminProfile: IGetCurrentAdminProfile,
+    private _updateUserProfile: IUpdateUserProfile,
   ) {}
 
   getCurrentUserProfile = async (
@@ -69,6 +72,31 @@ export class CurrentUserProfileController {
           uploadUrl,
           key,
         },
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  userProfileUpdate = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userId = req.headers["x-user-id"];
+      const dto = updateProfileSchema.parse({ userId, ...req.body });
+      const updatedUser = await this._updateUserProfile.exec(dto);
+      if (updatedUser === null) {
+        res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ success: false, message: "User not found" });
+        return;
+      }
+      res.status(HttpStatus.OK).json({
+        success: true,
+        message: "User profile updated",
+        data: updatedUser,
       });
     } catch (err) {
       next(err);

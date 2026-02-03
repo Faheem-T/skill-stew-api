@@ -30,7 +30,7 @@ const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
   PATCH: [
     { path: "/api/v1/users/:id/block-status", roles: ["ADMIN"] },
     { path: "/api/v1/payments/subscriptions/:id", roles: ["ADMIN"] },
-    { path: "/api/v1/users/profile", roles: ["USER"] },
+    { path: "/api/v1/me", roles: ["USER"] },
     { path: "/api/v1/users/onboarding/profile", roles: ["USER"] },
     {
       path: "/api/v1/me/username",

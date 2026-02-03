@@ -32,6 +32,7 @@ export class UpdateUserProfile implements IUpdateUserProfile {
       phoneNumber,
       socialLinks,
       timezone,
+      bannerKey,
     } = dto;
 
     let locationDetails: IUserLocation | undefined = undefined;
@@ -54,6 +55,7 @@ export class UpdateUserProfile implements IUpdateUserProfile {
       phoneNumber,
       socialLinks,
       timezone,
+      bannerKey,
     };
     const savedUser = await this._userProfileRepo.updateByUserId(
       userId,

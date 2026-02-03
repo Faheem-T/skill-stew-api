@@ -167,7 +167,6 @@ export const authController = new AuthController(
   createAdminUsecase,
 );
 export const userController = new UserController(
-  updateUserProfileUsecase,
   getUsersUsecase,
   updateUserBlockStatusUsecase,
   checkUsernameAvailabilityUsecase,
@@ -181,6 +180,7 @@ export const currentUserProfileController = new CurrentUserProfileController(
   getCurrentExpertProfileUsecase,
   generatePresignedUploadUrlUsecase,
   getCurrentExpertProfileUsecase,
+  updateUserProfileUsecase,
 );
 
 // Internal Usecases

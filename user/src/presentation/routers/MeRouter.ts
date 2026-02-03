@@ -11,6 +11,11 @@ router
     requireRole("USER", "EXPERT", "ADMIN"),
     currentUserProfileController.getCurrentUserProfile,
   )
+  .patch(
+    "/",
+    requireRole("USER"),
+    currentUserProfileController.userProfileUpdate,
+  )
   .post(
     "/upload/pre-signed",
     currentUserProfileController.generateUploadPresignedUrl,
