@@ -114,7 +114,11 @@ const sendVerificationLinkUsecase = new SendVerificationLink(
 );
 const verifyUserUsecase = new VerifyUser(userRepo, jwtService, producer);
 const generateAccessTokenUsecase = new GenerateAccessToken(jwtService);
-const createAdminUsecase = new CreateAdmin(userRepo, hasherService);
+const createAdminUsecase = new CreateAdmin(
+  userRepo,
+  adminProfileRepo,
+  hasherService,
+);
 const updateUserProfileUsecase = new UpdateUserProfile(
   producer,
   userProfileRepo,
@@ -179,7 +183,7 @@ export const currentUserProfileController = new CurrentUserProfileController(
   getCurrentUserProfileUsecase,
   getCurrentExpertProfileUsecase,
   generatePresignedUploadUrlUsecase,
-  getCurrentExpertProfileUsecase,
+  getCurrentAdminProfileUsecase,
   updateUserProfileUsecase,
 );
 

@@ -13,7 +13,7 @@ export class GetCurrentAdminProfile implements IGetCurrentAdminProfile {
 
   exec = async (adminId: string): Promise<GetCurrentAdminProfileDTO> => {
     const adminInfo = await this._userRepo.findById(adminId);
-    const adminProfile = await this._adminProfileRepo.findById(adminId);
+    const adminProfile = await this._adminProfileRepo.findByUserId(adminId);
 
     let avatarUrl = undefined;
     if (adminProfile.avatarKey) {
