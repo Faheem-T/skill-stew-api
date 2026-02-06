@@ -6,6 +6,7 @@ import { HttpMessages } from "../constants/HttpMessages";
 import { ENV } from "../utils/dotenv";
 import { isAuthRequired } from "../utils/isAuthRequired";
 import { HTTPMethod } from "../types/HTTPMethod";
+import { logger } from "../utils/logger";
 
 export const authMiddleware: RequestHandler = (req, res, next) => {
   const path = req.path;
@@ -30,13 +31,12 @@ export const authMiddleware: RequestHandler = (req, res, next) => {
     const payload = jwtService.verifyAccessToken(token);
     (req as any).user = {
       id: payload.userId,
-      ...(payload.role === "ADMIN"
-        ? { userame: payload.username }
-        : { email: payload.email }),
+      email: payload.email,
       role: payload.role,
     };
 
     if (!roles.includes(payload.role)) {
+      logger.error("Blocking access due to wrong role");
       res
         .status(HttpStatus.FORBIDDEN)
         .json({ success: false, message: HttpMessages.FORBIDDEN });

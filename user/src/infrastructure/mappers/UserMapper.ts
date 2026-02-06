@@ -1,69 +1,89 @@
 import { User } from "../../domain/entities/User";
-import { UserSchemaType } from "../db/schemas/userSchema";
+import { UserTableType } from "../db/schemas/userSchema";
+import { Mapper } from "./interfaces/Mapper";
 
-export class UserMapper {
-  static toDomain(raw: UserSchemaType): User {
+export class UserMapper implements Mapper<User, UserTableType> {
+  toDomain(raw: UserTableType): User {
     const {
       id,
       email,
+      role,
       username,
-      timezone,
-      social_links,
-      phone_number,
       password_hash,
-      name,
-      languages,
       is_verified,
-      is_subscribed,
-      avatar_url,
-      about,
       is_blocked,
       is_google_login,
       created_at,
       updated_at,
     } = raw;
-    const user = new User({ email, id, isGoogleLogin: is_google_login });
-    if (username) user.username = username;
-    if (name) user.name = name;
-    if (timezone) user.timezone = timezone;
-    user.languages = languages;
-    user.socialLinks = social_links;
-    if (phone_number) user.phoneNumber = phone_number;
-    if (password_hash) user.passwordHash = password_hash;
-    user.isVerified = is_verified;
-    user.isSubscribed = is_subscribed;
-    if (avatar_url) user.avatarUrl = avatar_url;
-    if (about) user.about = about;
-    if (is_blocked) user.isBlocked = true;
-    if (created_at) user.createdAt = created_at;
-    if (updated_at) user.updatedAt = updated_at;
 
-    return user;
+    return new User(
+      id,
+      email,
+      role,
+      is_verified,
+      is_blocked,
+      is_google_login,
+      username ?? undefined,
+      password_hash ?? undefined,
+      created_at,
+      updated_at ?? undefined,
+    );
   }
-  static toPersistence(
-    user: User,
-  ): UserSchemaType | Omit<UserSchemaType, "id"> {
-    const result: Omit<UserSchemaType, "id"> = {
-      email: user.email,
-      about: user.about || null,
-      avatar_url: user.avatarUrl || null,
-      is_verified: user.isVerified,
-      is_subscribed: user.isSubscribed,
-      languages: user.languages,
-      name: user.name ?? null,
-      username: user.username ?? null,
-      password_hash: user.passwordHash ?? null,
-      phone_number: user.phoneNumber ?? null,
-      social_links: user.socialLinks,
-      timezone: user.timezone ?? null,
-      is_blocked: user.isBlocked,
-      is_google_login: user.isGoogleLogin,
-      created_at: user.createdAt ?? new Date(),
-      updated_at: user.updatedAt ?? new Date(),
+  toPersistence(user: User): UserTableType {
+    const {
+      id,
+      email,
+      isVerified,
+      role,
+      isBlocked,
+      isGoogleLogin,
+      passwordHash = null,
+      username = null,
+      createdAt = new Date(),
+      updatedAt = new Date(),
+    } = user;
+    const result = {
+      id: id,
+      email: email,
+      is_verified: isVerified,
+      role,
+      username,
+      password_hash: passwordHash,
+      is_blocked: isBlocked,
+      is_google_login: isGoogleLogin,
+      created_at: createdAt,
+      updated_at: updatedAt,
     };
-    if (user.id) {
-      return Object.assign({ id: user.id }, result);
-    }
+    return result;
+  }
+  toPersistencePartial(partial: Partial<User>): Partial<UserTableType> {
+    const {
+      id,
+      email,
+      isVerified,
+      role,
+      isBlocked,
+      isGoogleLogin,
+      passwordHash,
+      username,
+      createdAt,
+      updatedAt,
+    } = partial;
+
+    const result: Partial<UserTableType> = {};
+
+    if (id !== undefined) result.id = id;
+    if (email !== undefined) result.email = email;
+    if (isVerified !== undefined) result.is_verified = isVerified;
+    if (role !== undefined) result.role = role;
+    if (username !== undefined) result.username = username ?? null;
+    if (passwordHash !== undefined) result.password_hash = passwordHash ?? null;
+    if (isBlocked !== undefined) result.is_blocked = isBlocked;
+    if (isGoogleLogin !== undefined) result.is_google_login = isGoogleLogin;
+    if (createdAt !== undefined) result.created_at = createdAt;
+    if (updatedAt !== undefined) result.updated_at = updatedAt;
+
     return result;
   }
 }

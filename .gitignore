@@ -3,3 +3,6 @@ node_modules
 *.yaml.bak
 base service setup
 build
+*.secrets.yaml
+Session.vim
+.infisical.json

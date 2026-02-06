@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skill-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skill
+  template:
+    metadata:
+      labels:
+        app: skill
+    spec:
+      containers:
+        - name: skill
+          image: faheem222/skill
+          envFrom:
+            - secretRef:
+                name: infisical-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: skill-srv
+spec:
+  selector:
+    app: skill
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

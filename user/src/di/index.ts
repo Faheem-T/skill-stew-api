@@ -1,15 +1,41 @@
 import { AuthController } from "../presentation/controllers/AuthController";
-import { AuthUsecases } from "../application/AuthUsecases";
 import { UserRepository } from "../infrastructure/repositories/UserRepository";
 import { EmailService } from "../infrastructure/services/EmailService";
 import { JwtService } from "../infrastructure/services/JwtService";
 import { BcryptHasher } from "../infrastructure/services/HashService";
 import { ENV } from "../utils/dotenv";
-import { AdminRepository } from "../infrastructure/repositories/AdminRepository";
-import { UserUsecases } from "../application/UserUsecases";
 import { UserController } from "../presentation/controllers/UserController";
-import { Consumer, Producer } from "@skillstew/common";
 import { OAuth2Client } from "google-auth-library";
+import { UpdateUserProfile } from "../application/use-cases/user/UpdateUserProfile.usecase";
+import { GetCurrentUserProfile } from "../application/use-cases/user/GetCurrentUserProfile.usecase";
+import { UserOnboardingController } from "../presentation/controllers/UserOnboardingController";
+import { OnboardingUpdateProfile } from "../application/use-cases/user/OnboardingUpdateUserProfile.usecase";
+import { GoogleLocationProvider } from "../infrastructure/services/GoogleLocationProvider";
+import { CurrentUserProfileController } from "../presentation/controllers/CurrentUserProfileController";
+import { GetCurrentExpertProfileUsecase } from "../application/use-cases/expert/GetCurrentExpertProfile.usecase";
+import { S3StorageService } from "../infrastructure/services/S3StorageService";
+import { GeneratePresignedUploadUrl } from "../application/use-cases/common/GeneratePresignedUploadUrl.usecase";
+import { UserProfileRepository } from "../infrastructure/repositories/UserProfileRepository";
+import { RegisterUser } from "../application/use-cases/auth/RegisterUser.usecase";
+import { LoginUser } from "../application/use-cases/auth/LoginUser.usecase";
+import { GoogleAuth } from "../application/use-cases/auth/GoogleAuth.usecase";
+import { SendVerificationLink } from "../application/use-cases/auth/SendVerificationLink.usecase";
+import { VerifyUser } from "../application/use-cases/auth/VerifyUser.usecase";
+import { GenerateAccessToken } from "../application/use-cases/auth/GenerateAccessToken.usecase";
+import { CreateAdmin } from "../application/use-cases/admin/CreateAdmin.usecase";
+import { UpdateUserBlockStatus } from "../application/use-cases/admin/UpdateUserBlockStatus.usecase";
+import { GetUsers } from "../application/use-cases/admin/GetUsers.usecase";
+import amqp from "amqplib";
+import { EventConsumer } from "../infrastructure/services/EventConsumer";
+import { EventProducer } from "../infrastructure/services/EventProducer";
+import { BloomFilter } from "../infrastructure/services/BloomFilter";
+import { CheckUsernameAvailability } from "../application/use-cases/common/CheckUsernameAvailability.usecase";
+import { logger } from "../presentation/logger";
+import { UpdateUsername } from "../application/use-cases/common/UpdateUsername.usecase";
+import { InitializeUsernameBloomfilter } from "../application/use-cases/internal/InitializeUsernameBloomfilter";
+import { GetCurrentAdminProfile } from "../application/use-cases/admin/GetCurrentAdminProfile.usecase";
+import { AdminProfileRepository } from "../infrastructure/repositories/AdminProfileRepository";
+import { SetOnboardingComplete } from "../application/use-cases/user/SetOnboardingComplete.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -23,30 +49,144 @@ const jwtService = new JwtService({
   emailJwtSecret: ENV.EMAIL_VERIFICATON_JWT_SECRET,
 });
 const hasherService = new BcryptHasher();
+const locationProvider = new GoogleLocationProvider();
+const s3StorageService = new S3StorageService();
+
+const expectedNumberOfUsers = 1000000; // 1 M
+const desiredErrorRate = 0.01; // 1%
+
+const usernameBloomFilter = new BloomFilter(
+  expectedNumberOfUsers,
+  desiredErrorRate,
+);
 
 // OAuthClient
 const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 
 // Repositories
 const userRepo = new UserRepository();
-const adminRepo = new AdminRepository();
+const userProfileRepo = new UserProfileRepository();
+const adminProfileRepo = new AdminProfileRepository();
 
 // RabbitMQ
-export const consumer = new Consumer();
-export const producer = new Producer();
+const EXCHANGE_NAME = "stew_exchange";
+const QUEUE_NAME = "user_service_queue";
+const connection = await amqp.connect(ENV.RABBIT_MQ_CONNECTION_STRING);
+const channel = await connection.createChannel();
+await channel.assertExchange(EXCHANGE_NAME, "topic", {
+  durable: true,
+});
+const queue = await channel.assertQueue(QUEUE_NAME, {
+  durable: true,
+});
+
+export const setOnboardingComplete = new SetOnboardingComplete(userProfileRepo);
+
+export const consumer = new EventConsumer(
+  channel,
+  queue.queue,
+  EXCHANGE_NAME,
+  logger,
+  setOnboardingComplete,
+);
+const producer = new EventProducer(channel, "stew_exchange");
 
 // Usecases
-const authUsecases = new AuthUsecases(
+const registerUserUsecase = new RegisterUser(
   userRepo,
-  emailService,
-  jwtService,
-  hasherService,
-  adminRepo,
+  userProfileRepo,
   producer,
-  oAuthClient,
+  hasherService,
+  jwtService,
 );
-const userUsecases = new UserUsecases(userRepo);
+const loginUserUsecase = new LoginUser(userRepo, jwtService, hasherService);
+const googleAuthUsecase = new GoogleAuth(
+  userRepo,
+  userProfileRepo,
+  oAuthClient,
+  producer,
+  jwtService,
+);
+const sendVerificationLinkUsecase = new SendVerificationLink(
+  userRepo,
+  jwtService,
+  emailService,
+);
+const verifyUserUsecase = new VerifyUser(userRepo, jwtService, producer);
+const generateAccessTokenUsecase = new GenerateAccessToken(jwtService);
+const createAdminUsecase = new CreateAdmin(
+  userRepo,
+  adminProfileRepo,
+  hasherService,
+);
+const updateUserProfileUsecase = new UpdateUserProfile(
+  producer,
+  userProfileRepo,
+  locationProvider,
+  s3StorageService,
+);
+const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
+  userRepo,
+  userProfileRepo,
+  s3StorageService,
+);
+const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase();
+const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
+  producer,
+  userProfileRepo,
+  locationProvider,
+);
+const generatePresignedUploadUrlUsecase = new GeneratePresignedUploadUrl(
+  s3StorageService,
+);
+const updateUserBlockStatusUsecase = new UpdateUserBlockStatus(userRepo);
+const getUsersUsecase = new GetUsers(userRepo);
+const checkUsernameAvailabilityUsecase = new CheckUsernameAvailability(
+  userRepo,
+  usernameBloomFilter,
+  logger,
+);
+const updateUsernameUsecase = new UpdateUsername(
+  userRepo,
+  checkUsernameAvailabilityUsecase,
+  usernameBloomFilter,
+  logger,
+  producer,
+);
+
+const getCurrentAdminProfileUsecase = new GetCurrentAdminProfile(
+  userRepo,
+  adminProfileRepo,
+  s3StorageService,
+);
 
 // Controllers
-export const authController = new AuthController(authUsecases);
-export const userController = new UserController(userUsecases);
+export const authController = new AuthController(
+  registerUserUsecase,
+  loginUserUsecase,
+  googleAuthUsecase,
+  sendVerificationLinkUsecase,
+  verifyUserUsecase,
+  generateAccessTokenUsecase,
+  createAdminUsecase,
+);
+export const userController = new UserController(
+  getUsersUsecase,
+  updateUserBlockStatusUsecase,
+  checkUsernameAvailabilityUsecase,
+  updateUsernameUsecase,
+);
+export const onboardingController = new UserOnboardingController(
+  onboardingUpdateUserProfileUsecase,
+);
+export const currentUserProfileController = new CurrentUserProfileController(
+  getCurrentUserProfileUsecase,
+  getCurrentExpertProfileUsecase,
+  generatePresignedUploadUrlUsecase,
+  getCurrentAdminProfileUsecase,
+  updateUserProfileUsecase,
+);
+
+// Internal Usecases
+export const initializeUsernameBloomfilterUsecase =
+  new InitializeUsernameBloomfilter(userRepo, usernameBloomFilter, logger);

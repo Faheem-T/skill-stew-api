@@ -12,32 +12,12 @@ spec:
       labels:
         app: user
     spec:
-      initContainers:
-        - name: wait-for-dependencies
-          image: busybox
-          command:
-            [
-              "sh",
-              "-c",
-              "timeout 60 sh -c 'until nc -z pg-srv 5432; do echo waiting for db; sleep 2; done && until nc -z my-rabbit 5672; do echo waiting for rabbitmq; sleep 2; done'",
-            ]
       containers:
         - name: user
           image: faheem222/user
           envFrom:
-            - configMapRef:
-                name: user-config
-          env:
-            - name: RABBITMQ_USER
-              valueFrom:
-                secretKeyRef:
-                  name: my-rabbit-default-user # created by operator
-                  key: username
-            - name: RABBITMQ_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: my-rabbit-default-user # created by operator
-                  key: password
+            - secretRef:
+                name: infisical-secrets
 
 ---
 apiVersion: v1

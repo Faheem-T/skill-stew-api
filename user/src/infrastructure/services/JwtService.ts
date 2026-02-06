@@ -6,15 +6,8 @@ import {
   JWTPayload,
 } from "../../application/ports/IJwtService";
 import jwt, { JwtHeader } from "jsonwebtoken";
-import {
-  AccessTokenVerifyError,
-  EmailVerificationJwtVerifyError,
-  InvalidTokenError,
-  InvalidTokenRoleError,
-  RefreshTokenVerifyError,
-  TokenRoleMismatchError,
-} from "@skillstew/common";
 import { UserRoles } from "../../domain/entities/UserRoles";
+import { InvalidAuthTokenError } from "../../application/errors/infra/InvalidAuthTokenError";
 
 // type guard for user roles
 function isUserRole(role: string): role is UserRoles {
@@ -24,8 +17,6 @@ function isUserRole(role: string): role is UserRoles {
 export class JwtService implements IJwtService {
   EMAIL_SECRET: string;
   SECRETS: Record<UserRoles, { refresh: string; access: string }>;
-  // REFRESH_TOKEN_SECRET: string;
-  // ACCESS_TOKEN_SECRET: string;
   REFRESH_EXPIRY_IN_SECONDS: number = 60 * 60 * 24 * 15; // 15 days
   ACCESS_EXPIRY_IN_SECONDS: number = 60 * 10; // 10 minutes
   constructor({
@@ -57,7 +48,6 @@ export class JwtService implements IJwtService {
         refresh: adminRefreshTokenSecret,
       },
     };
-    // this.SECRETS.USER = {}
   }
   generateEmailVerificationJwt(input: generateEmailVerificationJwtDto): string {
     return jwt.sign({ email: input.email }, this.EMAIL_SECRET, {
@@ -74,7 +64,7 @@ export class JwtService implements IJwtService {
       );
       return decoded;
     } catch (err) {
-      throw new EmailVerificationJwtVerifyError();
+      throw new InvalidAuthTokenError(err as Error);
     }
   }
 
@@ -102,25 +92,25 @@ export class JwtService implements IJwtService {
     const decoded = jwt.decode(jwtToken, { complete: true }) as any;
 
     if (!decoded || !decoded.header) {
-      throw new InvalidTokenError();
+      throw new InvalidAuthTokenError();
     }
 
     const header = decoded.header as JwtHeader & { kid?: string };
     const role = header.kid as UserRoles | undefined;
 
     if (!role || !isUserRole(role)) {
-      throw new InvalidTokenRoleError();
+      throw new InvalidAuthTokenError();
     }
 
     let payload: JWTPayload;
     try {
       payload = <JWTPayload>jwt.verify(jwtToken, this.SECRETS[role].refresh);
     } catch (err) {
-      throw new RefreshTokenVerifyError();
+      throw new InvalidAuthTokenError(err as Error);
     }
 
     if (!(role === payload.role)) {
-      throw new TokenRoleMismatchError();
+      throw new InvalidAuthTokenError();
     }
 
     return payload;
@@ -129,24 +119,24 @@ export class JwtService implements IJwtService {
   verifyAccessToken = (jwtToken: string): JWTPayload => {
     const decoded = jwt.decode(jwtToken, { complete: true }) as any;
     if (!decoded || !decoded.header) {
-      throw new InvalidTokenError();
+      throw new InvalidAuthTokenError();
     }
 
     const header = decoded.header as JwtHeader & { kid?: string };
     const role = header.kid as UserRoles | undefined;
 
     if (!role || !isUserRole(role)) {
-      throw new InvalidTokenRoleError();
+      throw new InvalidAuthTokenError();
     }
     let payload: JWTPayload;
     try {
       payload = <JWTPayload>jwt.verify(jwtToken, this.SECRETS[role].access);
     } catch (err) {
-      throw new AccessTokenVerifyError();
+      throw new InvalidAuthTokenError(err as Error);
     }
 
     if (!(role === payload.role)) {
-      throw new TokenRoleMismatchError();
+      throw new InvalidAuthTokenError();
     }
 
     return payload;

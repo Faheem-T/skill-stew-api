@@ -1,18 +1,28 @@
 import { User } from "../../domain/entities/User";
-import { UserAlreadyExistsError } from "../../domain/errors/UserAlreadyExistsError";
 import {
   IUserRepository,
   UserFilters,
 } from "../../domain/repositories/IUserRepository";
 import { db } from "../../start";
 import { decodeCursor, encodeCursor } from "../../utils/dbCursor";
-import { DatabaseError } from "../errors/DatabaseError";
 import { UserMapper } from "../mappers/UserMapper";
-import { userSchema } from "../db/schemas/userSchema";
-import { and, eq, ilike, gt, or } from "drizzle-orm";
+import { userTable } from "../db/schemas/userSchema";
+import { and, eq, ilike, gt, or, isNotNull } from "drizzle-orm";
+import { BaseRepository } from "./BaseRepository";
+import { NotFoundError } from "../../domain/errors/NotFoundError";
+import { mapDrizzleError } from "../mappers/ErrorMapper";
 
-export class UserRepository implements IUserRepository {
-  getAllUsers = async ({
+export class UserRepository
+  extends BaseRepository<User, typeof userTable>
+  implements IUserRepository
+{
+  constructor() {
+    super(userTable);
+  }
+
+  mapper = new UserMapper();
+
+  findAll = async ({
     cursor,
     limit,
     filters,
@@ -31,8 +41,8 @@ export class UserRepository implements IUserRepository {
       const { createdAt, id } = decodeCursor(cursor);
       conditions.push(
         or(
-          gt(userSchema.created_at, createdAt),
-          and(eq(userSchema.created_at, createdAt), gt(userSchema.id, id)),
+          gt(userTable.created_at, createdAt),
+          and(eq(userTable.created_at, createdAt), gt(userTable.id, id)),
         ),
       );
     }
@@ -42,120 +52,92 @@ export class UserRepository implements IUserRepository {
       if (query) {
         conditions.push(
           or(
-            ilike(userSchema.name, `%${query}%`),
-            ilike(userSchema.username, `%${query}%`),
-            ilike(userSchema.email, `%${query}%`),
+            ilike(userTable.username, `%${query}%`),
+            ilike(userTable.email, `%${query}%`),
           ),
         );
       }
       if (isVerified !== undefined) {
-        conditions.push(eq(userSchema.is_verified, isVerified));
+        conditions.push(eq(userTable.is_verified, isVerified));
       }
     }
 
     const where = conditions.length > 0 ? and(...conditions) : undefined;
 
+    let rows;
+    try {
+      rows = await db
+        .select()
+        .from(userTable)
+        .where(where)
+        .orderBy(userTable.created_at, userTable.id)
+        .limit(limit + 1);
+    } catch (err) {
+      throw mapDrizzleError(err);
+    }
+
+    const hasNextPage = rows.length > limit;
+    const sliced = hasNextPage ? rows.slice(0, -1) : rows;
+
+    const users = sliced.map(this.mapper.toDomain);
+
+    return {
+      users,
+      hasNextPage,
+      nextCursor: hasNextPage
+        ? encodeCursor(
+            users[users.length - 1].createdAt!,
+            users[users.length - 1].id!,
+          )
+        : undefined,
+    };
+  };
+
+  findByEmail = async (email: string): Promise<User> => {
+    let row;
     try {
       const rows = await db
         .select()
-        .from(userSchema)
-        .where(where)
-        .orderBy(userSchema.created_at, userSchema.id)
-        .limit(limit + 1);
-
-      const hasNextPage = rows.length > limit;
-      const sliced = hasNextPage ? rows.slice(0, -1) : rows;
-
-      const users = sliced.map(UserMapper.toDomain);
-
-      return {
-        users,
-        hasNextPage,
-        nextCursor: hasNextPage
-          ? encodeCursor(
-              users[users.length - 1].createdAt!,
-              users[users.length - 1].id!,
-            )
-          : undefined,
-      };
+        .from(userTable)
+        .where(eq(userTable.email, email));
+      row = rows[0];
     } catch (err) {
-      throw new DatabaseError(err);
+      throw mapDrizzleError(err);
     }
+
+    if (!row) {
+      throw new NotFoundError("User");
+    }
+
+    return this.mapper.toDomain(row);
   };
 
-  save = async (user: User): Promise<User> => {
-    const pUser = UserMapper.toPersistence(user);
-    if ("id" in pUser) {
-      const [user] = await db
-        .update(userSchema)
-        .set(pUser)
-        .where(eq(userSchema.id, pUser.id))
-        .returning();
-      return UserMapper.toDomain(user);
-    } else {
-      const foundUser = await db
+  findByUsername = async (username: string): Promise<User> => {
+    let row;
+    try {
+      const rows = await db
         .select()
-        .from(userSchema)
-        .where(eq(userSchema.email, pUser.email));
-      if (foundUser.length > 0) {
-        throw new UserAlreadyExistsError(pUser.email);
-      }
-
-      const [user] = await db.insert(userSchema).values(pUser).returning();
-      return UserMapper.toDomain(user);
+        .from(userTable)
+        .where(eq(userTable.username, username));
+      row = rows[0];
+    } catch (err) {
+      throw mapDrizzleError(err);
     }
+    if (!row) {
+      throw new NotFoundError("User");
+    }
+    return this.mapper.toDomain(row);
   };
 
-  getUserById = async (id: string): Promise<User | null> => {
+  getAllUsernames = async (): Promise<string[]> => {
     try {
-      const [user] = await db
-        .select()
-        .from(userSchema)
-        .where(eq(userSchema.id, id));
-      if (!user) return null;
-      return UserMapper.toDomain(user);
+      const rows = await db
+        .select({ username: userTable.username })
+        .from(userTable)
+        .where(isNotNull(userTable.username));
+      return rows.map((row) => row.username!);
     } catch (err) {
-      throw new DatabaseError(err);
-    }
-  };
-
-  getUserByEmail = async (email: string): Promise<User | null> => {
-    try {
-      const [user] = await db
-        .select()
-        .from(userSchema)
-        .where(eq(userSchema.email, email));
-      if (!user) return null;
-      return UserMapper.toDomain(user);
-    } catch (err) {
-      throw new DatabaseError(err);
-    }
-  };
-
-  blockUser = async (userId: string): Promise<User | null> => {
-    try {
-      const [user] = await db
-        .update(userSchema)
-        .set({ is_blocked: true })
-        .where(eq(userSchema.id, userId))
-        .returning();
-      if (!user) return null;
-      return UserMapper.toDomain(user);
-    } catch (err) {
-      throw new DatabaseError(err);
-    }
-  };
-  unblockUser = async (userId: string): Promise<User | null> => {
-    try {
-      const [user] = await db
-        .update(userSchema)
-        .set({ is_blocked: false })
-        .where(eq(userSchema.id, userId))
-        .returning();
-      if (!user) return null;
-      return UserMapper.toDomain(user);
-    } catch (err) {
-      throw new DatabaseError(err);
+      throw mapDrizzleError(err);
     }
   };
 }

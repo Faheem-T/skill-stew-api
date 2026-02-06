@@ -1,4 +1,10 @@
-const envVars = ["RABBITMQ_USER", "RABBITMQ_PASSWORD", "ES_URL"] as const;
+const envVars = [
+  "ES_URL",
+  "PORT",
+  "S3_BUCKET_NAME",
+  "CDN_DOMAIN_NAME",
+  "RABBIT_MQ_CONNECTION_STRING",
+] as const;
 
 export function generateEnvVars() {
   return envVars.reduce(

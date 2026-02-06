@@ -1,13 +1,13 @@
 import { User } from "../entities/User";
+import { IBaseRepository } from "./IBaseRepository";
 
 export interface UserFilters {
-  query?: string; // to query by name/username/email
+  query?: string; // to query by username/email
   isVerified?: boolean;
 }
 
-export interface IUserRepository {
-  getUserById(id: string): Promise<User | null>;
-  getAllUsers({
+export interface IUserRepository extends IBaseRepository<User> {
+  findAll({
     cursor,
     limit,
     filters,
@@ -20,8 +20,7 @@ export interface IUserRepository {
     hasNextPage: boolean;
     nextCursor: string | undefined;
   }>;
-  save(user: User): Promise<User>;
-  getUserByEmail(email: string): Promise<User | null>;
-  blockUser(userId: string): Promise<User | null>;
-  unblockUser(userId: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User>;
+  findByUsername(username: string): Promise<User>;
+  getAllUsernames(): Promise<string[]>;
 }

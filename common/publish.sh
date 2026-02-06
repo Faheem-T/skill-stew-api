@@ -4,7 +4,7 @@
 set -e
 
 # Change to correct dir
-cd "/home/fahi/dev/brototype/skillStew/skill-stew-api/common/"
+cd "/home/faheem/Work/dev/brototype/skillStew/skill-stew-api/common/"
 
 # Step 1: Bump patch version
 npm version patch
@@ -18,7 +18,7 @@ git add .
 # Step 4: Prompt for a commit message
 echo "Enter commit message:"
 read COMMIT_MESSAGE
-git commit -m "[common] $COMMIT_MESSAGE"
+git commit -m "$COMMIT_MESSAGE"
 
 # Step 5: Push to GitHub
 git push

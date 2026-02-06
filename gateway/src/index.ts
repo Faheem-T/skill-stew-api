@@ -14,6 +14,11 @@ const ServiceConfigs = [
     name: "user-service",
   },
   {
+    path: "/api/v1/me",
+    url: ENV.ME_SERVICE_URL,
+    name: "user-profile-service",
+  },
+  {
     path: "/api/v1/auth",
     url: ENV.AUTH_SERVICE_URL,
     name: "auth-service",
@@ -22,6 +27,16 @@ const ServiceConfigs = [
     path: "/api/v1/payments",
     url: ENV.PAYMENTS_SERVICE_URL,
     name: "payments-service",
+  },
+  {
+    path: "/api/v1/skills",
+    url: ENV.SKILL_SERVICE_URL,
+    name: "skill-service",
+  },
+  {
+    path: "/api/v1/search",
+    url: ENV.SEARCH_SERVICE_URL,
+    name: "search-service",
   },
 ];
 
@@ -38,16 +53,11 @@ ServiceConfigs.forEach((service) => {
           const user = (req as any).user;
           logger.info(`Request for ${service.name}`, {
             ...(user ? { userId: user.id, role: user.role } : {}),
+            path: (req as any).path,
           });
           if (user) {
             proxyReq.setHeader("x-user-id", user.id);
             proxyReq.setHeader("x-user-role", user.role);
-            if (user.username) {
-              proxyReq.setHeader("x-user-username", user.username);
-            }
-            if (user.email) {
-              proxyReq.setHeader("x-user-email", user.email);
-            }
           }
         },
         proxyRes: (proxyRes, req, res) => {},

@@ -16,19 +16,8 @@ spec:
         - name: gateway
           image: faheem222/gateway
           envFrom:
-            - configMapRef:
-                name: gateway-config
-          # env:
-          #   - name: RABBITMQ_USER
-          #     valueFrom:
-          #       secretKeyRef:
-          #         name: my-rabbit-default-user # created by operator
-          #         key: username
-          #   - name: RABBITMQ_PASSWORD
-          #     valueFrom:
-          #       secretKeyRef:
-          #         name: my-rabbit-default-user # created by operator
-          #         key: password
+            - secretRef:
+                name: infisical-secrets
 
 ---
 apiVersion: v1

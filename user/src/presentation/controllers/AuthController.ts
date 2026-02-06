@@ -1,65 +1,74 @@
 import { Request, Response, NextFunction } from "express";
-import {
-  loginSchema,
-  registerSchema,
-  resendVerifyEmailSchema,
-  verifyEmailSchema,
-} from "../validators/UserValidator";
 import { UnauthorizedError } from "../../domain/errors/UnauthorizedError";
-import {
-  adminLoginSchema,
-  createAdminSchema,
-} from "../validators/AdminValidator";
-import { HttpStatus, UserRoles } from "@skillstew/common";
-import { DomainValidationError } from "../../domain/errors/DomainValidationError";
+import { createAdminSchema } from "../../application/dtos/admin/CreateAdmin.dto";
+import { HttpStatus } from "@skillstew/common";
 import { ENV } from "../../utils/dotenv";
-import { GoogleAuthError } from "../../application/errors/GoogleAuthErrors";
-import { IAuthUsecases } from "../../application/interfaces/IAuthUsecases";
+import { IRegisterUser } from "../../application/interfaces/auth/IRegisterUser";
+import { ILoginUser } from "../../application/interfaces/auth/ILoginUser";
+import { IGoogleAuth } from "../../application/interfaces/auth/IGoogleAuth";
+import { ISendVerificationLink } from "../../application/interfaces/auth/ISendVerificationLink";
+import { IVerifyUser } from "../../application/interfaces/auth/IVerifyUser";
+import { IGenerateAccessToken } from "../../application/interfaces/auth/IGenerateAccessToken";
+import { ICreateAdmin } from "../../application/interfaces/admin/ICreateAdmin";
+import { registerSchema } from "../../application/dtos/auth/Register.dto";
+import { loginSchema } from "../../application/dtos/auth/Login.dto";
+import { verifyUserSchema } from "../../application/dtos/auth/VerifyUser.dto";
+import { sendVerificationLinkSchema } from "../../application/dtos/auth/SendVerificationLink.dto";
 
 export class AuthController {
-  constructor(private _authUsecases: IAuthUsecases) {}
+  constructor(
+    private _registerUser: IRegisterUser,
+    private _loginUser: ILoginUser,
+    private _googleAuth: IGoogleAuth,
+    private _sendVerificationLink: ISendVerificationLink,
+    private _verifyUser: IVerifyUser,
+    private _generateAccessToken: IGenerateAccessToken,
+    private _createAdmin: ICreateAdmin,
+  ) {}
 
   registerUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email } = registerSchema.parse(req.body);
-      const result = await this._authUsecases.registerUser(email);
+      const dto = registerSchema.parse(req.body);
+      const result = await this._registerUser.exec(dto);
 
       if (!result.success) {
-        const { userAlreadyExists, userVerified } = result;
+        const { userAlreadyExists } = result;
         res
-          .status(400)
-          .json({ success: false, userAlreadyExists, userVerified });
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, userAlreadyExists });
         return;
       }
 
-      await this._authUsecases.sendVerificationLinkToEmail(email);
+      await this._sendVerificationLink.exec({ email: dto.email });
+
+      const { accessToken, refreshToken } = result;
+
       res
-        .status(201)
-        .json({ success: true, message: "Link has been sent to email" });
+        .status(HttpStatus.CREATED)
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: ENV.NODE_ENV === "production",
+          sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
+        })
+        .json({
+          success: true,
+          message: "User registered successfully",
+          data: { accessToken },
+        });
     } catch (err) {
       next(err);
     }
   };
 
-  setPasswordAndVerify = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
+  verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = verifyEmailSchema.parse(req.body);
-      await this._authUsecases.verifyUserAndSetPassword(result);
-      res.status(200).json({
+      const dto = verifyUserSchema.parse(req.body);
+      await this._verifyUser.exec(dto);
+      res.status(HttpStatus.OK).json({
         success: true,
-        message: "User has been verified and password has been set",
+        message: "User has been verified.",
       });
     } catch (err) {
-      if (err instanceof DomainValidationError) {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: err.message });
-        return;
-      }
       next(err);
     }
   };
@@ -70,10 +79,12 @@ export class AuthController {
     next: NextFunction,
   ) => {
     try {
-      const { email } = resendVerifyEmailSchema.parse(req.body);
+      const dto = sendVerificationLinkSchema.parse(req.body);
 
-      await this._authUsecases.sendVerificationLinkToEmail(email);
-      res.status(200).json({ success: true, message: "Email has been resent" });
+      await this._sendVerificationLink.exec(dto);
+      res
+        .status(HttpStatus.OK)
+        .json({ success: true, message: "Email has been resent" });
     } catch (err) {
       next(err);
     }
@@ -81,8 +92,8 @@ export class AuthController {
 
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = loginSchema.parse(req.body);
-      const tokens = await this._authUsecases.loginUser(result);
+      const dto = loginSchema.parse(req.body);
+      const tokens = await this._loginUser.exec(dto);
 
       if (!tokens) {
         res
@@ -94,11 +105,11 @@ export class AuthController {
       const { refreshToken, accessToken } = tokens;
 
       res
-        .status(200)
+        .status(HttpStatus.OK)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: "none",
+          sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
         })
         .json({
           success: true,
@@ -107,16 +118,6 @@ export class AuthController {
           },
         });
     } catch (err) {
-      if (err instanceof GoogleAuthError) {
-        const status =
-          err.code === "LOCAL_ACCOUNT_EXISTS"
-            ? HttpStatus.CONFLICT
-            : HttpStatus.BAD_REQUEST;
-        res
-          .status(status)
-          .json({ success: false, message: err.message, error: err.code });
-        return;
-      }
       next(err);
     }
   };
@@ -127,8 +128,8 @@ export class AuthController {
       if (!refreshToken) {
         throw new UnauthorizedError();
       }
-      const accessToken = this._authUsecases.refresh({ refreshToken });
-      res.status(200).json({ success: true, data: { accessToken } });
+      const accessToken = await this._generateAccessToken.exec(refreshToken);
+      res.status(HttpStatus.OK).json({ success: true, data: { accessToken } });
     } catch (err) {
       next(err);
     }
@@ -144,44 +145,11 @@ export class AuthController {
     next: NextFunction,
   ) => {
     try {
-      const adminInfo = createAdminSchema.parse(req.body);
-      await this._authUsecases.createAdmin(adminInfo);
+      const dto = createAdminSchema.parse(req.body);
+      await this._createAdmin.exec(dto);
       res
         .status(HttpStatus.OK)
         .json({ success: true, message: "Admin has been created" });
-    } catch (err) {
-      next(err);
-    }
-  };
-
-  adminLogin = async (
-    req: Request,
-    res: Response<{
-      success: boolean;
-      data?: Record<string, any>;
-      message?: string;
-    }>,
-    next: NextFunction,
-  ) => {
-    try {
-      const details = adminLoginSchema.parse(req.body);
-
-      const { refreshToken, accessToken } =
-        await this._authUsecases.loginAdmin(details);
-
-      res
-        .status(HttpStatus.OK)
-        .cookie("refreshToken", refreshToken, {
-          httpOnly: true,
-          secure: ENV.NODE_ENV === "production",
-          sameSite: "none",
-        })
-        .json({
-          success: true,
-          data: {
-            accessToken,
-          },
-        });
     } catch (err) {
       next(err);
     }
@@ -199,14 +167,14 @@ export class AuthController {
       }
 
       const { accessToken, refreshToken } =
-        await this._authUsecases.googleAuth(credential);
+        await this._googleAuth.exec(credential);
 
       res
         .status(HttpStatus.OK)
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: ENV.NODE_ENV === "production",
-          sameSite: "none",
+          sameSite: ENV.NODE_ENV === "production" ? "none" : "lax",
         })
         .json({
           success: true,
@@ -214,27 +182,6 @@ export class AuthController {
             accessToken,
           },
         });
-    } catch (err) {
-      if (err instanceof GoogleAuthError) {
-        const status =
-          err.code === "LOCAL_ACCOUNT_EXISTS"
-            ? HttpStatus.CONFLICT
-            : HttpStatus.BAD_REQUEST;
-        res
-          .status(status)
-          .json({ success: false, message: err.message, error: err.code });
-        return;
-      }
-      next(err);
-    }
-  };
-
-  me = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId = req.headers["x-user-id"] as string;
-      const role = req.headers["x-user-role"] as UserRoles;
-      const profile = await this._authUsecases.getProfile(userId, role);
-      res.status(HttpStatus.OK).json({ success: true, data: profile });
     } catch (err) {
       next(err);
     }

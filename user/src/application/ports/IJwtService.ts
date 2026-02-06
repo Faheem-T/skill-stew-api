@@ -1,16 +1,10 @@
 import { UserRoles } from "../../domain/entities/UserRoles";
 
-export type tokenBody =
-  | {
-      userId: string;
-      email: string;
-      role: Exclude<UserRoles, "ADMIN">;
-    }
-  | {
-      userId: string;
-      username: string;
-      role: "ADMIN";
-    };
+export type tokenBody = {
+  userId: string;
+  email: string;
+  role: UserRoles;
+};
 
 export type JWTPayload = tokenBody & {
   iat: number;
@@ -21,8 +15,7 @@ export interface generateEmailVerificationJwtDto {
   email: string;
 }
 
-export interface EmailVerificationJWTPayload
-  extends generateEmailVerificationJwtDto {
+export interface EmailVerificationJWTPayload extends generateEmailVerificationJwtDto {
   iat: number;
   exp: number;
 }

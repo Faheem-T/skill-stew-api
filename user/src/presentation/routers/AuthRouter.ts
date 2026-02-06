@@ -5,16 +5,14 @@ const router = Router();
 
 // /api/v1/auth
 router.post("/register", authController.registerUser);
-router.post("/set-password", authController.setPasswordAndVerify);
+router.post("/verify", authController.verify);
 router.post("/resend-verification-link", authController.resendVerifyLink);
 router.post("/login", authController.login);
 router.post("/refresh", authController.refresh);
 router.post("/google-auth", authController.googleAuth);
-router.get("/me", authController.me);
 router.post("/logout", authController.logout);
 
 // admin auth routes
 router.post("/admin/create", authController.createAdmin);
-router.post("/admin/login", authController.adminLogin);
 
 export default router;

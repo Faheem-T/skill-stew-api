@@ -8,17 +8,11 @@ import {
 } from "../errors/JwtErrors";
 import { UserRoles } from "../types/UserRoles";
 
-type tokenBody =
-  | {
-      userId: string;
-      email: string;
-      role: Exclude<UserRoles, "ADMIN">;
-    }
-  | {
-      userId: string;
-      username: string;
-      role: "ADMIN";
-    };
+type tokenBody = {
+  userId: string;
+  email: string;
+  role: UserRoles;
+};
 
 type JWTPayload = tokenBody & {
   iat: number;
