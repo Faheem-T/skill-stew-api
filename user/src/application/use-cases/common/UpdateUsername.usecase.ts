@@ -17,7 +17,9 @@ export class UpdateUsername implements IUpdateUsername {
   ) {}
 
   exec = async (dto: UpdateUsernameDTO): Promise<void> => {
-    const { username, userId } = dto;
+    const { username: rawUsername, userId } = dto;
+
+    const username = rawUsername.toLowerCase();
 
     const { available } = await this._checkUsernameAvailability.exec({
       username,
