@@ -155,7 +155,17 @@ Runs successfully with this configuration.
 - Hosts file must be updated when migrating from Minikube.
 - Always reload the shell after updating environment variables.
 
-Uninstall K3s:
+### Port Forwarding Gotcha (Arch Linux)
+
+If `kubectl port-forward` fails, it is often because `socat` is missing. Install it with:
+
+```
+pacman -S socat
+```
+
+### Uninstall K3s
+
+Use the bundled uninstall script:
 
 ```
 /usr/local/bin/k3s-uninstall.sh
