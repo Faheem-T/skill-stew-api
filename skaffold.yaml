@@ -57,3 +57,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: faheem222/websocket-gateway
+      context: ./websocket-gateway
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
