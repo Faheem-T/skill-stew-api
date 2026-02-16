@@ -1,7 +1,6 @@
 import Express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import cors from "cors";
 import { logger } from "./utils/logger";
 import { socketAuthMiddleware } from "./middlewares/authMiddleware";
 import { ENV } from "./utils/dotenv";
@@ -28,5 +27,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(ENV.PORT, () => {
-  console.log(`Listening on port ${ENV.PORT}`);
+  logger.info(`Listening on port ${ENV.PORT}`);
 });
