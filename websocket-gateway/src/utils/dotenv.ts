@@ -3,6 +3,7 @@ const envVars = [
   "USER_ACCESS_TOKEN_SECRET",
   "EXPERT_ACCESS_TOKEN_SECRET",
   "ADMIN_ACCESS_TOKEN_SECRET",
+  "REDIS_URI",
 ] as const;
 
 export function generateEnvVars() {
