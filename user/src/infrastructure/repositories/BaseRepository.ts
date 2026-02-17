@@ -30,13 +30,18 @@ export abstract class BaseRepository<
     }
   };
 
-  update = async (id: string, partial: Partial<TEntity>): Promise<TEntity> => {
+  update = async (
+    id: string,
+    partial: Partial<TEntity>,
+    tx?: TransactionContext,
+  ): Promise<TEntity> => {
     const data = this.mapper.toPersistencePartial(
       partial,
     ) as InferInsertModel<TTable>;
     let row;
     try {
-      const rows = (await db
+      const runner = tx ?? db;
+      const rows = (await runner
         .update(this.table)
         .set(data)
         .where(eq(this.table.id, id))
@@ -53,18 +58,20 @@ export abstract class BaseRepository<
     return this.mapper.toDomain(row as TPersistence);
   };
 
-  delete = async (id: string): Promise<void> => {
+  delete = async (id: string, tx?: TransactionContext): Promise<void> => {
     try {
-      await db.delete(this.table).where(eq(this.table.id, id));
+      const runner = tx ?? db;
+      await runner.delete(this.table).where(eq(this.table.id, id));
     } catch (err) {
       throw mapDrizzleError(err);
     }
   };
 
-  findById = async (id: string): Promise<TEntity> => {
+  findById = async (id: string, tx?: TransactionContext): Promise<TEntity> => {
     let row;
     try {
-      const rows = await db
+      const runner = tx ?? db;
+      const rows = await runner
         .select()
         .from(this.table as any)
         .where(eq(this.table.id, id));

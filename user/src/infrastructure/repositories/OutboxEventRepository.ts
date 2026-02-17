@@ -31,10 +31,14 @@ export class OutboxEventRepository implements IOutboxEventRepository {
     }
   };
 
-  markProcessed = async (eventId: string): Promise<void> => {
+  markProcessed = async (
+    eventId: string,
+    tx?: TransactionContext,
+  ): Promise<void> => {
     let row: OutboxEventsTableType;
     try {
-      const rows = await db
+      const runner = tx ?? db;
+      const rows = await runner
         .update(outboxEventsTable)
         .set({ status: "PROCESSED", processed_at: new Date() })
         .where(eq(outboxEventsTable.id, eventId))
@@ -49,9 +53,13 @@ export class OutboxEventRepository implements IOutboxEventRepository {
     }
   };
 
-  getPending = async (limit: number = 20): Promise<OutboxEvent[]> => {
+  getPending = async (
+    limit: number = 20,
+    tx?: TransactionContext,
+  ): Promise<OutboxEvent[]> => {
     try {
-      const rows = await db
+      const runner = tx ?? db;
+      const rows = await runner
         .select()
         .from(outboxEventsTable)
         .where(eq(outboxEventsTable.status, "PENDING"))
