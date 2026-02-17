@@ -7,7 +7,7 @@ import { UserConnectionStatus } from "../../../domain/entities/UserConnectionSta
 const connectionStatusEnum = pgEnum("connection_status", UserConnectionStatus);
 
 export const userConnectionsTable = pgTable(
-  "users",
+  "user_connections",
   {
     id: uuid().primaryKey(),
     requester_id: uuid()
