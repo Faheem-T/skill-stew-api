@@ -41,6 +41,8 @@ import { UserConnectionRepository } from "../infrastructure/repositories/UserCon
 import { AcceptConnection } from "../application/use-cases/user/AcceptConnection.usecase";
 import { RejectConnection } from "../application/use-cases/user/RejectConnection.usecase";
 import { ConnectionController } from "../presentation/controllers/ConnectionController";
+import { UnitOfWork } from "../infrastructure/persistence/UnitOfWork";
+import { OutboxEventRepository } from "../infrastructure/repositories/OutboxEventRepository";
 
 // Services
 const emailService = new EmailService();
@@ -65,6 +67,9 @@ const usernameBloomFilter = new BloomFilter(
   desiredErrorRate,
 );
 
+// Unit of work
+const unitOfWork = new UnitOfWork();
+
 // OAuthClient
 const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 
@@ -73,6 +78,7 @@ const userRepo = new UserRepository();
 const userProfileRepo = new UserProfileRepository();
 const adminProfileRepo = new AdminProfileRepository();
 const connectionRepo = new UserConnectionRepository();
+const outboxEventRepo = new OutboxEventRepository();
 
 // RabbitMQ
 const EXCHANGE_NAME = "stew_exchange";
@@ -166,7 +172,8 @@ const getCurrentAdminProfileUsecase = new GetCurrentAdminProfile(
 );
 const sendConnectionRequestUsecase = new SendConnectionRequest(
   connectionRepo,
-  producer,
+  outboxEventRepo,
+  unitOfWork,
 );
 const acceptConnectionUsecase = new AcceptConnection(connectionRepo, producer);
 const rejectConnectionUsecase = new RejectConnection(connectionRepo, producer);
