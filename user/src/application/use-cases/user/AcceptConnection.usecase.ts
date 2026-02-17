@@ -3,6 +3,7 @@ import { UnauthorizedError } from "../../../domain/errors/UnauthorizedError";
 import { IUserConnectionRepository } from "../../../domain/repositories/IUserConnectionRepository";
 import { IAcceptConnection } from "../../interfaces/user/IAcceptConnection";
 import { IProducer } from "../../ports/IProducer";
+import { AcceptingRejectedConnectionError } from "../../../domain/errors/AcceptingRejectedConnection";
 
 export class AcceptConnection implements IAcceptConnection {
   constructor(
@@ -15,6 +16,14 @@ export class AcceptConnection implements IAcceptConnection {
 
     if (foundConnection.recipientId !== userId) {
       throw new UnauthorizedError();
+    }
+
+    if (foundConnection.status === "REJECTED") {
+      throw new AcceptingRejectedConnectionError();
+    }
+
+    if (foundConnection.status === "ACCEPTED") {
+      return;
     }
 
     await this.connectionRepo.update(connectionId, { status: "ACCEPTED" });
