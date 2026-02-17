@@ -1,12 +1,14 @@
 import z from "zod";
 import { UserEventSchemas } from "./schemas/userEventsSchema";
 import { SkillsEventSchemas } from "./schemas/skillsEventSchemas";
+import { ConnectionEventSchemas } from "./schemas/userConnectionEventSchemas";
 
 // Union of all app event schemas
 
 export const EventSchemas = {
   ...UserEventSchemas,
   ...SkillsEventSchemas,
+  ...ConnectionEventSchemas,
 } as const;
 
 // Union of all app event names
