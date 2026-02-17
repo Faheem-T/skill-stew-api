@@ -1,10 +1,8 @@
-import { pgTable, pgEnum, uuid, unique } from "drizzle-orm/pg-core";
+import { pgTable, uuid, unique } from "drizzle-orm/pg-core";
 import { InferSelectModel } from "drizzle-orm";
 import { timestamps } from "./timestamps";
 import { userTable } from "./userSchema";
-import { UserConnectionStatus } from "../../../domain/entities/UserConnectionStatus";
-
-const connectionStatusEnum = pgEnum("connection_status", UserConnectionStatus);
+import { connectionStatusEnum } from "./connectionStatusEnum";
 
 export const userConnectionsTable = pgTable(
   "user_connections",
