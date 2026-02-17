@@ -7,6 +7,7 @@ export const DomainErrorCodes = {
   VERIFIED_USER: "VERIFIED_USER",
   ALREADY_EXISTS: "ALREADY_EXISTS",
   AUTH_PROVIDER_CONFLICT: "AUTH_PROVIDER_CONFLICT",
+  SELF_CONNECTION_ERROR: "SELF_CONNECTION_ERROR",
 } as const;
 
 export type DomainErrorCodes = keyof typeof DomainErrorCodes;
