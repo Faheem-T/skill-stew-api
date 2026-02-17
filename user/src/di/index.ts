@@ -89,7 +89,7 @@ export const consumer = new EventConsumer(
   logger,
   setOnboardingComplete,
 );
-const producer = new EventProducer(channel, "stew_exchange");
+const producer = new EventProducer(channel, "stew_exchange", logger);
 
 // Usecases
 const registerUserUsecase = new RegisterUser(
