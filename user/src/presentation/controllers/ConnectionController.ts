@@ -4,6 +4,7 @@ import { IRejectConnection } from "../../application/interfaces/user/IRejectConn
 import { ISendConnectionRequest } from "../../application/interfaces/user/ISendConnectionRequest";
 import { ForbiddenError } from "../../domain/errors/ForbiddenError";
 import { ValidationError } from "../../application/errors/ValidationError";
+import { HttpStatus } from "@skillstew/common";
 
 export class ConnectionController {
   constructor(
@@ -31,6 +32,9 @@ export class ConnectionController {
       }
 
       await this._sendConnectionRequest.exec(userId, recipientId);
+      res
+        .status(HttpStatus.OK)
+        .json({ success: true, message: "Connection request sent!" });
     } catch (err) {
       next(err);
     }
