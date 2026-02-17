@@ -25,6 +25,10 @@ const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
       path: "/api/v1/me/upload/pre-signed",
       roles: ["USER", "EXPERT", "ADMIN"],
     },
+    {
+      path: "/api/v1/connections/:userId",
+      roles: ["USER", "EXPERT", "ADMIN"],
+    },
   ],
   PUT: [{ path: "/api/v1/skills/profile", roles: ["USER"] }],
   PATCH: [
