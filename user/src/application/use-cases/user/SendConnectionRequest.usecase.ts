@@ -2,7 +2,6 @@ import { UserConnection } from "../../../domain/entities/UserConnection";
 import { IUserConnectionRepository } from "../../../domain/repositories/IUserConnectionRepository";
 import { ISendConnectionRequest } from "../../interfaces/user/ISendConnectionRequest";
 import { v7 as uuidv7 } from "uuid";
-import { IProducer } from "../../ports/IProducer";
 import { CreateEvent } from "@skillstew/common";
 import { AppError } from "../../errors/AppError.abstract";
 import { DbForeignKeyConstraintError } from "../../errors/infra/DbForeignKeyConstraintError";
@@ -10,11 +9,14 @@ import { NotFoundError } from "../../../domain/errors/NotFoundError";
 import { DbUniqueConstraintError } from "../../errors/infra/DbUniqueConstraintError";
 import { AlreadyExistsError } from "../../../domain/errors/AlreadyExistsError";
 import { SelfConnectionError } from "../../../domain/errors/SelfConnectionError";
+import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
+import { IUnitOfWork } from "../../ports/IUnitOfWork";
 
 export class SendConnectionRequest implements ISendConnectionRequest {
   constructor(
     private connectionRepo: IUserConnectionRepository,
-    private messageProducer: IProducer,
+    private outboxRepo: IOutboxEventRepository,
+    private unitOfWork: IUnitOfWork,
   ) {}
 
   exec = async (requesterId: string, recipientId: string): Promise<void> => {
@@ -35,19 +37,35 @@ export class SendConnectionRequest implements ISendConnectionRequest {
       // No need for separate "does user exist" check
       // as create will fail with foreign key contraint error
       // if userId not valid
+      await this.unitOfWork.transact(async (tx) => {
+        const savedConnection = await this.connectionRepo.create(
+          newConnection,
+          tx,
+        );
 
-      const savedConnection = await this.connectionRepo.create(newConnection);
-      const event = CreateEvent(
-        "connection.requested",
-        {
-          connectionId: savedConnection.id,
-          fromUserId: savedConnection.requesterId,
-          toUserId: savedConnection.recipientId,
-          timestamp: savedConnection.createdAt,
-        },
-        "user-service",
-      );
-      this.messageProducer.publish(event);
+        const event = CreateEvent(
+          "connection.requested",
+          {
+            connectionId: savedConnection.id,
+            fromUserId: savedConnection.requesterId,
+            toUserId: savedConnection.recipientId,
+            timestamp: savedConnection.createdAt,
+          },
+          "user-service",
+        );
+
+        await this.outboxRepo.create(
+          {
+            id: uuidv7(),
+            name: event.eventName,
+            payload: JSON.stringify(event),
+            status: "PENDING",
+            createdAt: new Date(),
+            processedAt: undefined,
+          },
+          tx,
+        );
+      });
     } catch (err) {
       if (err instanceof AppError) {
         if (err instanceof DbForeignKeyConstraintError) {

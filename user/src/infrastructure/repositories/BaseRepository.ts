@@ -5,6 +5,7 @@ import { eq, InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { Mapper } from "../mappers/interfaces/Mapper";
 import { NotFoundError } from "../../domain/errors/NotFoundError";
 import { mapDrizzleError } from "../mappers/ErrorMapper";
+import { TransactionContext } from "../../types/TransactionContext";
 
 export abstract class BaseRepository<
   TEntity,
@@ -15,10 +16,14 @@ export abstract class BaseRepository<
 
   protected abstract mapper: Mapper<TEntity, TPersistence>;
 
-  create = async (entity: TEntity): Promise<TEntity> => {
+  create = async (
+    entity: TEntity,
+    tx?: TransactionContext,
+  ): Promise<TEntity> => {
     try {
       const data = this.mapper.toPersistence(entity);
-      const [row] = await db.insert(this.table).values(data).returning();
+      const runner = tx ?? db;
+      const [row] = await runner.insert(this.table).values(data).returning();
       return this.mapper.toDomain(row as TPersistence);
     } catch (err) {
       throw mapDrizzleError(err);
