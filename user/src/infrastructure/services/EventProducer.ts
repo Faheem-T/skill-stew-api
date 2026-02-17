@@ -12,11 +12,12 @@ export class EventProducer implements IProducer {
 
   publish = (event: AnyAppEvent) => {
     const routingKey = event.eventName;
-    const message = Buffer.from(JSON.stringify(event));
+    const stringifiedEvent = JSON.stringify(event);
+    const message = Buffer.from(stringifiedEvent);
 
     this._logger.info({
       message: `Publishing ${routingKey}`,
-      eventMessage: message,
+      eventMessage: stringifiedEvent,
     });
 
     this._channel.publish(this._exchange, routingKey, message, {
