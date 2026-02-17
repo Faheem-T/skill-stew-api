@@ -36,6 +36,11 @@ import { InitializeUsernameBloomfilter } from "../application/use-cases/internal
 import { GetCurrentAdminProfile } from "../application/use-cases/admin/GetCurrentAdminProfile.usecase";
 import { AdminProfileRepository } from "../infrastructure/repositories/AdminProfileRepository";
 import { SetOnboardingComplete } from "../application/use-cases/user/SetOnboardingComplete.usecase";
+import { SendConnectionRequest } from "../application/use-cases/user/SendConnectionRequest.usecase";
+import { UserConnectionRepository } from "../infrastructure/repositories/UserConnectionRepository";
+import { AcceptConnection } from "../application/use-cases/user/AcceptConnection.usecase";
+import { RejectConnection } from "../application/use-cases/user/RejectConnection.usecase";
+import { ConnectionController } from "../presentation/controllers/ConnectionController";
 
 // Services
 const emailService = new EmailService();
@@ -67,6 +72,7 @@ const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 const userRepo = new UserRepository();
 const userProfileRepo = new UserProfileRepository();
 const adminProfileRepo = new AdminProfileRepository();
+const connectionRepo = new UserConnectionRepository();
 
 // RabbitMQ
 const EXCHANGE_NAME = "stew_exchange";
@@ -153,12 +159,17 @@ const updateUsernameUsecase = new UpdateUsername(
   logger,
   producer,
 );
-
 const getCurrentAdminProfileUsecase = new GetCurrentAdminProfile(
   userRepo,
   adminProfileRepo,
   s3StorageService,
 );
+const sendConnectionRequestUsecase = new SendConnectionRequest(
+  connectionRepo,
+  producer,
+);
+const acceptConnectionUsecase = new AcceptConnection(connectionRepo, producer);
+const rejectConnectionUsecase = new RejectConnection(connectionRepo, producer);
 
 // Controllers
 export const authController = new AuthController(
@@ -185,6 +196,11 @@ export const currentUserProfileController = new CurrentUserProfileController(
   generatePresignedUploadUrlUsecase,
   getCurrentAdminProfileUsecase,
   updateUserProfileUsecase,
+);
+export const connectionController = new ConnectionController(
+  sendConnectionRequestUsecase,
+  acceptConnectionUsecase,
+  rejectConnectionUsecase,
 );
 
 // Internal Usecases
