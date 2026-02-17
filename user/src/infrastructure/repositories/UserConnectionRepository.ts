@@ -8,5 +8,8 @@ export class UserConnectionRepository
   extends BaseRepository<UserConnection, typeof userConnectionsTable>
   implements IUserConnectionRepository
 {
+  constructor() {
+    super(userConnectionsTable);
+  }
   mapper = new UserConnectionMapper();
 }
