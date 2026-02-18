@@ -2,7 +2,7 @@ import { UserConnection } from "../../../domain/entities/UserConnection";
 import { IUserConnectionRepository } from "../../../domain/repositories/IUserConnectionRepository";
 import { ISendConnectionRequest } from "../../interfaces/user/ISendConnectionRequest";
 import { v7 as uuidv7 } from "uuid";
-import { CreateEvent } from "@skillstew/common";
+import { EventName, EventPayload } from "@skillstew/common";
 import { AppError } from "../../errors/AppError.abstract";
 import { DbForeignKeyConstraintError } from "../../errors/infra/DbForeignKeyConstraintError";
 import { NotFoundError } from "../../../domain/errors/NotFoundError";
@@ -43,22 +43,20 @@ export class SendConnectionRequest implements ISendConnectionRequest {
           tx,
         );
 
-        const event = CreateEvent(
-          "connection.requested",
-          {
-            connectionId: savedConnection.id,
-            fromUserId: savedConnection.requesterId,
-            toUserId: savedConnection.recipientId,
-            timestamp: savedConnection.createdAt,
-          },
-          "user-service",
-        );
+        const eventName: EventName = "connection.requested";
+
+        const payload: EventPayload<typeof eventName> = {
+          connectionId: savedConnection.id,
+          fromUserId: savedConnection.requesterId,
+          toUserId: savedConnection.recipientId,
+          timestamp: savedConnection.createdAt,
+        };
 
         await this.outboxRepo.create(
           {
             id: uuidv7(),
-            name: event.eventName,
-            payload: event.data,
+            name: eventName,
+            payload,
             status: "PENDING",
             createdAt: new Date(),
             processedAt: undefined,

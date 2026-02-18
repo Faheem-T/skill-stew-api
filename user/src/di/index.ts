@@ -175,8 +175,16 @@ const sendConnectionRequestUsecase = new SendConnectionRequest(
   outboxEventRepo,
   unitOfWork,
 );
-const acceptConnectionUsecase = new AcceptConnection(connectionRepo, producer);
-const rejectConnectionUsecase = new RejectConnection(connectionRepo, producer);
+const acceptConnectionUsecase = new AcceptConnection(
+  connectionRepo,
+  outboxEventRepo,
+  unitOfWork,
+);
+const rejectConnectionUsecase = new RejectConnection(
+  connectionRepo,
+  outboxEventRepo,
+  unitOfWork,
+);
 
 // Controllers
 export const authController = new AuthController(

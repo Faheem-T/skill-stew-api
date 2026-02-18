@@ -1,18 +1,21 @@
-import { CreateEvent } from "@skillstew/common";
+import { EventName, EventPayload } from "@skillstew/common";
+import { v7 as uuidv7 } from "uuid";
 import { UnauthorizedError } from "../../../domain/errors/UnauthorizedError";
 import { IUserConnectionRepository } from "../../../domain/repositories/IUserConnectionRepository";
-import { IProducer } from "../../ports/IProducer";
 import { IRejectConnection } from "../../interfaces/user/IRejectConnection";
 import { RejectingAcceptedConnectionError } from "../../../domain/errors/RejectingAcceptedError";
+import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
+import { IUnitOfWork } from "../../ports/IUnitOfWork";
 
 export class RejectConnection implements IRejectConnection {
   constructor(
-    private connectionRepo: IUserConnectionRepository,
-    private messageProducer: IProducer,
+    private _connectionRepo: IUserConnectionRepository,
+    private _outboxRepo: IOutboxEventRepository,
+    private _unitOfWork: IUnitOfWork,
   ) {}
 
   exec = async (connectionId: string, userId: string): Promise<void> => {
-    const foundConnection = await this.connectionRepo.findById(connectionId);
+    const foundConnection = await this._connectionRepo.findById(connectionId);
 
     if (foundConnection.recipientId !== userId) {
       throw new UnauthorizedError();
@@ -26,19 +29,33 @@ export class RejectConnection implements IRejectConnection {
       return;
     }
 
-    await this.connectionRepo.update(connectionId, { status: "REJECTED" });
-
-    const event = CreateEvent(
-      "connection.rejected",
-      {
+    await this._unitOfWork.transact(async (tx) => {
+      const savedConnection = await this._connectionRepo.update(
         connectionId,
-        fromUserId: foundConnection.requesterId,
-        toUserId: foundConnection.recipientId,
-        timestamp: new Date(),
-      },
-      "user-service",
-    );
+        { status: "REJECTED" },
+        tx,
+      );
 
-    this.messageProducer.publish(event);
+      const eventName: EventName = "connection.rejected";
+
+      const payload: EventPayload<typeof eventName> = {
+        connectionId: savedConnection.id,
+        fromUserId: savedConnection.requesterId,
+        toUserId: savedConnection.recipientId,
+        timestamp: savedConnection.createdAt,
+      };
+
+      await this._outboxRepo.create(
+        {
+          id: uuidv7(),
+          name: eventName,
+          payload,
+          status: "PENDING",
+          createdAt: new Date(),
+          processedAt: undefined,
+        },
+        tx,
+      );
+    });
   };
 }
