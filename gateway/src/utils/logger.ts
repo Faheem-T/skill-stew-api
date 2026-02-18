@@ -7,9 +7,9 @@ export const logger = winston.createLogger({
   format: combine(
     timestamp(),
     errors({ stack: true }),
-    json(),
-    ...(process.env.NODE_ENV !== "production" ? [prettyPrint()] : []),
-    colorize({ all: true }),
+    process.env.NODE_ENV === "production"
+      ? json()
+      : combine(prettyPrint(), colorize({ all: true })),
   ),
   transports: [new winston.transports.Console()],
   defaultMeta: { service: "gateway" },
