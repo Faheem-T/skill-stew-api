@@ -58,7 +58,7 @@ export class SendConnectionRequest implements ISendConnectionRequest {
           {
             id: uuidv7(),
             name: event.eventName,
-            payload: event,
+            payload: event.data,
             status: "PENDING",
             createdAt: new Date(),
             processedAt: undefined,
