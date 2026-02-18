@@ -5,7 +5,7 @@ export const connectionRequestedSchema = z
     connectionId: z.string(),
     fromUserId: z.string(),
     toUserId: z.string(),
-    timestamp: z.date(),
+    timestamp: z.coerce.date(),
   })
   .strict();
 
