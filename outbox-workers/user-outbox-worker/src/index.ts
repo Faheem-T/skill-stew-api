@@ -35,6 +35,7 @@ try {
 }
 
 logger.info("Connected to database!");
+logger.info("User service outbox worker up and running!");
 
 const PENDING_FETCH_LIMIT = 20;
 

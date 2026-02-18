@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-outbox-worker-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service-outbox-worker
+  template:
+    metadata:
+      labels:
+        app: user-service-outbox-worker
+    spec:
+      containers:
+        - name: user-service-outbox-worker
+          image: faheem222/user-service-outbox-worker
+          envFrom:
+            - secretRef:
+                name: infisical-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service-outbox-worker-srv
+spec:
+  selector:
+    app: user-service-outbox-worker
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

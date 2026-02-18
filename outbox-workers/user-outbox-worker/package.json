@@ -2,6 +2,9 @@
   "name": "user-outbox-worker",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "start": "bun --watch --no-clear-screen ./src/index.ts"
+  },
   "private": true,
   "devDependencies": {
     "@types/amqplib": "^0.10.8",
