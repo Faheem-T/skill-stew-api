@@ -55,7 +55,7 @@ setInterval(async () => {
     // verify name is valid
     if (!isValidEventName(event_name)) {
       logger.error(`Unknown event ${event_name}. Not publishing.`, {
-        payload: JSON.stringify(payload),
+        payload,
         eventId: id,
       });
 
@@ -72,8 +72,9 @@ setInterval(async () => {
     const result = schema.safeParse(payload);
     if (!result.success) {
       logger.error(`Invalid payload for ${event_name}.`, {
-        payload: JSON.stringify(payload),
+        payload,
         eventId: id,
+        error: result.error,
       });
 
       await db
@@ -97,7 +98,7 @@ setInterval(async () => {
     const message = Buffer.from(stringifiedEvent);
 
     logger.info(`Publishing ${routingKey}`, {
-      payload: stringifiedEvent,
+      payload: event,
       eventId: id,
     });
 
