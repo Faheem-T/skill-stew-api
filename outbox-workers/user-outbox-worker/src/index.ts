@@ -57,6 +57,7 @@ process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
 
 intervalId = setInterval(async () => {
+  try {
     // fetch PENDING events
     const rows = await db
       .select()
@@ -119,60 +120,28 @@ intervalId = setInterval(async () => {
         eventId: id,
       });
 
-      await db
-        .update(outboxEventsTable)
-        .set({ status: "PROCESSED", processed_at: new Date() })
-        .where(eq(outboxEventsTable.id, id));
+      try {
+        channel.publish(EXCHANGE_NAME, routingKey, message, {
+          persistent: true,
+        });
+        logger.info(`Published ${routingKey}`, { eventId: id });
 
-      continue;
+        await db
+          .update(outboxEventsTable)
+          .set({ status: "PROCESSED", processed_at: new Date() })
+          .where(eq(outboxEventsTable.id, id));
+
+        logger.info(`Processed ${event_name} successfully`, { eventId: id });
+      } catch (err) {
+        logger.error(`Failed to publish ${event_name}`, {
+          eventId: id,
+          error: err,
+        });
+        // Don't mark processed — retry next interval
+      }
     }
-
-    // verify payload is valid using EventMap from common package
-    const schema = EventSchemas[event_name];
-    const result = schema.safeParse(payload);
-    if (!result.success) {
-      logger.error(`Invalid payload for ${event_name}.`, {
-        payload,
-        eventId: id,
-        error: result.error,
-      });
-
-      await db
-        .update(outboxEventsTable)
-        .set({ status: "PROCESSED", processed_at: new Date() })
-        .where(eq(outboxEventsTable.id, id));
-
-      continue;
-    }
-
-    const parsedPayload = result.data;
-    // log event
-    logger.info(`Processing ${event_name}.`, { eventId: id });
-
-    // create AppEvent
-    const event = CreateEvent(event_name, parsedPayload, "user-service");
-
-    // publish to rabbitmq
-    const routingKey = event.eventName;
-    const stringifiedEvent = JSON.stringify(event);
-    const message = Buffer.from(stringifiedEvent);
-
-    logger.info(`Publishing ${routingKey}`, {
-      payload: event,
-      eventId: id,
-    });
-
-    channel.publish(EXCHANGE_NAME, routingKey, message, {
-      persistent: true,
-    });
-
-    // mark processed in db
-    await db
-      .update(outboxEventsTable)
-      .set({ status: "PROCESSED", processed_at: new Date() })
-      .where(eq(outboxEventsTable.id, id))
-      .returning();
-
-    logger.info(`Processed ${event_name} event sucessfully`, { eventId: id });
+  } catch (err) {
+    logger.error("Error in outbox processing loop", err);
+    // Continue to next interval
   }
 }, intervalMs);
