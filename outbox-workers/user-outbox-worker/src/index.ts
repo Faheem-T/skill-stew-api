@@ -39,6 +39,8 @@ logger.info("User service outbox worker up and running!");
 
 const PENDING_FETCH_LIMIT = 20;
 
+const pollIntervalMs = Number(ENV.POLL_INTERVAL_MS);
+const intervalMs = Number.isFinite(pollIntervalMs) ? pollIntervalMs : 5000;
 
 let intervalId: Timer;
 
@@ -173,4 +175,4 @@ intervalId = setInterval(async () => {
 
     logger.info(`Processed ${event_name} event sucessfully`, { eventId: id });
   }
-}, 5000);
+}, intervalMs);

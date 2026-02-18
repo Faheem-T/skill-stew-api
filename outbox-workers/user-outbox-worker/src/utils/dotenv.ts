@@ -1,4 +1,8 @@
-const envVars = ["RABBIT_MQ_CONNECTION_STRING", "DATABASE_URL"] as const;
+const envVars = [
+  "RABBIT_MQ_CONNECTION_STRING",
+  "DATABASE_URL",
+  "POLL_INTERVAL_MS",
+] as const;
 
 export function generateEnvVars() {
   return envVars.reduce(
