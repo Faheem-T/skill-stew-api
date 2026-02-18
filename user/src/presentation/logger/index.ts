@@ -1,5 +1,6 @@
 import winston from "winston";
-const { combine, timestamp, json, errors, colorize } = winston.format;
+const { combine, timestamp, json, errors, colorize, prettyPrint } =
+  winston.format;
 
 export const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "info",
@@ -7,6 +8,7 @@ export const logger = winston.createLogger({
     timestamp(),
     errors({ stack: true }),
     json(),
+    ...(process.env.NODE_ENV !== "production" ? [prettyPrint()] : []),
     colorize({ all: true }),
   ),
   transports: [new winston.transports.Console()],
