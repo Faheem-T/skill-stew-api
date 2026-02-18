@@ -27,7 +27,6 @@ import { UpdateUserBlockStatus } from "../application/use-cases/admin/UpdateUser
 import { GetUsers } from "../application/use-cases/admin/GetUsers.usecase";
 import amqp from "amqplib";
 import { EventConsumer } from "../infrastructure/services/EventConsumer";
-import { EventProducer } from "../infrastructure/services/EventProducer";
 import { BloomFilter } from "../infrastructure/services/BloomFilter";
 import { CheckUsernameAvailability } from "../application/use-cases/common/CheckUsernameAvailability.usecase";
 import { logger } from "../presentation/logger";
@@ -101,13 +100,13 @@ export const consumer = new EventConsumer(
   logger,
   setOnboardingComplete,
 );
-const producer = new EventProducer(channel, "stew_exchange", logger);
 
 // Usecases
 const registerUserUsecase = new RegisterUser(
   userRepo,
   userProfileRepo,
-  producer,
+  outboxEventRepo,
+  unitOfWork,
   hasherService,
   jwtService,
 );
@@ -116,7 +115,8 @@ const googleAuthUsecase = new GoogleAuth(
   userRepo,
   userProfileRepo,
   oAuthClient,
-  producer,
+  outboxEventRepo,
+  unitOfWork,
   jwtService,
 );
 const sendVerificationLinkUsecase = new SendVerificationLink(
@@ -124,7 +124,12 @@ const sendVerificationLinkUsecase = new SendVerificationLink(
   jwtService,
   emailService,
 );
-const verifyUserUsecase = new VerifyUser(userRepo, jwtService, producer);
+const verifyUserUsecase = new VerifyUser(
+  userRepo,
+  jwtService,
+  outboxEventRepo,
+  unitOfWork,
+);
 const generateAccessTokenUsecase = new GenerateAccessToken(jwtService);
 const createAdminUsecase = new CreateAdmin(
   userRepo,
@@ -132,10 +137,11 @@ const createAdminUsecase = new CreateAdmin(
   hasherService,
 );
 const updateUserProfileUsecase = new UpdateUserProfile(
-  producer,
   userProfileRepo,
   locationProvider,
   s3StorageService,
+  outboxEventRepo,
+  unitOfWork,
 );
 const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
   userRepo,
@@ -144,9 +150,10 @@ const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
 );
 const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase();
 const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
-  producer,
   userProfileRepo,
   locationProvider,
+  outboxEventRepo,
+  unitOfWork,
 );
 const generatePresignedUploadUrlUsecase = new GeneratePresignedUploadUrl(
   s3StorageService,
@@ -163,7 +170,8 @@ const updateUsernameUsecase = new UpdateUsername(
   checkUsernameAvailabilityUsecase,
   usernameBloomFilter,
   logger,
-  producer,
+  outboxEventRepo,
+  unitOfWork,
 );
 const getCurrentAdminProfileUsecase = new GetCurrentAdminProfile(
   userRepo,

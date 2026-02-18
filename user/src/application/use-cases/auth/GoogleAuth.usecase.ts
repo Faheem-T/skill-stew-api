@@ -4,14 +4,15 @@ import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { ENV } from "../../../utils/dotenv";
 import { v7 as uuidv7 } from "uuid";
 import { User } from "../../../domain/entities/User";
-import { CreateEvent } from "@skillstew/common";
+import { EventName, EventPayload } from "@skillstew/common";
 import { BlockedUserError } from "../../../domain/errors/BlockedUserError";
 import { IJwtService } from "../../ports/IJwtService";
 import { UserProfile } from "../../../domain/entities/UserProfile";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
 import { InvalidCredentialsError } from "../../../domain/errors/InvalidCredentialsError";
 import { AccountAuthProviderConflictError } from "../../../domain/errors/AccountAuthProviderConflictError";
-import { IProducer } from "../../ports/IProducer";
+import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
+import { IUnitOfWork } from "../../ports/IUnitOfWork";
 import { NotFoundError } from "../../../domain/errors/NotFoundError";
 
 export class GoogleAuth implements IGoogleAuth {
@@ -19,7 +20,8 @@ export class GoogleAuth implements IGoogleAuth {
     private _userRepo: IUserRepository,
     private _userProfileRepo: IUserProfileRepository,
     private _OAuthClient: OAuth2Client,
-    private _messageProducer: IProducer,
+    private _outboxRepo: IOutboxEventRepository,
+    private _unitOfWork: IUnitOfWork,
     private _jwtService: IJwtService,
   ) {}
   exec = async (
@@ -45,39 +47,77 @@ export class GoogleAuth implements IGoogleAuth {
 
         const { name, picture: _picture } = payload;
 
-        // Insert new user in db
         const newUser = new User(uuidv7(), email, "USER", true, false, true);
 
-        user = await this._userRepo.create(newUser);
+        user = await this._unitOfWork.transact(async (tx) => {
+          const savedUser = await this._userRepo.create(newUser, tx);
 
-        // Insert new user profile in db
-        const newUserProfile = new UserProfile(uuidv7(), user.id, false, name);
+          const newUserProfile = new UserProfile(
+            uuidv7(),
+            savedUser.id,
+            false,
+            name,
+          );
+          const userProfile = await this._userProfileRepo.create(
+            newUserProfile,
+            tx,
+          );
 
-        const userProfile = await this._userProfileRepo.create(newUserProfile);
-
-        // emit events
-        this._messageProducer.publish(
-          CreateEvent(
-            "user.registered",
-            { id: user.id, email: user.email },
-            "user-service",
-          ),
-        );
-
-        this._messageProducer.publish(
-          CreateEvent("user.verified", { id: user.id }, "user-service"),
-        );
-
-        this._messageProducer.publish(
-          CreateEvent(
-            "user.profileUpdated",
+          // user.registered outbox event
+          const registeredEventName: EventName = "user.registered";
+          const registeredPayload: EventPayload<typeof registeredEventName> = {
+            id: savedUser.id,
+            email: savedUser.email,
+          };
+          await this._outboxRepo.create(
             {
-              id: userProfile.userId,
-              name: userProfile.name,
+              id: uuidv7(),
+              name: registeredEventName,
+              payload: registeredPayload,
+              status: "PENDING",
+              createdAt: new Date(),
+              processedAt: undefined,
             },
-            "user-service",
-          ),
-        );
+            tx,
+          );
+
+          // user.verified outbox event
+          const verifiedEventName: EventName = "user.verified";
+          const verifiedPayload: EventPayload<typeof verifiedEventName> = {
+            id: savedUser.id,
+          };
+          await this._outboxRepo.create(
+            {
+              id: uuidv7(),
+              name: verifiedEventName,
+              payload: verifiedPayload,
+              status: "PENDING",
+              createdAt: new Date(),
+              processedAt: undefined,
+            },
+            tx,
+          );
+
+          // user.profileUpdated outbox event
+          const profileEventName: EventName = "user.profileUpdated";
+          const profilePayload: EventPayload<typeof profileEventName> = {
+            id: userProfile.userId,
+            name: userProfile.name,
+          };
+          await this._outboxRepo.create(
+            {
+              id: uuidv7(),
+              name: profileEventName,
+              payload: profilePayload,
+              status: "PENDING",
+              createdAt: new Date(),
+              processedAt: undefined,
+            },
+            tx,
+          );
+
+          return savedUser;
+        });
       } else {
         throw err;
       }

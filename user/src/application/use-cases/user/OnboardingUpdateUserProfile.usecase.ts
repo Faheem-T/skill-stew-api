@@ -1,5 +1,4 @@
-import { CreateEvent } from "@skillstew/common";
-import { IProducer } from "../../ports/IProducer";
+import { EventName, EventPayload } from "@skillstew/common";
 import {
   OnboardingUpdateUserProfileDTO,
   OnboardingUpdateUserProfileOutputDTO,
@@ -8,12 +7,16 @@ import { IOnboardingUpdateUserProfile } from "../../interfaces/user/IOnbaordingU
 import { ILocationProvider } from "../../ports/ILocationProvider";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
 import { UserProfile } from "../../../domain/entities/UserProfile";
+import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
+import { IUnitOfWork } from "../../ports/IUnitOfWork";
+import { v7 as uuidv7 } from "uuid";
 
 export class OnboardingUpdateProfile implements IOnboardingUpdateUserProfile {
   constructor(
-    private _messageProducer: IProducer,
     private _userProfileRepo: IUserProfileRepository,
     private _locationProvider: ILocationProvider,
+    private _outboxRepo: IOutboxEventRepository,
+    private _unitOfWork: IUnitOfWork,
   ) {}
 
   exec = async (
@@ -33,23 +36,37 @@ export class OnboardingUpdateProfile implements IOnboardingUpdateUserProfile {
       languages,
     };
 
-    const savedProfile = await this._userProfileRepo.updateByUserId(
-      userId,
-      profile,
-    );
+    const savedProfile = await this._unitOfWork.transact(async (tx) => {
+      const savedProfile = await this._userProfileRepo.updateByUserId(
+        userId,
+        profile,
+        tx,
+      );
 
-    const event = CreateEvent(
-      "user.profileUpdated",
-      {
+      const eventName: EventName = "user.profileUpdated";
+      const payload: EventPayload<typeof eventName> = {
         id: savedProfile.userId,
         name: savedProfile.name,
         languages: savedProfile.languages,
         location: savedProfile.location,
         avatarKey: savedProfile.avatarKey,
-      },
-      "user-service",
-    );
-    this._messageProducer.publish(event);
+      };
+
+      await this._outboxRepo.create(
+        {
+          id: uuidv7(),
+          name: eventName,
+          payload,
+          status: "PENDING",
+          createdAt: new Date(),
+          processedAt: undefined,
+        },
+        tx,
+      );
+
+      return savedProfile;
+    });
+
     return {
       name: savedProfile.name,
       languages: savedProfile.languages,

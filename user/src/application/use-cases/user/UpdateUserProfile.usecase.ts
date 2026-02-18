@@ -1,4 +1,4 @@
-import { CreateEvent } from "@skillstew/common";
+import { EventName, EventPayload } from "@skillstew/common";
 import {
   IUserLocation,
   UserProfile,
@@ -8,17 +8,20 @@ import {
   UpdateProfileOutputDTO,
 } from "../../dtos/user/UpdateUserProfile.dto";
 import { IUpdateUserProfile } from "../../interfaces/user/IUpdateUserProfile";
-import { IProducer } from "../../ports/IProducer";
 import { ILocationProvider } from "../../ports/ILocationProvider";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
 import { IStorageService } from "../../ports/IStorageService";
+import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
+import { IUnitOfWork } from "../../ports/IUnitOfWork";
+import { v7 as uuidv7 } from "uuid";
 
 export class UpdateUserProfile implements IUpdateUserProfile {
   constructor(
-    private _messageProducer: IProducer,
     private _userProfileRepo: IUserProfileRepository,
     private _locationProvider: ILocationProvider,
     private _storageService: IStorageService,
+    private _outboxRepo: IOutboxEventRepository,
+    private _unitOfWork: IUnitOfWork,
   ) {}
 
   exec = async (dto: UpdateProfileDTO): Promise<UpdateProfileOutputDTO> => {
@@ -57,24 +60,36 @@ export class UpdateUserProfile implements IUpdateUserProfile {
       timezone,
       bannerKey,
     };
-    const savedUser = await this._userProfileRepo.updateByUserId(
-      userId,
-      profile,
-    );
+    const savedUser = await this._unitOfWork.transact(async (tx) => {
+      const savedUser = await this._userProfileRepo.updateByUserId(
+        userId,
+        profile,
+        tx,
+      );
 
-    // emit event
-    const event = CreateEvent(
-      "user.profileUpdated",
-      {
+      const eventName: EventName = "user.profileUpdated";
+      const payload: EventPayload<typeof eventName> = {
         id: savedUser.userId,
         name: savedUser.name,
         languages: savedUser.languages,
         location: savedUser.location,
         avatarKey: savedUser.avatarKey,
-      },
-      "user-service",
-    );
-    this._messageProducer.publish(event);
+      };
+
+      await this._outboxRepo.create(
+        {
+          id: uuidv7(),
+          name: eventName,
+          payload,
+          status: "PENDING",
+          createdAt: new Date(),
+          processedAt: undefined,
+        },
+        tx,
+      );
+
+      return savedUser;
+    });
 
     const avatarUrl = savedUser.avatarKey
       ? this._storageService.getPublicUrl(savedUser.avatarKey)
