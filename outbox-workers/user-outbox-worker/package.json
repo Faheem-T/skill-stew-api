@@ -9,9 +9,10 @@
     "@types/pg": "^8.16.0"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@skillstew/common": "^1.0.32",
     "amqplib": "^0.10.9",
     "drizzle-orm": "^0.45.1",
     "pg": "^8.18.0",
