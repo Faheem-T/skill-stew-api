@@ -1,0 +1,18 @@
+export const AppErrorCodes = {
+  // App errors
+  INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+
+  // Infra errors (generalized)
+  DB_CONNECTION_ERROR: "DB_CONNECTION_ERROR",
+  DB_QUERY_ERROR: "DB_QUERY_ERROR",
+  DB_TIMEOUT: "DB_TIMEOUT",
+  DB_UNIQUE_CONSTRAINT: "DB_UNIQUE_CONSTRAINT",
+
+  // External service errors
+  MESSAGE_QUEUE_ERROR: "MESSAGE_QUEUE_ERROR",
+  EXTERNAL_SERVICE_ERROR: "EXTERNAL_SERVICE_ERROR",
+} as const;
+
+export type AppErrorCodes = keyof typeof AppErrorCodes;
+
