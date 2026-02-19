@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "bun --watch --no-clear-screen ./src/start.ts",
-    "seed": "bun ./src/infrastructure/config/seedSkillData.ts",
-    "_start": "tsx watch --clear-screen=false --include './src/**/*.ts' ./src/start.ts",
-    "_seed": "tsx ./src/infrastructure/config/seedSkillData.ts"
+    "seed": "bun ./src/infrastructure/config/seedSkillData.ts"
   },
   "private": true,
   "devDependencies": {
@@ -15,8 +13,7 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/morgan": "^1.9.10",
-    "tsx": "^4.21.0"
+    "@types/morgan": "^1.9.10"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
