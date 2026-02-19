@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "bun --watch --no-clear-screen ./src/start.ts",
+    "start": "bun --hot --no-clear-screen ./src/start.ts",
     "seed": "bun ./src/infrastructure/config/seedSkillData.ts"
   },
   "private": true,

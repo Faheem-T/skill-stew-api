@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "bun --watch --no-clear-screen ./src/start.ts"
+    "start": "bun --hot --no-clear-screen ./src/start.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

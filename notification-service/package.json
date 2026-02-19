@@ -3,7 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun --watch --no-clear-screen ./src/start.ts"
+    "start": "bun --hot --no-clear-screen ./src/start.ts"
   },
   "private": true,
   "devDependencies": {
