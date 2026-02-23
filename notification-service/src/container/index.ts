@@ -24,7 +24,7 @@ container
   .to(NotificationService)
   .inSingletonScope();
 
-container.bind<ILogger>(TYPES.Logger).to(WinstonLogger);
+container.bind<ILogger>(TYPES.Logger).to(WinstonLogger).inSingletonScope();
 
 container
   .bind<IEventConsumer>(TYPES.EventConsumer)
