@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import { Notification } from "../../domain/entities/Notification";
 import { NotFoundError } from "../../domain/errors";
 import type { INotificationRepository } from "../../domain/repositories/INotificationRepository";
@@ -8,6 +9,7 @@ import type {
   NotificationDoc,
 } from "../models/NotificationModel";
 
+@injectable()
 export class NotificationRepository implements INotificationRepository {
   model = NotificationModel;
 
