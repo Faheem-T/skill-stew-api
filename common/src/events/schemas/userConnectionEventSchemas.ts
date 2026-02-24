@@ -4,8 +4,8 @@ export const connectionRequestedSchema = z
   .object({
     connectionId: z.string(),
     requesterId: z.string(),
-    recipientId: z.string(),
     requesterUsername: z.string().optional(),
+    recipientId: z.string(),
     recipientUsername: z.string().optional(),
     timestamp: z.coerce.date(),
   })
@@ -15,6 +15,8 @@ export const connectionAcceptedSchema = z.object({
   connectionId: z.string(),
   accepterId: z.string(),
   accepterUsername: z.string().optional(),
+  requesterId: z.string(),
+  requesterUsername: z.string().optional(),
   timestamp: z.coerce.date(),
 });
 
@@ -22,6 +24,8 @@ export const connectionRejectedSchema = z.object({
   connectionId: z.string(),
   rejecterId: z.string(),
   rejecterUsername: z.string().optional(),
+  requesterId: z.string(),
+  requesterUsername: z.string().optional(),
   timestamp: z.coerce.date(),
 });
 
