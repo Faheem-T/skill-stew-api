@@ -6,6 +6,7 @@ import type { ILogger } from "./application/ports/ILogger";
 import type { INotificationService } from "./application/service-interfaces/INotificationService";
 import { setupEventHandlers } from "./consumers";
 import type { IRealtimeEventPublisher } from "./application/ports/IRealtimeEmitter";
+import { connectDB } from "./infrastructure/config/mongoConnection";
 
 const logger = container.get<ILogger>(TYPES.Logger);
 const eventConsumer = await container.getAsync<IEventConsumer>(
@@ -19,5 +20,6 @@ const realtimeEventPublisher = container.get<IRealtimeEventPublisher>(
 );
 
 setupEventHandlers(eventConsumer, notificationService, realtimeEventPublisher);
+await connectDB();
 
 logger.info("RabbitMQ event consumer set up successfully");
