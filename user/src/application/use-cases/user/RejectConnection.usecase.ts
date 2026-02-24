@@ -43,12 +43,19 @@ export class RejectConnection implements IRejectConnection {
         tx,
       );
 
+      const requester = await this._userRepo.findById(
+        savedConnection.requesterId,
+        tx,
+      );
+
       const eventName: EventName = "connection.rejected";
 
       const payload: EventPayload<typeof eventName> = {
         connectionId: savedConnection.id,
-        rejecterId: savedConnection.recipientId,
+        rejecterId: recipient.id,
         rejecterUsername: recipient.username,
+        requesterId: requester.id,
+        requesterUsername: requester.username,
         timestamp: savedConnection.createdAt,
       };
 
