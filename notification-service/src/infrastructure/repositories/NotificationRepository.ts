@@ -11,7 +11,7 @@ import type {
 
 @injectable()
 export class NotificationRepository implements INotificationRepository {
-  model = NotificationModel;
+  private model = NotificationModel;
 
   create = async (
     entity: Exclude<Notification, Notification["id"]>,
