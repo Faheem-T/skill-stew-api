@@ -19,7 +19,11 @@ const realtimeEventPublisher = container.get<IRealtimeEventPublisher>(
   TYPES.RealtimeEventPublisher,
 );
 
-setupEventHandlers(eventConsumer, notificationService, realtimeEventPublisher);
 await connectDB();
 
-logger.info("RabbitMQ event consumer set up successfully");
+setupEventHandlers(
+  eventConsumer,
+  notificationService,
+  realtimeEventPublisher,
+  logger,
+);
