@@ -11,6 +11,8 @@ import { WinstonLogger } from "../infrastructure/adapters/WinstonLogger";
 import type { IEventConsumer } from "../application/ports/IEventConsumer";
 import { RabbitMQEventConsumer } from "../infrastructure/adapters/RabbitMQEventConsumer";
 import { ENV } from "../utils/dotenv";
+import type { IRealtimeEventPublisher } from "../application/ports/IRealtimeEmitter";
+import { SocketIoRedisPublisher } from "../infrastructure/adapters/RedisEmitter";
 
 const container = new Container();
 
@@ -45,6 +47,11 @@ container
       logger,
     );
   })
+  .inSingletonScope();
+
+container
+  .bind<IRealtimeEventPublisher>(TYPES.RealtimeEventPublisher)
+  .to(SocketIoRedisPublisher)
   .inSingletonScope();
 
 export { container };

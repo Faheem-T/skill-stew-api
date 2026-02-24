@@ -1,13 +1,17 @@
 import type { AppEvent } from "@skillstew/common";
 import type { INotificationService } from "../../application/service-interfaces/INotificationService";
 import { NotificationType } from "../../domain/entities/NotificationType.enum";
+import type { IRealtimeEventPublisher } from "../../application/ports/IRealtimeEmitter";
 
 export const connectionRejectedHandler =
-  (notificationService: INotificationService) =>
+  (
+    notificationService: INotificationService,
+    realtimeEventPublisher: IRealtimeEventPublisher,
+  ) =>
   async (event: AppEvent<"connection.rejected">) => {
     const { connectionId, rejecterId, rejecterUsername } = event.data;
 
-    await notificationService.createNotification({
+    const savedNotification = await notificationService.createNotification({
       recipientId: event.data.requesterId,
       type: NotificationType.CONNECTION_REJECTED,
       data: {
@@ -17,6 +21,8 @@ export const connectionRejectedHandler =
         connectionId,
       },
     });
+
+    realtimeEventPublisher.emitToRecipient(savedNotification);
 
     return { success: true };
   };

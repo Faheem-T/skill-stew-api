@@ -4,4 +4,5 @@ export const TYPES = {
 
   Logger: Symbol.for("Logger"),
   EventConsumer: Symbol.for("EventConsumer"),
+  RealtimeEventPublisher: Symbol.for("RealtimeEventPublisher"),
 } as const;

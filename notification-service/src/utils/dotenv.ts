@@ -4,6 +4,7 @@ const envVars = [
   "RABBIT_MQ_CONNECTION_STRING",
   "RABBIT_MQ_EXCHANGE_NAME",
   "RABBIT_MQ_QUEUE_NAME",
+  "REDIS_URI",
 ] as const;
 
 export function generateEnvVars() {

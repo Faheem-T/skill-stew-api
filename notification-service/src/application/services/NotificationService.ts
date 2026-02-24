@@ -3,7 +3,10 @@ import type { INotificationService } from "../service-interfaces/INotificationSe
 import type { INotificationRepository } from "../../domain/repositories/INotificationRepository";
 import { TYPES } from "../../constants/Types";
 import type { Notification } from "../../domain/entities/Notification";
-import type { CreateNotificationDTO } from "../dtos/CreateNotification.dto";
+import type {
+  CreateNotificationDTO,
+  CreateNotificationOutputDTO,
+} from "../dtos/CreateNotification.dto";
 import { NotificationType } from "../../domain/entities/NotificationType.enum";
 import type { NotificationData } from "../../domain/entities/NotificationData";
 
@@ -14,7 +17,9 @@ export class NotificationService implements INotificationService {
     private _notificationRepo: INotificationRepository,
   ) {}
 
-  createNotification = async (dto: CreateNotificationDTO): Promise<void> => {
+  createNotification = async (
+    dto: CreateNotificationDTO,
+  ): Promise<CreateNotificationOutputDTO> => {
     const { recipientId, type, data } = dto;
 
     const { message, title } = this._getNotificationContent(data);
@@ -28,7 +33,7 @@ export class NotificationService implements INotificationService {
       isRead: false,
     };
 
-    await this._notificationRepo.create(notification);
+    return await this._notificationRepo.create(notification);
   };
 
   private _getNotificationContent(data: NotificationData): {

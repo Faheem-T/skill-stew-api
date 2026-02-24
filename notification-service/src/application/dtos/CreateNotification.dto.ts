@@ -6,3 +6,14 @@ export interface CreateNotificationDTO {
   type: NotificationType;
   data: NotificationData;
 }
+
+export interface CreateNotificationOutputDTO {
+  id: string;
+  recipientId: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  data: NotificationData;
+  isRead: boolean;
+  createdAt: Date;
+}

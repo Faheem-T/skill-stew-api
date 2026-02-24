@@ -1,5 +1,10 @@
-import type { CreateNotificationDTO } from "../dtos/CreateNotification.dto";
+import type {
+  CreateNotificationDTO,
+  CreateNotificationOutputDTO,
+} from "../dtos/CreateNotification.dto";
 
 export interface INotificationService {
-  createNotification(dto: CreateNotificationDTO): Promise<void>;
+  createNotification(
+    dto: CreateNotificationDTO,
+  ): Promise<CreateNotificationOutputDTO>;
 }

@@ -1,4 +1,5 @@
 import type { IEventConsumer } from "../application/ports/IEventConsumer";
+import type { IRealtimeEventPublisher } from "../application/ports/IRealtimeEmitter";
 import type { INotificationService } from "../application/service-interfaces/INotificationService";
 import { connectionAcceptedHandler } from "./handlers/connectionAccepted.handler";
 import { connectionRejectedHandler } from "./handlers/connectionRejected.handler";
@@ -7,17 +8,18 @@ import { connectionRequestedHandler } from "./handlers/connectionRequested.handl
 export function setupEventHandlers(
   eventConsumer: IEventConsumer,
   notificationService: INotificationService,
+  realtimeEventPublisher: IRealtimeEventPublisher,
 ) {
   eventConsumer.registerHandler(
     "connection.requested",
-    connectionRequestedHandler(notificationService),
+    connectionRequestedHandler(notificationService, realtimeEventPublisher),
   );
   eventConsumer.registerHandler(
     "connection.accepted",
-    connectionAcceptedHandler(notificationService),
+    connectionAcceptedHandler(notificationService, realtimeEventPublisher),
   );
   eventConsumer.registerHandler(
     "connection.rejected",
-    connectionRejectedHandler(notificationService),
+    connectionRejectedHandler(notificationService, realtimeEventPublisher),
   );
 }

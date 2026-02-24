@@ -5,6 +5,7 @@ import type { IEventConsumer } from "./application/ports/IEventConsumer";
 import type { ILogger } from "./application/ports/ILogger";
 import type { INotificationService } from "./application/service-interfaces/INotificationService";
 import { setupEventHandlers } from "./consumers";
+import type { IRealtimeEventPublisher } from "./application/ports/IRealtimeEmitter";
 
 const logger = container.get<ILogger>(TYPES.Logger);
 const eventConsumer = await container.getAsync<IEventConsumer>(
@@ -13,7 +14,10 @@ const eventConsumer = await container.getAsync<IEventConsumer>(
 const notificationService = container.get<INotificationService>(
   TYPES.NotificationService,
 );
+const realtimeEventPublisher = container.get<IRealtimeEventPublisher>(
+  TYPES.RealtimeEventPublisher,
+);
 
-setupEventHandlers(eventConsumer, notificationService);
+setupEventHandlers(eventConsumer, notificationService, realtimeEventPublisher);
 
 logger.info("RabbitMQ event consumer set up successfully");
