@@ -3,15 +3,27 @@ import z from "zod";
 export const connectionRequestedSchema = z
   .object({
     connectionId: z.string(),
-    fromUserId: z.string(),
-    toUserId: z.string(),
+    requesterId: z.string(),
+    recipientId: z.string(),
+    requesterUsername: z.string(),
+    recipientUsername: z.string(),
     timestamp: z.coerce.date(),
   })
   .strict();
 
-export const connectionAcceptedSchema = connectionRequestedSchema.extend({});
+export const connectionAcceptedSchema = z.object({
+  connectionId: z.string(),
+  accepterId: z.string(),
+  accepterUsername: z.string(),
+  timestamp: z.coerce.date(),
+});
 
-export const connectionRejectedSchema = connectionRequestedSchema.extend({});
+export const connectionRejectedSchema = z.object({
+  connectionId: z.string(),
+  rejecterId: z.string(),
+  rejecterUsername: z.string(),
+  timestamp: z.coerce.date(),
+});
 
 export const ConnectionEventSchemas = {
   "connection.requested": connectionRequestedSchema,
