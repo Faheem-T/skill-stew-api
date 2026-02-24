@@ -4,6 +4,8 @@ import type { INotificationRepository } from "../../domain/repositories/INotific
 import { TYPES } from "../../constants/Types";
 import type { Notification } from "../../domain/entities/Notification";
 import type { CreateNotificationDTO } from "../dtos/CreateNotification.dto";
+import { NotificationType } from "../../domain/entities/NotificationType.enum";
+import type { NotificationData } from "../../domain/entities/NotificationData";
 
 @injectable()
 export class NotificationService implements INotificationService {
@@ -15,15 +17,40 @@ export class NotificationService implements INotificationService {
   createNotification = async (dto: CreateNotificationDTO): Promise<void> => {
     const { recipientId, type, data } = dto;
 
+    const { message, title } = this._getNotificationContent(data);
+
     const notification: Omit<Notification, "id" | "createdAt"> = {
       recipientId,
       type,
       data,
-      title: "",
-      message: "",
+      title,
+      message,
       isRead: false,
     };
 
     await this._notificationRepo.create(notification);
   };
+
+  private _getNotificationContent(data: NotificationData): {
+    title: string;
+    message: string;
+  } {
+    switch (data.type) {
+      case NotificationType.CONNECTION_REQUEST:
+        return {
+          title: "New Connection Request",
+          message: `${data.senderUsername ?? "User" + data.senderId} wants to connect with you`,
+        };
+      case NotificationType.CONNECTION_ACCEPTED:
+        return {
+          title: "Connection Accepted",
+          message: `${data.accepterUsername ?? "User" + data.accepterId} accepted your connection request`,
+        };
+      case NotificationType.CONNECTION_REJECTED:
+        return {
+          title: "Connection Declined",
+          message: `${data.rejecterUsername ?? "User" + data.rejecterId} declined your connection request`,
+        };
+    }
+  }
 }
