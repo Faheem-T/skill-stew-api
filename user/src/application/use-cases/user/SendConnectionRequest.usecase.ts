@@ -11,12 +11,14 @@ import { AlreadyExistsError } from "../../../domain/errors/AlreadyExistsError";
 import { SelfConnectionError } from "../../../domain/errors/SelfConnectionError";
 import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
 import { IUnitOfWork } from "../../ports/IUnitOfWork";
+import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 
 export class SendConnectionRequest implements ISendConnectionRequest {
   constructor(
-    private connectionRepo: IUserConnectionRepository,
-    private outboxRepo: IOutboxEventRepository,
-    private unitOfWork: IUnitOfWork,
+    private _connectionRepo: IUserConnectionRepository,
+    private _outboxRepo: IOutboxEventRepository,
+    private _userRepo: IUserRepository,
+    private _unitOfWork: IUnitOfWork,
   ) {}
 
   exec = async (requesterId: string, recipientId: string): Promise<void> => {
@@ -34,11 +36,11 @@ export class SendConnectionRequest implements ISendConnectionRequest {
     );
 
     try {
-      // No need for separate "does user exist" check
-      // as create will fail with foreign key contraint error
-      // if userId not valid
-      await this.unitOfWork.transact(async (tx) => {
-        const savedConnection = await this.connectionRepo.create(
+      await this._unitOfWork.transact(async (tx) => {
+        const requester = await this._userRepo.findById(requesterId, tx);
+        const recipient = await this._userRepo.findById(recipientId, tx);
+
+        const savedConnection = await this._connectionRepo.create(
           newConnection,
           tx,
         );
@@ -47,12 +49,14 @@ export class SendConnectionRequest implements ISendConnectionRequest {
 
         const payload: EventPayload<typeof eventName> = {
           connectionId: savedConnection.id,
-          fromUserId: savedConnection.requesterId,
-          toUserId: savedConnection.recipientId,
+          requesterId: savedConnection.requesterId,
+          requesterUsername: requester.username,
+          recipientId: savedConnection.recipientId,
+          recipientUsername: recipient.username,
           timestamp: savedConnection.createdAt,
         };
 
-        await this.outboxRepo.create(
+        await this._outboxRepo.create(
           {
             id: uuidv7(),
             name: eventName,
@@ -66,7 +70,10 @@ export class SendConnectionRequest implements ISendConnectionRequest {
       });
     } catch (err) {
       if (err instanceof AppError) {
-        if (err instanceof DbForeignKeyConstraintError) {
+        if (
+          err instanceof DbForeignKeyConstraintError ||
+          err instanceof NotFoundError
+        ) {
           throw new NotFoundError("User");
         } else if (err instanceof DbUniqueConstraintError) {
           throw new AlreadyExistsError("Connection");

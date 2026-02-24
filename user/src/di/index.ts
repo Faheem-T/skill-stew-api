@@ -181,16 +181,19 @@ const getCurrentAdminProfileUsecase = new GetCurrentAdminProfile(
 const sendConnectionRequestUsecase = new SendConnectionRequest(
   connectionRepo,
   outboxEventRepo,
+  userRepo,
   unitOfWork,
 );
 const acceptConnectionUsecase = new AcceptConnection(
   connectionRepo,
   outboxEventRepo,
+  userRepo,
   unitOfWork,
 );
 const rejectConnectionUsecase = new RejectConnection(
   connectionRepo,
   outboxEventRepo,
+  userRepo,
   unitOfWork,
 );
 

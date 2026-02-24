@@ -6,11 +6,13 @@ import { IRejectConnection } from "../../interfaces/user/IRejectConnection";
 import { RejectingAcceptedConnectionError } from "../../../domain/errors/RejectingAcceptedError";
 import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
 import { IUnitOfWork } from "../../ports/IUnitOfWork";
+import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 
 export class RejectConnection implements IRejectConnection {
   constructor(
     private _connectionRepo: IUserConnectionRepository,
     private _outboxRepo: IOutboxEventRepository,
+    private _userRepo: IUserRepository,
     private _unitOfWork: IUnitOfWork,
   ) {}
 
@@ -36,12 +38,17 @@ export class RejectConnection implements IRejectConnection {
         tx,
       );
 
+      const recipient = await this._userRepo.findById(
+        savedConnection.recipientId,
+        tx,
+      );
+
       const eventName: EventName = "connection.rejected";
 
       const payload: EventPayload<typeof eventName> = {
         connectionId: savedConnection.id,
-        fromUserId: savedConnection.requesterId,
-        toUserId: savedConnection.recipientId,
+        rejecterId: savedConnection.recipientId,
+        rejecterUsername: recipient.username,
         timestamp: savedConnection.createdAt,
       };
 
