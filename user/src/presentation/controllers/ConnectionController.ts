@@ -5,12 +5,18 @@ import { ISendConnectionRequest } from "../../application/interfaces/user/ISendC
 import { ForbiddenError } from "../../domain/errors/ForbiddenError";
 import { ValidationError } from "../../application/errors/ValidationError";
 import { HttpStatus } from "@skillstew/common";
+import { IGetConnectionStatuses } from "../../application/interfaces/user/IGetConnectionStatuses";
+import {
+  GetConnectionStatusesOutputDTO,
+  getConnectionStatusesSchema,
+} from "../../application/dtos/user/GetConnectionStatus.dto";
 
 export class ConnectionController {
   constructor(
     private _sendConnectionRequest: ISendConnectionRequest,
     private _acceptConnection: IAcceptConnection,
     private _rejectConnection: IRejectConnection,
+    private _getConnectionStatuses: IGetConnectionStatuses,
   ) {}
 
   sendConnectionRequest = async (
@@ -59,12 +65,10 @@ export class ConnectionController {
       }
 
       await this._acceptConnection.exec(connectionId, userId);
-      res
-        .status(HttpStatus.OK)
-        .json({
-          success: true,
-          message: "Connection request accepted successfully!",
-        });
+      res.status(HttpStatus.OK).json({
+        success: true,
+        message: "Connection request accepted successfully!",
+      });
     } catch (err) {
       next(err);
     }
@@ -92,6 +96,28 @@ export class ConnectionController {
       res
         .status(HttpStatus.OK)
         .json({ success: true, message: "Connection request rejected." });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getConnectionStatuses = async (
+    req: Request<{}, any, any, { userId: string; targetIds: string[] }>,
+    res: Response<{ success: boolean; data: GetConnectionStatusesOutputDTO }>,
+    next: NextFunction,
+  ) => {
+    try {
+      let { targetIds, userId } = req.query;
+
+      if (typeof targetIds === "string") {
+        targetIds = [targetIds];
+      }
+
+      const dto = getConnectionStatusesSchema.parse({ targetIds, userId });
+
+      const result = await this._getConnectionStatuses.exec(dto);
+
+      res.status(HttpStatus.OK).json({ success: true, data: result });
     } catch (err) {
       next(err);
     }

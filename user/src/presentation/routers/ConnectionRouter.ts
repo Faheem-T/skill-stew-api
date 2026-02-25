@@ -5,6 +5,7 @@ import { connectionController } from "../../di";
 const router = Router()
   .post("/:userId", connectionController.sendConnectionRequest)
   .patch("/:connectionId/accept", connectionController.acceptConnectionRequest)
-  .patch("/:connectionId/reject", connectionController.rejectConnectionRequest);
+  .patch("/:connectionId/reject", connectionController.rejectConnectionRequest)
+  .get("/statuses", connectionController.getConnectionStatuses);
 
 export default router;

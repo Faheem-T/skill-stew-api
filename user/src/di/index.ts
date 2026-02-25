@@ -42,6 +42,7 @@ import { RejectConnection } from "../application/use-cases/user/RejectConnection
 import { ConnectionController } from "../presentation/controllers/ConnectionController";
 import { UnitOfWork } from "../infrastructure/persistence/UnitOfWork";
 import { OutboxEventRepository } from "../infrastructure/repositories/OutboxEventRepository";
+import { GetConnectionStatuses } from "../application/use-cases/user/GetConnectionStatus.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -196,6 +197,7 @@ const rejectConnectionUsecase = new RejectConnection(
   userRepo,
   unitOfWork,
 );
+const getConnectionStatusesUsecase = new GetConnectionStatuses(connectionRepo);
 
 // Controllers
 export const authController = new AuthController(
@@ -227,6 +229,7 @@ export const connectionController = new ConnectionController(
   sendConnectionRequestUsecase,
   acceptConnectionUsecase,
   rejectConnectionUsecase,
+  getConnectionStatusesUsecase,
 );
 
 // Internal Usecases
