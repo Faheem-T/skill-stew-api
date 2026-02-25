@@ -14,7 +14,7 @@ export class SocketIoRedisPublisher implements IRealtimeEventPublisher {
   constructor(@inject(TYPES.Logger) private _logger: ILogger) {}
 
   emitToRecipient = (payload: Notification): true => {
-    this._logger.debug("Emitting realtime event", {
+    this._logger.info("Emitting realtime event", {
       eventId: payload.id,
       eventType: payload.type,
       recipientId: payload.recipientId,
@@ -25,7 +25,7 @@ export class SocketIoRedisPublisher implements IRealtimeEventPublisher {
         .to(`user:${payload.recipientId}`)
         .emit("notification:new", payload);
 
-      this._logger.debug("Successfully emitted event", {
+      this._logger.info("Successfully emitted event", {
         eventId: payload.id,
         eventType: payload.type,
       });

@@ -12,7 +12,7 @@ import type { IEventConsumer } from "../application/ports/IEventConsumer";
 import { RabbitMQEventConsumer } from "../infrastructure/adapters/RabbitMQEventConsumer";
 import { ENV } from "../utils/dotenv";
 import type { IRealtimeEventPublisher } from "../application/ports/IRealtimeEmitter";
-import { SocketIoRedisPublisher } from "../infrastructure/adapters/RedisEmitter";
+import { SocketIoRedisPublisher } from "../infrastructure/adapters/SocketIoRedisPublisher";
 
 const container = new Container();
 

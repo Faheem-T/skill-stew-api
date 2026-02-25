@@ -6,21 +6,25 @@ import { connectionAcceptedHandler } from "./handlers/connectionAccepted.handler
 import { connectionRejectedHandler } from "./handlers/connectionRejected.handler";
 import { connectionRequestedHandler } from "./handlers/connectionRequested.handler";
 
-export function setupEventHandlers(
+export async function setupEventHandlers(
   eventConsumer: IEventConsumer,
   notificationService: INotificationService,
   realtimeEventPublisher: IRealtimeEventPublisher,
   logger: ILogger,
 ) {
-  eventConsumer.registerHandler(
+  await eventConsumer.registerHandler(
     "connection.requested",
-    connectionRequestedHandler(notificationService, realtimeEventPublisher),
+    connectionRequestedHandler(
+      notificationService,
+      realtimeEventPublisher,
+      logger,
+    ),
   );
-  eventConsumer.registerHandler(
+  await eventConsumer.registerHandler(
     "connection.accepted",
     connectionAcceptedHandler(notificationService, realtimeEventPublisher),
   );
-  eventConsumer.registerHandler(
+  await eventConsumer.registerHandler(
     "connection.rejected",
     connectionRejectedHandler(notificationService, realtimeEventPublisher),
   );

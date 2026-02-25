@@ -21,7 +21,7 @@ const realtimeEventPublisher = container.get<IRealtimeEventPublisher>(
 
 await connectDB();
 
-setupEventHandlers(
+await setupEventHandlers(
   eventConsumer,
   notificationService,
   realtimeEventPublisher,
