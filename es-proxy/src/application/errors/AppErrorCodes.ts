@@ -12,6 +12,9 @@ export const AppErrorCodes = {
   ES_TIMEOUT_ERROR: "ES_TIMEOUT_ERROR",
   ES_INDEX_NOT_FOUND: "ES_INDEX_NOT_FOUND",
   ES_MAPPING_ERROR: "ES_MAPPING_ERROR",
+
+  // Internal service errors
+  INTERNAL_SERVICE_ERROR: "INTERNAL_SERVICE_ERROR",
 } as const;
 
 export type AppErrorCodes = keyof typeof AppErrorCodes;
