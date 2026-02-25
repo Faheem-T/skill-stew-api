@@ -8,11 +8,13 @@ import {
 } from "../dtos/UserDTO";
 import { IUserService } from "../interfaces/IUserService";
 import { IStorageService } from "../ports/IStorageService";
+import { IUserConnectionService } from "../ports/IUserConnectionService";
 
 export class UserService implements IUserService {
   constructor(
     private _userRepo: IUserRepository,
     private _storageService: IStorageService,
+    private _userConnectionService: IUserConnectionService,
   ) {}
 
   create = async (dto: SaveUserDTO): Promise<void> => {
@@ -68,6 +70,12 @@ export class UserService implements IUserService {
     const filteredUsers = recommendedUsers.filter(
       (recommendedUser) => recommendedUser.id !== userId,
     );
+
+    const response = await this._userConnectionService.getConnectionStatuses(
+      userId,
+      filteredUsers.map((user) => user.id),
+    );
+    console.log("User Service Response: ", response);
 
     return filteredUsers.map(
       ({
