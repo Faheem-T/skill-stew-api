@@ -43,6 +43,11 @@ const ServiceConfigs = [
     url: ENV.SEARCH_SERVICE_URL,
     name: "search-service",
   },
+  {
+    path: "/api/v1/notifications",
+    url: ENV.NOTIFICATION_SERVICE_URL,
+    name: "notification-service",
+  },
 ];
 
 app.use(authMiddleware);

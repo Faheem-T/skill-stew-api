@@ -13,6 +13,7 @@ import { RabbitMQEventConsumer } from "../infrastructure/adapters/RabbitMQEventC
 import { ENV } from "../utils/dotenv";
 import type { IRealtimeEventPublisher } from "../application/ports/IRealtimeEmitter";
 import { SocketIoRedisPublisher } from "../infrastructure/adapters/SocketIoRedisPublisher";
+import { NotificationController } from "../http/controllers/NotificationController";
 
 const container = new Container();
 
@@ -52,6 +53,11 @@ container
 container
   .bind<IRealtimeEventPublisher>(TYPES.RealtimeEventPublisher)
   .to(SocketIoRedisPublisher)
+  .inSingletonScope();
+
+container
+  .bind<NotificationController>(TYPES.NotificationController)
+  .to(NotificationController)
   .inSingletonScope();
 
 export { container };

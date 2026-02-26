@@ -7,6 +7,8 @@ import type { INotificationService } from "./application/service-interfaces/INot
 import { setupEventHandlers } from "./consumers";
 import type { IRealtimeEventPublisher } from "./application/ports/IRealtimeEmitter";
 import { connectDB } from "./infrastructure/config/mongoConnection";
+import { app } from "./http/server";
+import { ENV } from "./utils/dotenv";
 
 const logger = container.get<ILogger>(TYPES.Logger);
 const eventConsumer = await container.getAsync<IEventConsumer>(
@@ -27,3 +29,7 @@ await setupEventHandlers(
   realtimeEventPublisher,
   logger,
 );
+
+app.listen(ENV.PORT, () => {
+  logger.info(`Notification service listening on port ${ENV.PORT}`);
+});

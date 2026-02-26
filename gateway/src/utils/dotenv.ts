@@ -12,6 +12,7 @@ const envVars = [
   "SEARCH_SERVICE_URL",
   "ME_SERVICE_URL",
   "CONNECTION_SERVICE_URL",
+  "NOTIFICATION_SERVICE_URL",
 ] as const;
 
 function generateEnvVars() {

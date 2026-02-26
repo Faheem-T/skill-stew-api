@@ -43,6 +43,26 @@ export class NotificationRepository implements INotificationRepository {
     }
   };
 
+  getNotificationsForUser = async (
+    userId: string,
+    lastReadId: string | undefined,
+    limit: number,
+  ): Promise<Notification[]> => {
+    try {
+      const query: Record<string, unknown> = { recipientId: userId };
+      if (lastReadId) {
+        query._id = { $lt: lastReadId };
+      }
+      const notifications = await this.model
+        .find(query)
+        .sort({ _id: -1 })
+        .limit(limit);
+      return notifications.map(this.toDomain);
+    } catch (err) {
+      throw mapMongooseError(err);
+    }
+  };
+
   private toPersistence = (entity: Notification): NotificationAttr => {
     const { recipientId, type, title, message, data, isRead } = entity;
     return { recipientId, type, title, message, data, isRead };

@@ -26,6 +26,9 @@ export const authMiddleware: RequestHandler = (req, res, next) => {
       res
         .status(HttpStatus.UNAUTHORIZED)
         .json({ success: false, message: HttpMessages.UNAUTHENTICATED });
+
+      logger.warn("Blocking access due to missing token");
+
       return;
     }
     const payload = jwtService.verifyAccessToken(token);
@@ -49,11 +52,13 @@ export const authMiddleware: RequestHandler = (req, res, next) => {
       res
         .status(HttpStatus.UNAUTHORIZED)
         .json({ success: false, message: err.message, code: err.code });
+      logger.warn("Blocking access due to access token verify error");
       return;
     } else if (err instanceof InvalidTokenError) {
       res
         .status(HttpStatus.UNAUTHORIZED)
         .json({ success: false, message: err.message, code: err.code });
+      logger.warn("Blocking access due to invalid access token");
       return;
     }
     next(err);

@@ -9,6 +9,7 @@ import type {
 } from "../dtos/CreateNotification.dto";
 import { NotificationType } from "../../domain/entities/NotificationType.enum";
 import type { NotificationData } from "../../domain/entities/NotificationData";
+import type { GetNotificationsForUserDTO } from "../dtos/GetNotificationsForUser.dto";
 
 @injectable()
 export class NotificationService implements INotificationService {
@@ -34,6 +35,21 @@ export class NotificationService implements INotificationService {
     };
 
     return await this._notificationRepo.create(notification);
+  };
+
+  getNotificationsForUser = async (
+    dto: GetNotificationsForUserDTO,
+  ): Promise<Notification[]> => {
+    const { userId, lastReadId, limit } = dto;
+    return await this._notificationRepo.getNotificationsForUser(
+      userId,
+      lastReadId,
+      limit,
+    );
+  };
+
+  markRead = async (id: string, recipientId: string): Promise<Notification> => {
+    return await this._notificationRepo.markRead(id, recipientId);
   };
 
   private _getNotificationContent(data: NotificationData): {

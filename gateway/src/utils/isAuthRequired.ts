@@ -17,6 +17,8 @@ const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
     { path: "/api/v1/me", roles: ["USER", "ADMIN", "EXPERT"] },
     { path: "/api/v1/search/users/recommended", roles: ["USER"] },
     { path: "/api/v1/skills/profile/me", roles: ["USER"] },
+    { path: "/api/v1/notifications", roles: ["USER", "EXPERT", "ADMIN"] },
+    { path: "/api/v1/notifications/*path", roles: ["USER", "EXPERT", "ADMIN"] },
   ],
   POST: [
     { path: "/api/v1/payments/subscriptions", roles: ["ADMIN"] },
@@ -44,6 +46,8 @@ const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
       path: "/api/v1/connections/*path",
       roles: ["USER", "EXPERT", "ADMIN"],
     },
+    { path: "/api/v1/notifications", roles: ["USER", "EXPERT", "ADMIN"] },
+    { path: "/api/v1/notifications/*path", roles: ["USER", "EXPERT", "ADMIN"] },
   ],
   DELETE: [{ path: "/api/v1/payments/subscriptions/:id", roles: ["ADMIN"] }],
 };
