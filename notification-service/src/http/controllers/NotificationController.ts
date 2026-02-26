@@ -15,7 +15,7 @@ export class NotificationController {
   ) {}
 
   getNotifications = async (
-    req: Request,
+    req: Request<{}, any, any, { cursor?: string; limit?: string }>,
     res: Response,
     next: NextFunction,
   ) => {
@@ -25,16 +25,19 @@ export class NotificationController {
         throw new UnauthorizedAccessError();
       }
 
-      const cursor = req.query.cursor as string | undefined;
+      const cursor = req.query.cursor;
       const limit = Number(req.query.limit) || DEFAULT_LIMIT;
 
-      const notifications = await this._notificationService.getNotificationsForUser({
-        userId,
-        lastReadId: cursor,
-        limit,
-      });
+      const { notifications, hasNextPage, nextCursor } =
+        await this._notificationService.getNotificationsForUser({
+          userId,
+          lastReadId: cursor,
+          limit,
+        });
 
-      res.status(HttpStatus.OK).json({ success: true, data: notifications });
+      res
+        .status(HttpStatus.OK)
+        .json({ success: true, data: notifications, hasNextPage, nextCursor });
     } catch (err) {
       next(err);
     }

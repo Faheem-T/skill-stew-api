@@ -47,17 +47,31 @@ export class NotificationRepository implements INotificationRepository {
     userId: string,
     lastReadId: string | undefined,
     limit: number,
-  ): Promise<Notification[]> => {
+  ): Promise<{
+    notifications: Notification[];
+    hasNextPage: boolean;
+    nextCursor?: string;
+  }> => {
     try {
       const query: Record<string, unknown> = { recipientId: userId };
       if (lastReadId) {
         query._id = { $lt: lastReadId };
       }
-      const notifications = await this.model
+      const rows = await this.model
         .find(query)
         .sort({ _id: -1 })
-        .limit(limit);
-      return notifications.map(this.toDomain);
+        .limit(limit + 1);
+
+      const hasNextPage = rows.length > limit;
+      const sliced = hasNextPage ? rows.slice(0, -1) : rows;
+
+      const notifications = sliced.map(this.toDomain);
+
+      return {
+        hasNextPage,
+        nextCursor: hasNextPage ? rows[rows.length - 1]?.id! : undefined,
+        notifications,
+      };
     } catch (err) {
       throw mapMongooseError(err);
     }

@@ -39,7 +39,11 @@ export class NotificationService implements INotificationService {
 
   getNotificationsForUser = async (
     dto: GetNotificationsForUserDTO,
-  ): Promise<Notification[]> => {
+  ): Promise<{
+    notifications: Notification[];
+    hasNextPage: boolean;
+    nextCursor?: string;
+  }> => {
     const { userId, lastReadId, limit } = dto;
     return await this._notificationRepo.getNotificationsForUser(
       userId,

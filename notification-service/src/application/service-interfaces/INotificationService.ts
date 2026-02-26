@@ -9,8 +9,10 @@ export interface INotificationService {
   createNotification(
     dto: CreateNotificationDTO,
   ): Promise<CreateNotificationOutputDTO>;
-  getNotificationsForUser(
-    dto: GetNotificationsForUserDTO,
-  ): Promise<Notification[]>;
+  getNotificationsForUser(dto: GetNotificationsForUserDTO): Promise<{
+    notifications: Notification[];
+    hasNextPage: boolean;
+    nextCursor?: string;
+  }>;
   markRead(id: string, recipientId: string): Promise<Notification>;
 }

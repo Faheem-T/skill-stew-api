@@ -7,5 +7,9 @@ export interface INotificationRepository {
     userId: string,
     lastReadId: string | undefined,
     limit: number,
-  ): Promise<Notification[]>;
+  ): Promise<{
+    notifications: Notification[];
+    hasNextPage: boolean;
+    nextCursor?: string;
+  }>;
 }
