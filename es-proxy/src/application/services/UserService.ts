@@ -71,11 +71,14 @@ export class UserService implements IUserService {
       (recommendedUser) => recommendedUser.id !== userId,
     );
 
-    const response = await this._userConnectionService.getConnectionStatuses(
-      userId,
-      filteredUsers.map((user) => user.id),
-    );
-    console.log("User Service Response: ", response);
+    // TODO: (?) Filter out the users that are aleady being followed from
+    // recommended users?
+
+    const connectionStatuses =
+      await this._userConnectionService.getConnectionStatuses(
+        userId,
+        filteredUsers.map((user) => user.id),
+      );
 
     return filteredUsers.map(
       ({
@@ -96,10 +99,10 @@ export class UserService implements IUserService {
         wantedSkills,
         offeredSkills,
         location: location?.formattedAddress,
-
         ...(avatarKey
           ? { avatarUrl: this._storageService.getPublicUrl(avatarKey) }
           : {}),
+        connectionStatusToUser: connectionStatuses[id] ?? "NONE",
       }),
     );
   };

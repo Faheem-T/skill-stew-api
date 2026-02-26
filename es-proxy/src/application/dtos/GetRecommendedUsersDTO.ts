@@ -1,3 +1,5 @@
+import { UserConnectionStatus } from "../../constants/UserConnectionStatus";
+
 export type GetRecommendedUsersOutputDTO = {
   id: string;
   name?: string;
@@ -7,4 +9,5 @@ export type GetRecommendedUsersOutputDTO = {
   offeredSkills?: { skillId: string; skillName: string }[];
   wantedSkills?: { skillId: string; skillName: string }[];
   avatarUrl?: string;
+  connectionStatusToUser: UserConnectionStatus | "NONE";
 }[];
