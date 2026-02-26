@@ -8,6 +8,7 @@ import { mapDrizzleError } from "../mappers/ErrorMapper";
 import { UserConnectionMapper } from "../mappers/UserConnectionMapper";
 import { BaseRepository } from "./BaseRepository";
 import { UserConnectionStatus } from "../../domain/entities/UserConnectionStatus";
+import { NotFoundError } from "../../domain/errors/NotFoundError";
 
 export class UserConnectionRepository
   extends BaseRepository<UserConnection, typeof userConnectionsTable>
@@ -38,9 +39,37 @@ export class UserConnectionRepository
             inArray(this.table.recipient_id, targetIds),
           ),
         );
-      console.log(rows);
 
       return rows;
+    } catch (err) {
+      throw mapDrizzleError(err);
+    }
+  };
+
+  findByRequesterAndRecipientId = async (
+    requesterId: string,
+    recipientId: string,
+    tx?: TransactionContext,
+  ): Promise<UserConnection> => {
+    try {
+      const runner = tx ?? db;
+
+      const rows = await runner
+        .select()
+        .from(this.table)
+        .where(
+          and(
+            eq(this.table.requester_id, requesterId),
+            eq(this.table.recipient_id, recipientId),
+          ),
+        );
+
+      const connectionRow = rows[0];
+      if (!connectionRow) {
+        throw new NotFoundError("Connection");
+      }
+
+      return this.mapper.toDomain(connectionRow);
     } catch (err) {
       throw mapDrizzleError(err);
     }

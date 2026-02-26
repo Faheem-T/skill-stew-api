@@ -9,4 +9,9 @@ export interface IUserConnectionRepository extends IBaseRepository<UserConnectio
     targetIds: string[],
     tx?: TransactionContext,
   ): Promise<{ recipientId: string; status: UserConnectionStatus }[]>;
+  findByRequesterAndRecipientId(
+    requesterId: string,
+    recipientId: string,
+    tx?: TransactionContext,
+  ): Promise<UserConnection>;
 }

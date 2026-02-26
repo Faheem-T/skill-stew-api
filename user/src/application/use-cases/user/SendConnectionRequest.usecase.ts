@@ -12,6 +12,7 @@ import { SelfConnectionError } from "../../../domain/errors/SelfConnectionError"
 import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
 import { IUnitOfWork } from "../../ports/IUnitOfWork";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import { ConflictingConnectionRequest } from "../../../domain/errors/ConflictingConnectionRequest";
 
 export class SendConnectionRequest implements ISendConnectionRequest {
   constructor(
@@ -39,6 +40,33 @@ export class SendConnectionRequest implements ISendConnectionRequest {
       await this._unitOfWork.transact(async (tx) => {
         const requester = await this._userRepo.findById(requesterId, tx);
         const recipient = await this._userRepo.findById(recipientId, tx);
+
+        try {
+          // check if recipient has already sent a request to requester
+          const existingConnection =
+            await this._connectionRepo.findByRequesterAndRecipientId(
+              recipient.id,
+              requester.id,
+              tx,
+            );
+
+          if (existingConnection.status === "ACCEPTED") {
+            throw new AlreadyExistsError("Connection");
+          }
+
+          throw new ConflictingConnectionRequest(
+            existingConnection.status,
+            recipient.id,
+            recipient.username,
+            requester.id,
+            requester.username,
+          );
+        } catch (err) {
+          // continue if connection not found
+          if (!(err instanceof NotFoundError)) {
+            throw err;
+          }
+        }
 
         const savedConnection = await this._connectionRepo.create(
           newConnection,
