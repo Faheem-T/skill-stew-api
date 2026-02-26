@@ -7,7 +7,7 @@ import { AcceptingRejectedConnectionError } from "../../../domain/errors/Accepti
 import { IUnitOfWork } from "../../ports/IUnitOfWork";
 import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { request } from "http";
+import { UserConnection } from "../../../domain/entities/UserConnection";
 
 export class AcceptConnection implements IAcceptConnection {
   constructor(
@@ -48,6 +48,18 @@ export class AcceptConnection implements IAcceptConnection {
         savedConnection.requesterId,
         tx,
       );
+
+      // creating ACCEPTED connection for recipient
+      const recipientConnection = new UserConnection(
+        uuidv7(),
+        recipient.id,
+        requester.id,
+        "ACCEPTED",
+        new Date(),
+        new Date(),
+      );
+
+      await this._connectionRepo.create(recipientConnection, tx);
 
       const eventName: EventName = "connection.accepted";
 
