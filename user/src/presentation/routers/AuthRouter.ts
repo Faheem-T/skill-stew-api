@@ -1,18 +1,16 @@
 import { Router } from "express";
 import { authController } from "../../di";
 
-const router = Router();
-
 // /api/v1/auth
-router.post("/register", authController.registerUser);
-router.post("/verify", authController.verify);
-router.post("/resend-verification-link", authController.resendVerifyLink);
-router.post("/login", authController.login);
-router.post("/refresh", authController.refresh);
-router.post("/google-auth", authController.googleAuth);
-router.post("/logout", authController.logout);
-
-// admin auth routes
-router.post("/admin/create", authController.createAdmin);
+const router = Router()
+  .post("/register", authController.registerUser)
+  .post("/verify", authController.verify)
+  .post("/resend-verification-link", authController.resendVerifyLink)
+  .post("/login", authController.login)
+  .post("/refresh", authController.refresh)
+  .post("/google-auth", authController.googleAuth)
+  .post("/logout", authController.logout)
+  // TODO: Remove in production
+  .post("/admin/create", authController.createAdmin);
 
 export default router;
