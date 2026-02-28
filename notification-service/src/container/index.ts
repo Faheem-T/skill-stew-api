@@ -1,5 +1,6 @@
 import { Container } from "inversify";
 import amqp from "amqplib";
+import Redis from "ioredis";
 
 import { TYPES } from "../constants/Types";
 import { NotificationRepository } from "../infrastructure/repositories/NotificationRepository";
@@ -59,5 +60,9 @@ container
   .bind<NotificationController>(TYPES.NotificationController)
   .to(NotificationController)
   .inSingletonScope();
+
+container
+  .bind<Redis>(TYPES.RedisClient)
+  .toConstantValue(new Redis(ENV.REDIS_URI));
 
 export { container };
