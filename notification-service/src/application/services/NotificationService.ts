@@ -10,12 +10,22 @@ import type {
 import { NotificationType } from "../../domain/entities/NotificationType.enum";
 import type { NotificationData } from "../../domain/entities/NotificationData";
 import type { GetNotificationsForUserDTO } from "../dtos/GetNotificationsForUser.dto";
+import type { IUnitOfWork } from "../ports/IUnitOfWork";
+import type { ClientSession } from "mongoose";
+import type { IUnreadNotificationCountRepository } from "../../domain/repositories/IUnreadNotificationCountRepository";
+import type { IUnreadNotificationCountCache } from "../ports/IUnreadNotificationCountCache";
 
 @injectable()
 export class NotificationService implements INotificationService {
   constructor(
     @inject(TYPES.NotificationRepository)
     private _notificationRepo: INotificationRepository,
+    @inject(TYPES.UnreadNotificationCountRepository)
+    private _unreadNotificationCountRepository: IUnreadNotificationCountRepository,
+    @inject(TYPES.UnreadNotificationCountCache)
+    private _unreadNotificationCountCache: IUnreadNotificationCountCache,
+    @inject(TYPES.UnitOfWork)
+    private _unitOfWork: IUnitOfWork,
   ) {}
 
   createNotification = async (
@@ -33,8 +43,29 @@ export class NotificationService implements INotificationService {
       message,
       isRead: false,
     };
+    const result = await this._unitOfWork.transact(
+      async (tx: ClientSession) => {
+        const savedNotification = await this._notificationRepo.create(
+          notification,
+          tx,
+        );
 
-    return await this._notificationRepo.create(notification);
+        await this._unreadNotificationCountRepository.incrementByUserId(
+          savedNotification.recipientId,
+          1,
+          tx,
+        );
+
+        return savedNotification;
+      },
+    );
+
+    await this._unreadNotificationCountCache.incrementByUserId(
+      result.recipientId,
+      1,
+    );
+
+    return result;
   };
 
   getNotificationsForUser = async (
@@ -53,7 +84,30 @@ export class NotificationService implements INotificationService {
   };
 
   markRead = async (id: string, recipientId: string): Promise<Notification> => {
-    return await this._notificationRepo.markRead(id, recipientId);
+    const result = await this._unitOfWork.transact(
+      async (tx: ClientSession) => {
+        const notification = await this._notificationRepo.markRead(
+          id,
+          recipientId,
+          tx,
+        );
+
+        await this._unreadNotificationCountRepository.decrementByUserId(
+          notification.recipientId,
+          1,
+          tx,
+        );
+
+        return notification;
+      },
+    );
+
+    await this._unreadNotificationCountCache.decrementByUserId(
+      result.recipientId,
+      1,
+    );
+
+    return result;
   };
 
   private _getNotificationContent(data: NotificationData): {

@@ -4,6 +4,7 @@ import { TYPES } from "../../constants/Types";
 import type { IUnreadNotificationCountRepository } from "../../domain/repositories/IUnreadNotificationCountRepository";
 import type { IUnreadNotificationCountCache } from "../ports/IUnreadNotificationCountCache";
 import { NotFoundError } from "../../domain/errors";
+import type { ILogger } from "../ports/ILogger";
 
 @injectable()
 export class UnreadNotificationCountService implements IUnreadNotificationCountService {
@@ -12,6 +13,8 @@ export class UnreadNotificationCountService implements IUnreadNotificationCountS
     private _unreadNotificationCountRepo: IUnreadNotificationCountRepository,
     @inject(TYPES.UnreadNotificationCountCache)
     private _unreadNotificationCountCache: IUnreadNotificationCountCache,
+    @inject(TYPES.Logger)
+    private _logger: ILogger,
   ) {}
 
   getUnreadCountForUser = async (userId: string): Promise<number> => {
@@ -21,6 +24,7 @@ export class UnreadNotificationCountService implements IUnreadNotificationCountS
 
     // cache miss
     if (!count) {
+      this._logger.warn("Cache miss for unread count for user", { userId });
       try {
         count = await this._unreadNotificationCountRepo.getByUserId(userId);
       } catch (err) {
@@ -33,6 +37,10 @@ export class UnreadNotificationCountService implements IUnreadNotificationCountS
       }
 
       await this._unreadNotificationCountCache.setByUserId(userId, count);
+    } else {
+      this._logger.info("Returning value from cache for unread count", {
+        userId,
+      });
     }
 
     return count;
