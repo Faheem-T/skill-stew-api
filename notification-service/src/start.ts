@@ -10,6 +10,14 @@ import { connectDB } from "./infrastructure/config/mongoConnection";
 import { app } from "./http/server";
 import { ENV } from "./utils/dotenv";
 
+process.on("uncaughtException", (err, origin) => {
+  logger.error(
+    "Critical application error. Exiting process with status code 1.",
+    { err, origin },
+  );
+  process.exit(1);
+});
+
 const logger = container.get<ILogger>(TYPES.Logger);
 const eventConsumer = await container.getAsync<IEventConsumer>(
   TYPES.EventConsumer,

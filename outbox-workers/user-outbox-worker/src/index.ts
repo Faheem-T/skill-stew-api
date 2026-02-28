@@ -7,6 +7,14 @@ import { outboxEventsTable } from "./db/schemas/outboxEventSchema";
 import { CreateEvent, EventName, EventSchemas } from "@skillstew/common";
 import { eq } from "drizzle-orm";
 
+process.on("uncaughtException", (err, origin) => {
+  logger.error(
+    "Critical application error. Exiting process with status code 1.",
+    { err, origin },
+  );
+  process.exit(1);
+});
+
 function isValidEventName(value: unknown): value is EventName {
   return EventName.includes(value as EventName);
 }

@@ -7,6 +7,14 @@ import { logger } from "./utils/logger";
 import { socketAuthMiddleware } from "./middlewares/authMiddleware";
 import { ENV } from "./utils/dotenv";
 
+process.on("uncaughtException", (err, origin) => {
+  logger.error(
+    "Critical application error. Exiting process with status code 1.",
+    { err, origin },
+  );
+  process.exit(1);
+});
+
 const pubClient = new Redis(ENV.REDIS_URI);
 const subClient = pubClient.duplicate();
 

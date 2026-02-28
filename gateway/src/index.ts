@@ -4,6 +4,14 @@ import { logger } from "./utils/logger";
 import { ENV } from "./utils/dotenv";
 import { authMiddleware } from "./middlewares/authMiddleware";
 
+process.on("uncaughtException", (err, origin) => {
+  logger.error(
+    "Critical application error. Exiting process with status code 1.",
+    { err, origin },
+  );
+  process.exit(1);
+});
+
 const app = express();
 const port = process.env.PORT || 3000;
 

@@ -31,3 +31,11 @@ process.on("exit", async () => {
   await db.$client.end();
   logger.info("Disconnected from database");
 });
+
+process.on("uncaughtException", (err, origin) => {
+  logger.error(
+    "Critical application error. Exiting process with status code 1.",
+    { err, origin },
+  );
+  process.exit(1);
+});
