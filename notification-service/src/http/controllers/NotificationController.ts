@@ -77,12 +77,12 @@ export class NotificationController {
         throw new UnauthorizedAccessError();
       }
 
-      const unreadCount =
+      const count =
         await this._unreadNotificationCountService.getUnreadCountForUser(
           userId,
         );
 
-      res.status(200).json({ success: true, data: unreadCount });
+      res.status(200).json({ success: true, data: { count } });
     } catch (err) {
       next(err);
     }
