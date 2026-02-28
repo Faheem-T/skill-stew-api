@@ -10,6 +10,7 @@ const notificationController = container.get<NotificationController>(
 // /api/v1/notifications
 const router = Router()
   .get("/", notificationController.getNotifications)
-  .patch("/:id/read", notificationController.markRead);
+  .patch("/:id/read", notificationController.markRead)
+  .get("/unread-count", notificationController.getUnreadCount);
 
 export default router;
