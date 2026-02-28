@@ -12,7 +12,7 @@ export const AppErrorCodes = {
   // External service errors
   MESSAGE_QUEUE_ERROR: "MESSAGE_QUEUE_ERROR",
   EXTERNAL_SERVICE_ERROR: "EXTERNAL_SERVICE_ERROR",
+  CACHE_CONSTRAINT_ERROR: "CACHE_CONSTRAINT_ERROR",
 } as const;
 
 export type AppErrorCodes = keyof typeof AppErrorCodes;
-

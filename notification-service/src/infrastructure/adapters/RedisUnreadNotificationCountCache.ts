@@ -1,7 +1,9 @@
 import { injectable, inject } from "inversify";
+import type Redis from "ioredis";
 import type { IUnreadNotificationCountCache } from "../../application/ports/IUnreadNotificationCountCache";
 import { TYPES } from "../../constants/Types";
-import type Redis from "ioredis";
+import { NotFoundError } from "../../domain/errors";
+import { CacheConstraintError } from "../../application/errors/infra/CacheConstraintError";
 
 @injectable()
 export class RedisUnreadNotificationCountCache implements IUnreadNotificationCountCache {
@@ -32,7 +34,20 @@ export class RedisUnreadNotificationCountCache implements IUnreadNotificationCou
 
   decrementByUserId = async (userId: string, dec: number): Promise<number> => {
     // redis sets the value to 0 and decrements if the key does not exist
+    // so a check is needed for the current value
+    const existing = await this._redisClient.get(`unreadCount:${userId}`);
+    if (!existing) {
+      throw new NotFoundError("Unread count cache");
+    }
+
+    if (Number(existing) < dec) {
+      throw new CacheConstraintError(
+        `Unread count cannot be less than 0. Trying to decrement ${dec} from ${existing}.`,
+      );
+    }
+
     const result = await this._redisClient.decrby(`unreadCount:${userId}`, dec);
+
     return result;
   };
 }

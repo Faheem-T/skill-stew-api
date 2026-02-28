@@ -23,4 +23,5 @@ export const ErrorCodeToStatusCodeMap: Record<AllErrorCodes, number> = {
   // External Service Error Codes
   [AppErrorCodes.MESSAGE_QUEUE_ERROR]: HttpStatus.SERVICE_UNAVAILABLE,
   [AppErrorCodes.EXTERNAL_SERVICE_ERROR]: HttpStatus.SERVICE_UNAVAILABLE,
+  [AppErrorCodes.CACHE_CONSTRAINT_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
 };
