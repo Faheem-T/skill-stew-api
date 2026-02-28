@@ -18,4 +18,5 @@ export const TYPES = {
   RealtimeEventPublisher: Symbol.for("RealtimeEventPublisher"),
   RedisClient: Symbol.for("RedisClient"),
   UnreadNotificationCountCache: Symbol.for("UnreadNotificationCountCache"),
+  UnitOfWork: Symbol.for("UnitOfWork"),
 } as const;

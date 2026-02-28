@@ -21,6 +21,8 @@ import type { IUnreadNotificationCountRepository } from "../domain/repositories/
 import { UnreadNotificationCountRepository } from "../infrastructure/repositories/UnreadNotificationCountRepository";
 import type { IUnreadNotificationCountService } from "../application/service-interfaces/IUnreadNotificationCountService";
 import { UnreadNotificationCountService } from "../application/services/UnreadNotificationCountService";
+import type { IUnitOfWork } from "../application/ports/IUnitOfWork";
+import { UnitOfWork } from "../infrastructure/adapters/UnitOfWork";
 
 const container = new Container();
 
@@ -87,5 +89,7 @@ container
   .bind<IUnreadNotificationCountCache>(TYPES.UnreadNotificationCountCache)
   .to(RedisUnreadNotificationCountCache)
   .inSingletonScope();
+
+container.bind<IUnitOfWork>(TYPES.UnitOfWork).to(UnitOfWork).inSingletonScope();
 
 export { container };
