@@ -49,17 +49,17 @@ export class UnreadNotificationCountRepository implements IUnreadNotificationCou
     tx?: TransactionContext,
   ): Promise<number> => {
     try {
-      const newUnreadCount = await this._model.findOneAndUpdate(
+      const savedCount = await this._model.findOneAndUpdate(
         { userId },
         { $inc: { unreadCount: inc } },
-        { session: tx },
+        { session: tx, upsert: true },
       );
 
-      if (!newUnreadCount) {
+      if (!savedCount) {
         throw new NotFoundError("Unread count");
       }
 
-      return newUnreadCount.unreadCount;
+      return savedCount.unreadCount;
     } catch (err) {
       throw mapMongooseError(err);
     }
@@ -71,17 +71,17 @@ export class UnreadNotificationCountRepository implements IUnreadNotificationCou
     tx?: TransactionContext,
   ): Promise<number> => {
     try {
-      const newUnreadCount = await this._model.findOneAndUpdate(
+      const savedCount = await this._model.findOneAndUpdate(
         { userId },
         { $inc: { unreadCount: -dec } },
         { session: tx },
       );
 
-      if (!newUnreadCount) {
+      if (!savedCount) {
         throw new NotFoundError("Unread count");
       }
 
-      return newUnreadCount.unreadCount;
+      return savedCount.unreadCount;
     } catch (err) {
       throw mapMongooseError(err);
     }
