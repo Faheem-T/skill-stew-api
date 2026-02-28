@@ -8,6 +8,7 @@ import type {
   NotificationAttr,
   NotificationDoc,
 } from "../models/NotificationModel";
+import type { TransactionContext } from "../../types/TransactionContext";
 
 @injectable()
 export class NotificationRepository implements INotificationRepository {
@@ -15,28 +16,34 @@ export class NotificationRepository implements INotificationRepository {
 
   create = async (
     entity: Exclude<Notification, Notification["id"]>,
+    tx?: TransactionContext,
   ): Promise<Notification> => {
     try {
       const attr = this.toPersistence(entity);
       const notification = this.model.build(attr);
-      const savedNotification = await notification.save();
+      const savedNotification = await notification.save({ session: tx });
       return this.toDomain(savedNotification);
     } catch (err) {
       throw mapMongooseError(err);
     }
   };
 
-  markRead = async (id: string, recipientId: string): Promise<Notification> => {
+  markRead = async (
+    id: string,
+    recipientId: string,
+    tx?: TransactionContext,
+  ): Promise<Notification> => {
     try {
-      const foundNotification = await this.model.findOne({
-        _id: id,
-        recipientId,
-      });
+      const foundNotification = await this.model.findOne(
+        { _id: id, recipientId },
+        {},
+        { session: tx },
+      );
       if (!foundNotification) {
         throw new NotFoundError("Notification");
       }
       foundNotification.isRead = true;
-      const savedNotification = await foundNotification.save();
+      const savedNotification = await foundNotification.save({ session: tx });
       return this.toDomain(savedNotification);
     } catch (err) {
       throw mapMongooseError(err);

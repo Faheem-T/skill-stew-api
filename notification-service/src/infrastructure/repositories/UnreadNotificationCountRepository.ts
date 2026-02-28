@@ -3,14 +3,22 @@ import type { IUnreadNotificationCountRepository } from "../../domain/repositori
 import { UnreadNotificationCountModel } from "../models/UnreadNotificationCountModel";
 import { NotFoundError } from "../../domain/errors";
 import { mapMongooseError } from "../mappers/mapMongooseError";
+import type { TransactionContext } from "../../types/TransactionContext";
 
 @injectable()
 export class UnreadNotificationCountRepository implements IUnreadNotificationCountRepository {
   private _model = UnreadNotificationCountModel;
 
-  getByUserId = async (userId: string): Promise<number> => {
+  getByUserId = async (
+    userId: string,
+    tx?: TransactionContext,
+  ): Promise<number> => {
     try {
-      const foundCount = await this._model.findOne({ userId });
+      const foundCount = await this._model.findOne(
+        { userId },
+        {},
+        { session: tx },
+      );
 
       if (!foundCount) {
         throw new NotFoundError("Unread count");
@@ -22,21 +30,29 @@ export class UnreadNotificationCountRepository implements IUnreadNotificationCou
     }
   };
 
-  createByUserId = async (userId: string): Promise<number> => {
+  createByUserId = async (
+    userId: string,
+    tx?: TransactionContext,
+  ): Promise<number> => {
     try {
       const newUnreadCount = this._model.build({ userId, unreadCount: 0 });
-      const savedUnreadCount = await newUnreadCount.save();
+      const savedUnreadCount = await newUnreadCount.save({ session: tx });
       return savedUnreadCount.unreadCount;
     } catch (err) {
       throw mapMongooseError(err);
     }
   };
 
-  incrementByUserId = async (userId: string, inc: number): Promise<number> => {
+  incrementByUserId = async (
+    userId: string,
+    inc: number,
+    tx?: TransactionContext,
+  ): Promise<number> => {
     try {
       const newUnreadCount = await this._model.findOneAndUpdate(
         { userId },
         { $inc: { unreadCount: inc } },
+        { session: tx },
       );
 
       if (!newUnreadCount) {
@@ -49,11 +65,16 @@ export class UnreadNotificationCountRepository implements IUnreadNotificationCou
     }
   };
 
-  decrementByUserId = async (userId: string, dec: number): Promise<number> => {
+  decrementByUserId = async (
+    userId: string,
+    dec: number,
+    tx?: TransactionContext,
+  ): Promise<number> => {
     try {
       const newUnreadCount = await this._model.findOneAndUpdate(
         { userId },
         { $inc: { unreadCount: -dec } },
+        { session: tx },
       );
 
       if (!newUnreadCount) {
