@@ -1,10 +1,10 @@
 import winston, { Logger } from "winston";
-import type { ILogger } from "../types/ILogger";
+import type { ILogger } from "../../application/ports/ILogger";
 
 const { combine, timestamp, json, errors, colorize, prettyPrint } =
   winston.format;
 
-class WinstonLogger implements ILogger {
+export class WinstonLogger implements ILogger {
   private _logger: Logger;
   constructor() {
     // Overriding winston colors as http and info colors
@@ -32,7 +32,7 @@ class WinstonLogger implements ILogger {
           : combine(prettyPrint(), colorize({ all: true })),
       ),
       transports: [new winston.transports.Console()],
-      defaultMeta: { service: "websocket-gateway" },
+      defaultMeta: { service: "user-service" },
     });
   }
 
@@ -43,5 +43,3 @@ class WinstonLogger implements ILogger {
   warn = (...args: any[]) => this._logger.warn(args[0], ...args.slice(1));
   error = (...args: any[]) => this._logger.error(args[0], ...args.slice(1));
 }
-
-export const logger = new WinstonLogger();
