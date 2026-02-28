@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import { Notification } from "../../domain/entities/Notification";
 import { NotFoundError } from "../../domain/errors";
 import type { INotificationRepository } from "../../domain/repositories/INotificationRepository";
-import { mapMongooseError } from "../mappers/DBErrorMapper";
+import { mapMongooseError } from "../mappers/mapMongooseError";
 import { NotificationModel } from "../models/NotificationModel";
 import type {
   NotificationAttr,

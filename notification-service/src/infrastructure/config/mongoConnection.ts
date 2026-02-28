@@ -4,7 +4,7 @@ import { ENV } from "../../utils/dotenv";
 import { container } from "../../container";
 import type { ILogger } from "../../application/ports/ILogger";
 import { TYPES } from "../../constants/Types";
-import { mapMongooseError } from "../mappers/DBErrorMapper";
+import { mapMongooseError } from "../mappers/mapMongooseError";
 
 const logger = container.get<ILogger>(TYPES.Logger);
 

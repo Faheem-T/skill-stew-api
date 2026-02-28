@@ -1,17 +1,20 @@
-import type { AppError } from "../../application/errors";
+import { AppError } from "../../application/errors";
 import { DbConnectionError } from "../../application/errors";
 import { DbQueryError } from "../../application/errors";
 import { DbTimeoutError } from "../../application/errors";
 import { DbUniqueConstraintError } from "../../application/errors";
+import { DomainError } from "../../domain/errors";
 
 /**
  * Maps any Mongoose / MongoDB error to a clean AppError
  */
-export function mapMongooseError(
-  err: unknown,
-): DbConnectionError | DbTimeoutError | DbQueryError | DbUniqueConstraintError {
+export function mapMongooseError(err: unknown): AppError | DomainError {
   if (!err || typeof err !== "object") {
     return new DbQueryError(err as Error);
+  }
+
+  if (err instanceof AppError || err instanceof DomainError) {
+    return err;
   }
 
   const error = err as Error;
