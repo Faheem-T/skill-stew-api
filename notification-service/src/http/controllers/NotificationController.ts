@@ -4,6 +4,7 @@ import { TYPES } from "../../constants/Types";
 import { HttpStatus } from "../../constants/HttpStatusCodes";
 import type { INotificationService } from "../../application/service-interfaces/INotificationService";
 import { UnauthorizedAccessError } from "../../domain/errors";
+import type { IUnreadNotificationCountService } from "../../application/service-interfaces/IUnreadNotificationCountService";
 
 const DEFAULT_LIMIT = 20;
 
@@ -12,6 +13,8 @@ export class NotificationController {
   constructor(
     @inject(TYPES.NotificationService)
     private _notificationService: INotificationService,
+    @inject(TYPES.UnreadNotificationCountService)
+    private _unreadNotificationCountService: IUnreadNotificationCountService,
   ) {}
 
   getNotifications = async (
@@ -62,6 +65,24 @@ export class NotificationController {
       );
 
       res.status(HttpStatus.OK).json({ success: true, data: notification });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getUnreadCount = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.headers["x-user-id"] as string;
+      if (!userId) {
+        throw new UnauthorizedAccessError();
+      }
+
+      const unreadCount =
+        await this._unreadNotificationCountService.getUnreadCountForUser(
+          userId,
+        );
+
+      res.status(200).json({ success: true, data: unreadCount });
     } catch (err) {
       next(err);
     }

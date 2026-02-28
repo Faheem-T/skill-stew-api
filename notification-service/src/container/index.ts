@@ -15,6 +15,12 @@ import { ENV } from "../utils/dotenv";
 import type { IRealtimeEventPublisher } from "../application/ports/IRealtimeEmitter";
 import { SocketIoRedisPublisher } from "../infrastructure/adapters/SocketIoRedisPublisher";
 import { NotificationController } from "../http/controllers/NotificationController";
+import type { IUnreadNotificationCountCache } from "../application/ports/IUnreadNotificationCountCache";
+import { RedisUnreadNotificationCountCache } from "../infrastructure/adapters/RedisUnreadNotificationCountCache";
+import type { IUnreadNotificationCountRepository } from "../domain/repositories/IUnreadNotificationCountRepository";
+import { UnreadNotificationCountRepository } from "../infrastructure/repositories/UnreadNotificationCountRepository";
+import type { IUnreadNotificationCountService } from "../application/service-interfaces/IUnreadNotificationCountService";
+import { UnreadNotificationCountService } from "../application/services/UnreadNotificationCountService";
 
 const container = new Container();
 
@@ -24,8 +30,20 @@ container
   .inSingletonScope();
 
 container
+  .bind<IUnreadNotificationCountRepository>(
+    TYPES.UnreadNotificationCountRepository,
+  )
+  .to(UnreadNotificationCountRepository)
+  .inSingletonScope();
+
+container
   .bind<INotificationService>(TYPES.NotificationService)
   .to(NotificationService)
+  .inSingletonScope();
+
+container
+  .bind<IUnreadNotificationCountService>(TYPES.UnreadNotificationCountService)
+  .to(UnreadNotificationCountService)
   .inSingletonScope();
 
 container.bind<ILogger>(TYPES.Logger).to(WinstonLogger).inSingletonScope();
@@ -64,5 +82,10 @@ container
 container
   .bind<Redis>(TYPES.RedisClient)
   .toConstantValue(new Redis(ENV.REDIS_URI));
+
+container
+  .bind<IUnreadNotificationCountCache>(TYPES.UnreadNotificationCountCache)
+  .to(RedisUnreadNotificationCountCache)
+  .inSingletonScope();
 
 export { container };
