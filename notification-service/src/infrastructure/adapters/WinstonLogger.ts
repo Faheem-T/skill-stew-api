@@ -7,7 +7,7 @@ const { combine, timestamp, json, errors, colorize, prettyPrint } =
 @injectable()
 export class WinstonLogger implements ILogger {
   private _logger = winston.createLogger({
-    level: process.env.LOG_LEVEL || "info",
+    level: process.env.LOG_LEVEL || "silly",
     format: combine(
       timestamp({
         format: () =>
@@ -23,6 +23,7 @@ export class WinstonLogger implements ILogger {
   });
 
   silly = (...args: any[]) => this._logger.silly(args[0], ...args.slice(1));
+  http = (...args: any[]) => this._logger.http(args[0], ...args.slice(1));
   debug = (...args: any[]) => this._logger.debug(args[0], ...args.slice(1));
   info = (...args: any[]) => this._logger.info(args[0], ...args.slice(1));
   warn = (...args: any[]) => this._logger.warn(args[0], ...args.slice(1));

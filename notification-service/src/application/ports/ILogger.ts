@@ -1,8 +1,9 @@
 export interface ILogger {
-  warn: LogMethod;
   error: LogMethod;
+  warn: LogMethod;
   info: LogMethod;
   debug: LogMethod;
+  http: LogMethod;
   silly: LogMethod;
 }
 
