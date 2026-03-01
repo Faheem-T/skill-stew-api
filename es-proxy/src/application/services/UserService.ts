@@ -75,10 +75,12 @@ export class UserService implements IUserService {
     // recommended users?
 
     const connectionStatuses =
-      await this._userConnectionService.getConnectionStatuses(
-        userId,
-        filteredUsers.map((user) => user.id),
-      );
+      filteredUsers.length > 0
+        ? await this._userConnectionService.getConnectionStatuses(
+            userId,
+            filteredUsers.map((user) => user.id),
+          )
+        : {};
 
     return filteredUsers.map(
       ({
