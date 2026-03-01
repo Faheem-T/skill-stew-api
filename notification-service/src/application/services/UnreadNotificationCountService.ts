@@ -23,7 +23,7 @@ export class UnreadNotificationCountService implements IUnreadNotificationCountS
     count = await this._unreadNotificationCountCache.getByUserId(userId);
 
     // cache miss
-    if (!count) {
+    if (count == null) {
       this._logger.warn("Cache miss for unread count for user", { userId });
       try {
         count = await this._unreadNotificationCountRepo.getByUserId(userId);
