@@ -15,6 +15,7 @@ const router = Router()
     requireRole("USER"),
     onboardingController.onboardingUserProfileUpdate,
   )
-  .get("/username-availability", userController.usernameAvailabilityCheck);
+  .get("/username-availability", userController.usernameAvailabilityCheck)
+  .get("/:id", userController.getUserProfile);
 
 export default router;

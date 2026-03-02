@@ -9,6 +9,8 @@ import { checkUsernameAvailabilitySchema } from "../../application/dtos/common/C
 import { ICheckUsernameAvailability } from "../../application/interfaces/common/ICheckUsernameAvailability";
 import { updateUsernameSchema } from "../../application/dtos/common/UpdateUsername.dto";
 import { IUpdateUsername } from "../../application/interfaces/common/IUpdateUsername";
+import { getUserProfileSchema } from "../../application/dtos/user/GetUserProfile.dto";
+import { IGetUserProfile } from "../../application/interfaces/user/IGetUserProfile";
 
 export class UserController {
   constructor(
@@ -16,6 +18,7 @@ export class UserController {
     private _updateUserBlockStatus: IUpdateUserBlockStatus,
     private _checkUsernameAvailability: ICheckUsernameAvailability,
     private _updateUsername: IUpdateUsername,
+    private _getUserProfile: IGetUserProfile,
   ) {}
 
   getAllUsers = async (
@@ -117,6 +120,24 @@ export class UserController {
       res
         .status(HttpStatus.OK)
         .json({ success: true, message: "Your username has been changed." });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getUserProfile = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = getUserProfileSchema.parse({
+        userId: req.params.id,
+      });
+
+      const profile = await this._getUserProfile.exec(dto);
+
+      res.status(HttpStatus.OK).json({ success: true, data: profile });
     } catch (err) {
       next(err);
     }

@@ -10,6 +10,8 @@ import {
   GetConnectionStatusesOutputDTO,
   getConnectionStatusesSchema,
 } from "../../application/dtos/user/GetConnectionStatus.dto";
+import { getConnectionStatusToUserSchema } from "../../application/dtos/user/GetConnectionStatusToUser.dto";
+import { IGetConnectionStatusToUser } from "../../application/interfaces/user/IGetConnectionStatusToUser";
 
 export class ConnectionController {
   constructor(
@@ -17,6 +19,7 @@ export class ConnectionController {
     private _acceptConnection: IAcceptConnection,
     private _rejectConnection: IRejectConnection,
     private _getConnectionStatuses: IGetConnectionStatuses,
+    private _getConnectionStatusToUser: IGetConnectionStatusToUser,
   ) {}
 
   sendConnectionRequest = async (
@@ -118,6 +121,25 @@ export class ConnectionController {
       const result = await this._getConnectionStatuses.exec(dto);
 
       res.status(HttpStatus.OK).json({ success: true, data: result });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getConnectionStatusToUser = async (
+    req: Request<{ targetId: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = getConnectionStatusToUserSchema.parse({
+        userId: req.headers["x-user-id"],
+        targetId: req.params.targetId,
+      });
+
+      const status = await this._getConnectionStatusToUser.exec(dto);
+
+      res.status(200).json({ success: true, data: { status } });
     } catch (err) {
       next(err);
     }

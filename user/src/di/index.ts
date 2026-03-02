@@ -42,7 +42,9 @@ import { RejectConnection } from "../application/use-cases/user/RejectConnection
 import { ConnectionController } from "../presentation/controllers/ConnectionController";
 import { UnitOfWork } from "../infrastructure/persistence/UnitOfWork";
 import { OutboxEventRepository } from "../infrastructure/repositories/OutboxEventRepository";
-import { GetConnectionStatuses } from "../application/use-cases/user/GetConnectionStatus.usecase";
+import { GetConnectionStatuses } from "../application/use-cases/user/GetConnectionStatuses.usecase";
+import { GetUserProfile } from "../application/use-cases/user/GetUserProfile.usecase";
+import { GetConnectionStatusToUser } from "../application/use-cases/user/GetConnectionStatusToUser.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -198,6 +200,15 @@ const rejectConnectionUsecase = new RejectConnection(
   unitOfWork,
 );
 const getConnectionStatusesUsecase = new GetConnectionStatuses(connectionRepo);
+const getUserProfileUsecase = new GetUserProfile(
+  userRepo,
+  userProfileRepo,
+  connectionRepo,
+  s3StorageService,
+);
+const getConnectionStatusToUserUsecase = new GetConnectionStatusToUser(
+  connectionRepo,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -214,6 +225,7 @@ export const userController = new UserController(
   updateUserBlockStatusUsecase,
   checkUsernameAvailabilityUsecase,
   updateUsernameUsecase,
+  getUserProfileUsecase,
 );
 export const onboardingController = new UserOnboardingController(
   onboardingUpdateUserProfileUsecase,
@@ -230,6 +242,7 @@ export const connectionController = new ConnectionController(
   acceptConnectionUsecase,
   rejectConnectionUsecase,
   getConnectionStatusesUsecase,
+  getConnectionStatusToUserUsecase,
 );
 
 // Internal Usecases
