@@ -84,6 +84,20 @@ export class NotificationRepository implements INotificationRepository {
     }
   };
 
+  findById = async (id: string): Promise<Notification> => {
+    try {
+      const notification = await this.model.findById(id);
+
+      if (!notification) {
+        throw new NotFoundError("Notification");
+      }
+
+      return this.toDomain(notification);
+    } catch (err) {
+      throw mapMongooseError(err);
+    }
+  };
+
   private toPersistence = (entity: Notification): NotificationAttr => {
     const { recipientId, type, title, message, data, isRead } = entity;
     return { recipientId, type, title, message, data, isRead };

@@ -84,6 +84,12 @@ export class NotificationService implements INotificationService {
   };
 
   markRead = async (id: string, recipientId: string): Promise<Notification> => {
+    const notification = await this._notificationRepo.findById(id);
+
+    if (notification.isRead) {
+      return notification;
+    }
+
     const result = await this._unitOfWork.transact(
       async (tx: ClientSession) => {
         const notification = await this._notificationRepo.markRead(

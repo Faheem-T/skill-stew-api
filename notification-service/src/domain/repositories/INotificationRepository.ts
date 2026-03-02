@@ -22,4 +22,6 @@ export interface INotificationRepository {
     hasNextPage: boolean;
     nextCursor?: string;
   }>;
+
+  findById(id: string): Promise<Notification>;
 }
