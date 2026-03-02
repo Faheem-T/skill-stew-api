@@ -137,9 +137,10 @@ export class ConnectionController {
         targetId: req.params.targetId,
       });
 
-      const status = await this._getConnectionStatusToUser.exec(dto);
+      const { status, connectionId } =
+        await this._getConnectionStatusToUser.exec(dto);
 
-      res.status(200).json({ success: true, data: { status } });
+      res.status(200).json({ success: true, data: { status, connectionId } });
     } catch (err) {
       next(err);
     }

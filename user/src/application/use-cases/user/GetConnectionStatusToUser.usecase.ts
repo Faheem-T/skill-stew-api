@@ -1,4 +1,3 @@
-import { UserConnectionStatus } from "../../../domain/entities/UserConnectionStatus";
 import { NotFoundError } from "../../../domain/errors/NotFoundError";
 import { IUserConnectionRepository } from "../../../domain/repositories/IUserConnectionRepository";
 import {
@@ -21,7 +20,7 @@ export class GetConnectionStatusToUser implements IGetConnectionStatusToUser {
           targetId,
           userId,
         );
-      return connection.status;
+      return { connectionId: connection.id, status: connection.status };
     } catch (err) {
       if (!(err instanceof NotFoundError)) {
         throw err;
@@ -30,27 +29,24 @@ export class GetConnectionStatusToUser implements IGetConnectionStatusToUser {
 
     // if not found
     // find user -> target
-    try {
-      const connection =
-        await this._connectionRepo.findByRequesterAndRecipientId(
-          userId,
-          targetId,
-        );
+    const connection = await this._connectionRepo.findByRequesterAndRecipientId(
+      userId,
+      targetId,
+    );
 
-      switch (connection.status) {
-        case "PENDING":
-          return "CURRENT_USER_REQUESTING";
-        case "ACCEPTED":
-          return "ACCEPTED";
-        case "REJECTED":
-          return "REJECTED_BY_TARGET_USER";
-      }
-    } catch (err) {
-      if (err instanceof NotFoundError) {
-        return "NONE";
-      } else {
-        throw err;
-      }
+    switch (connection.status) {
+      case "PENDING":
+        return {
+          connectionId: connection.id,
+          status: "CURRENT_USER_REQUESTING",
+        };
+      case "ACCEPTED":
+        return { connectionId: connection.id, status: "ACCEPTED" };
+      case "REJECTED":
+        return {
+          connectionId: connection.id,
+          status: "REJECTED_BY_TARGET_USER",
+        };
     }
   };
 }

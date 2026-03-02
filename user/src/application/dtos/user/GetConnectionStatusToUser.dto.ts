@@ -10,8 +10,11 @@ export type GetConnectionStatusToUserDTO = z.infer<
   typeof getConnectionStatusToUserSchema
 >;
 
-export type GetConnectionStatusToUserOutputDTO =
-  | UserConnectionStatus
-  | "CURRENT_USER_REQUESTING"
-  | "REJECTED_BY_TARGET_USER"
-  | "NONE";
+export type GetConnectionStatusToUserOutputDTO = {
+  connectionId: string;
+  status:
+    | UserConnectionStatus
+    | "CURRENT_USER_REQUESTING"
+    | "REJECTED_BY_TARGET_USER"
+    | "NONE";
+};
