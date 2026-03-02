@@ -11,6 +11,8 @@ import { updateUsernameSchema } from "../../application/dtos/common/UpdateUserna
 import { IUpdateUsername } from "../../application/interfaces/common/IUpdateUsername";
 import { getUserProfileSchema } from "../../application/dtos/user/GetUserProfile.dto";
 import { IGetUserProfile } from "../../application/interfaces/user/IGetUserProfile";
+import { getUserAvatarSchema } from "../../application/dtos/user/GetUserAvatar.dto";
+import { IGetUserAvatar } from "../../application/interfaces/user/IGetUserAvatar";
 
 export class UserController {
   constructor(
@@ -19,6 +21,7 @@ export class UserController {
     private _checkUsernameAvailability: ICheckUsernameAvailability,
     private _updateUsername: IUpdateUsername,
     private _getUserProfile: IGetUserProfile,
+    private _getUserAvatar: IGetUserAvatar,
   ) {}
 
   getAllUsers = async (
@@ -138,6 +141,22 @@ export class UserController {
       const profile = await this._getUserProfile.exec(dto);
 
       res.status(HttpStatus.OK).json({ success: true, data: profile });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getUserAvatar = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = getUserAvatarSchema.parse({ userId: req.params.id });
+
+      const { avatarUrl } = await this._getUserAvatar.exec(dto);
+
+      res.status(HttpStatus.OK).json({ success: true, data: { avatarUrl } });
     } catch (err) {
       next(err);
     }

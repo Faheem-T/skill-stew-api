@@ -16,6 +16,7 @@ const router = Router()
     onboardingController.onboardingUserProfileUpdate,
   )
   .get("/username-availability", userController.usernameAvailabilityCheck)
+  .get("/:id/avatar", userController.getUserAvatar)
   .get("/:id", userController.getUserProfile);
 
 export default router;

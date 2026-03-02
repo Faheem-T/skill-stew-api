@@ -45,6 +45,7 @@ import { OutboxEventRepository } from "../infrastructure/repositories/OutboxEven
 import { GetConnectionStatuses } from "../application/use-cases/user/GetConnectionStatuses.usecase";
 import { GetUserProfile } from "../application/use-cases/user/GetUserProfile.usecase";
 import { GetConnectionStatusToUser } from "../application/use-cases/user/GetConnectionStatusToUser.usecase";
+import { GetUserAvatar } from "../application/use-cases/user/GetUserAvatar.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -209,6 +210,10 @@ const getUserProfileUsecase = new GetUserProfile(
 const getConnectionStatusToUserUsecase = new GetConnectionStatusToUser(
   connectionRepo,
 );
+const getUserAvatarUsecase = new GetUserAvatar(
+  userProfileRepo,
+  s3StorageService,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -226,6 +231,7 @@ export const userController = new UserController(
   checkUsernameAvailabilityUsecase,
   updateUsernameUsecase,
   getUserProfileUsecase,
+  getUserAvatarUsecase,
 );
 export const onboardingController = new UserOnboardingController(
   onboardingUpdateUserProfileUsecase,
