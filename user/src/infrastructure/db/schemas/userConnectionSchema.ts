@@ -8,16 +8,17 @@ export const userConnectionsTable = pgTable(
   "user_connections",
   {
     id: uuid().primaryKey(),
-    requester_id: uuid()
+    user_id_1: uuid("userId1")
       .references(() => userTable.id)
       .notNull(),
-    recipient_id: uuid()
+    user_id_2: uuid("userId2")
       .references(() => userTable.id)
       .notNull(),
+    requester_id: uuid("requesterId").notNull(),
     status: connectionStatusEnum("status").notNull(),
     ...timestamps,
   },
-  (t) => [unique().on(t.recipient_id, t.requester_id)],
+  (t) => [unique().on(t.user_id_1, t.user_id_2)],
 );
 
 export type UserConnectionsTableType = InferSelectModel<

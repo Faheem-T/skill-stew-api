@@ -7,13 +7,21 @@ export class UserConnectionMapper implements Mapper<
   UserConnectionsTableType
 > {
   toDomain = (raw: UserConnectionsTableType): UserConnection => {
-    const { id, requester_id, recipient_id, status, created_at, updated_at } =
-      raw;
+    const {
+      id,
+      user_id_1,
+      user_id_2,
+      requester_id,
+      status,
+      created_at,
+      updated_at,
+    } = raw;
 
     return new UserConnection(
       id,
+      user_id_1,
+      user_id_2,
       requester_id,
-      recipient_id,
       status,
       created_at,
       updated_at,
@@ -21,13 +29,14 @@ export class UserConnectionMapper implements Mapper<
   };
 
   toPersistence = (entity: UserConnection): UserConnectionsTableType => {
-    const { id, requesterId, recipientId, status, createdAt, updatedAt } =
+    const { id, userId1, userId2, requesterId, status, createdAt, updatedAt } =
       entity;
 
     return {
       id,
+      user_id_1: userId1,
+      user_id_2: userId2,
       requester_id: requesterId,
-      recipient_id: recipientId,
       status,
       created_at: createdAt,
       updated_at: updatedAt,
@@ -40,8 +49,9 @@ export class UserConnectionMapper implements Mapper<
     const result: Partial<UserConnectionsTableType> = {};
 
     if (partial.id) result.id = partial.id;
+    if (partial.userId1) result.user_id_1 = partial.userId1;
+    if (partial.userId2) result.user_id_2 = partial.userId2;
     if (partial.requesterId) result.requester_id = partial.requesterId;
-    if (partial.recipientId) result.recipient_id = partial.recipientId;
     if (partial.status) result.status = partial.status;
     if (partial.createdAt) result.created_at = partial.createdAt;
     if (partial.updatedAt) result.updated_at = partial.updatedAt;
