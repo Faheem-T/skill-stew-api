@@ -13,40 +13,48 @@ export class GetConnectionStatusToUser implements IGetConnectionStatusToUser {
     dto: GetConnectionStatusToUserDTO,
   ): Promise<GetConnectionStatusToUserOutputDTO> => {
     const { userId, targetId } = dto;
-    // first find target -> user connection
-    try {
-      const connection =
-        await this._connectionRepo.findByRequesterAndRecipientId(
-          targetId,
-          userId,
-        );
-      return { connectionId: connection.id, status: connection.status };
-    } catch (err) {
-      if (!(err instanceof NotFoundError)) {
-        throw err;
-      }
+
+    let userId1, userId2: string;
+
+    if (userId.localeCompare(targetId) < 0) {
+      userId1 = userId;
+      userId2 = targetId;
+    } else {
+      userId2 = userId;
+      userId1 = targetId;
     }
 
-    // if not found
-    // find user -> target
-    const connection = await this._connectionRepo.findByRequesterAndRecipientId(
-      userId,
-      targetId,
-    );
+    try {
+      const connection = await this._connectionRepo.findByUserIds(
+        userId1,
+        userId2,
+      );
 
-    switch (connection.status) {
-      case "PENDING":
-        return {
-          connectionId: connection.id,
-          status: "CURRENT_USER_REQUESTING",
-        };
-      case "ACCEPTED":
-        return { connectionId: connection.id, status: "ACCEPTED" };
-      case "REJECTED":
-        return {
-          connectionId: connection.id,
-          status: "REJECTED_BY_TARGET_USER",
-        };
+      let status: "CONNECTED" | "PENDING_SENT" | "PENDING_RECEIVED" | "NONE";
+
+      if (connection.requesterId == userId) {
+        switch (connection.status) {
+          case "PENDING":
+            status = "PENDING_SENT";
+          case "ACCEPTED":
+            status = "CONNECTED";
+        }
+      } else {
+        switch (connection.status) {
+          case "PENDING":
+            status = "PENDING_RECEIVED";
+          case "ACCEPTED":
+            status = "CONNECTED";
+        }
+      }
+
+      return { connectionId: connection.id, status };
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        return { status: "NONE", connectionId: null };
+      } else {
+        throw err;
+      }
     }
   };
 }

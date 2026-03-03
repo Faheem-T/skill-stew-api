@@ -1,5 +1,4 @@
 import z from "zod";
-import { UserConnectionStatus } from "../../../domain/entities/UserConnectionStatus";
 
 export const getConnectionStatusToUserSchema = z.object({
   userId: z.string().nonempty(),
@@ -10,11 +9,9 @@ export type GetConnectionStatusToUserDTO = z.infer<
   typeof getConnectionStatusToUserSchema
 >;
 
-export type GetConnectionStatusToUserOutputDTO = {
-  connectionId: string;
-  status:
-    | UserConnectionStatus
-    | "CURRENT_USER_REQUESTING"
-    | "REJECTED_BY_TARGET_USER"
-    | "NONE";
-};
+export type GetConnectionStatusToUserOutputDTO =
+  | {
+      connectionId: string;
+      status: "CONNECTED" | "PENDING_SENT" | "PENDING_RECEIVED";
+    }
+  | { connectionId: null; status: "NONE" };
