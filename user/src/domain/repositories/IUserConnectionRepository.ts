@@ -1,17 +1,33 @@
 import { TransactionContext } from "../../types/TransactionContext";
 import { UserConnection } from "../entities/UserConnection";
-import { UserConnectionStatus } from "../entities/UserConnectionStatus";
 import { IBaseRepository } from "./IBaseRepository";
 
 export interface IUserConnectionRepository extends IBaseRepository<UserConnection> {
-  getConnectionStatus(
-    userId: string,
-    targetIds: string[],
+  /**
+   * Finds a connection between two users.
+   *
+   * **Important:** `userId1` must be lexicographically less than `userId2`
+   * (i.e. `userId1 < userId2`), matching the ordering enforced by the
+   * `UserConnection` entity constructor.
+   */
+  findByUserIds(
+    userId1: string,
+    userId2: string,
     tx?: TransactionContext,
-  ): Promise<{ recipientId: string; status: UserConnectionStatus }[]>;
-  findByRequesterAndRecipientId(
-    requesterId: string,
-    recipientId: string,
+  ): Promise<UserConnection>;
+
+  /**
+   * Inserts a new connection or accepts an existing one on conflict.
+   *
+   * If a connection between the same two users already exists (conflict on
+   * `user_id_1` + `user_id_2`), the status is updated to "ACCEPTED" — but
+   * only if the new requester is different from the original requester.
+   * This prevents a user from accepting their own connection request.
+   *
+   * @returns The inserted or updated connection.
+   */
+  upsert(
+    connection: UserConnection,
     tx?: TransactionContext,
   ): Promise<UserConnection>;
 }
