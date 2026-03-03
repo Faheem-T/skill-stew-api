@@ -74,14 +74,6 @@ export class UserService implements IUserService {
     // TODO: (?) Filter out the users that are aleady being followed from
     // recommended users?
 
-    const connectionStatuses =
-      filteredUsers.length > 0
-        ? await this._userConnectionService.getConnectionStatuses(
-            userId,
-            filteredUsers.map((user) => user.id),
-          )
-        : {};
-
     return filteredUsers.map(
       ({
         id,
@@ -104,7 +96,6 @@ export class UserService implements IUserService {
         ...(avatarKey
           ? { avatarUrl: this._storageService.getPublicUrl(avatarKey) }
           : {}),
-        connectionStatusToUser: connectionStatuses[id] ?? "NONE",
       }),
     );
   };
