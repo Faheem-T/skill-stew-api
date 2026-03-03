@@ -6,13 +6,10 @@ import { EventName, EventPayload } from "@skillstew/common";
 import { AppError } from "../../errors/AppError.abstract";
 import { DbForeignKeyConstraintError } from "../../errors/infra/DbForeignKeyConstraintError";
 import { NotFoundError } from "../../../domain/errors/NotFoundError";
-import { DbUniqueConstraintError } from "../../errors/infra/DbUniqueConstraintError";
-import { AlreadyExistsError } from "../../../domain/errors/AlreadyExistsError";
 import { SelfConnectionError } from "../../../domain/errors/SelfConnectionError";
 import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
 import { IUnitOfWork } from "../../ports/IUnitOfWork";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { ConflictingConnectionRequest } from "../../../domain/errors/ConflictingConnectionRequest";
 
 export class SendConnectionRequest implements ISendConnectionRequest {
   constructor(
@@ -31,6 +28,7 @@ export class SendConnectionRequest implements ISendConnectionRequest {
       uuidv7(),
       requesterId,
       recipientId,
+      requesterId,
       "PENDING",
       new Date(),
       new Date(),
@@ -38,63 +36,72 @@ export class SendConnectionRequest implements ISendConnectionRequest {
 
     try {
       await this._unitOfWork.transact(async (tx) => {
-        const requester = await this._userRepo.findById(requesterId, tx);
-        const recipient = await this._userRepo.findById(recipientId, tx);
-
-        try {
-          // check if recipient has already sent a request to requester
-          const existingConnection =
-            await this._connectionRepo.findByRequesterAndRecipientId(
-              recipient.id,
-              requester.id,
-              tx,
-            );
-
-          if (existingConnection.status === "ACCEPTED") {
-            throw new AlreadyExistsError("Connection");
-          }
-
-          throw new ConflictingConnectionRequest(
-            existingConnection.status,
-            recipient.id,
-            recipient.username,
-            requester.id,
-            requester.username,
-          );
-        } catch (err) {
-          // continue if connection not found
-          if (!(err instanceof NotFoundError)) {
-            throw err;
-          }
-        }
-
-        const savedConnection = await this._connectionRepo.create(
+        const savedConnection = await this._connectionRepo.upsert(
           newConnection,
           tx,
         );
 
-        const eventName: EventName = "connection.requested";
+        if (savedConnection.status === "ACCEPTED") {
+          const savedRecipientId =
+            savedConnection.requesterId == savedConnection.userId1
+              ? savedConnection.userId2
+              : savedConnection.userId1;
 
-        const payload: EventPayload<typeof eventName> = {
-          connectionId: savedConnection.id,
-          requesterId: savedConnection.requesterId,
-          requesterUsername: requester.username,
-          recipientId: savedConnection.recipientId,
-          recipientUsername: recipient.username,
-          timestamp: savedConnection.createdAt,
-        };
+          const requester = await this._userRepo.findById(
+            savedConnection.requesterId,
+            tx,
+          );
+          const recipient = await this._userRepo.findById(savedRecipientId, tx);
 
-        await this._outboxRepo.create(
-          {
-            id: uuidv7(),
-            name: eventName,
-            payload,
-            status: "PENDING",
-            createdAt: new Date(),
-            processedAt: undefined,
-          },
-          tx,
-        );
+          const eventName: EventName = "connection.accepted";
+
+          const payload: EventPayload<typeof eventName> = {
+            connectionId: savedConnection.id,
+            requesterId: savedConnection.requesterId,
+            requesterUsername: requester.username,
+            accepterId: recipient.id,
+            accepterUsername: recipient.username,
+            timestamp: new Date(),
+          };
+
+          await this._outboxRepo.create(
+            {
+              id: uuidv7(),
+              name: eventName,
+              payload,
+              status: "PENDING",
+              createdAt: new Date(),
+              processedAt: undefined,
+            },
+            tx,
+          );
+        } else {
+          const requester = await this._userRepo.findById(requesterId, tx);
+          const recipient = await this._userRepo.findById(recipientId, tx);
+
+          const eventName: EventName = "connection.requested";
+
+          const payload: EventPayload<typeof eventName> = {
+            connectionId: savedConnection.id,
+            requesterId: savedConnection.requesterId,
+            requesterUsername: requester.username,
+            recipientId: recipient.id,
+            recipientUsername: recipient.username,
+            timestamp: savedConnection.createdAt,
+          };
+
+          await this._outboxRepo.create(
+            {
+              id: uuidv7(),
+              name: eventName,
+              payload,
+              status: "PENDING",
+              createdAt: new Date(),
+              processedAt: undefined,
+            },
+            tx,
+          );
+        }
       });
     } catch (err) {
       if (err instanceof AppError) {
@@ -103,8 +110,6 @@ export class SendConnectionRequest implements ISendConnectionRequest {
           err instanceof NotFoundError
         ) {
           throw new NotFoundError("User");
-        } else if (err instanceof DbUniqueConstraintError) {
-          throw new AlreadyExistsError("Connection");
         }
       }
       throw err;

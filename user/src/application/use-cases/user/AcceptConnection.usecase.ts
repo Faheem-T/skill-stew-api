@@ -3,11 +3,9 @@ import { v7 as uuidv7 } from "uuid";
 import { UnauthorizedError } from "../../../domain/errors/UnauthorizedError";
 import { IUserConnectionRepository } from "../../../domain/repositories/IUserConnectionRepository";
 import { IAcceptConnection } from "../../interfaces/user/IAcceptConnection";
-import { AcceptingRejectedConnectionError } from "../../../domain/errors/AcceptingRejectedConnection";
 import { IUnitOfWork } from "../../ports/IUnitOfWork";
 import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
-import { UserConnection } from "../../../domain/entities/UserConnection";
 
 export class AcceptConnection implements IAcceptConnection {
   constructor(
@@ -19,13 +17,13 @@ export class AcceptConnection implements IAcceptConnection {
 
   exec = async (connectionId: string, userId: string): Promise<void> => {
     const foundConnection = await this._connectionRepo.findById(connectionId);
+    const recipientId =
+      foundConnection.userId1 == foundConnection.requesterId
+        ? foundConnection.userId2
+        : foundConnection.userId1;
 
-    if (foundConnection.recipientId !== userId) {
+    if (recipientId !== userId) {
       throw new UnauthorizedError();
-    }
-
-    if (foundConnection.status === "REJECTED") {
-      throw new AcceptingRejectedConnectionError();
     }
 
     if (foundConnection.status === "ACCEPTED") {
@@ -39,27 +37,12 @@ export class AcceptConnection implements IAcceptConnection {
         tx,
       );
 
-      const recipient = await this._userRepo.findById(
-        savedConnection.recipientId,
-        tx,
-      );
+      const recipient = await this._userRepo.findById(recipientId, tx);
 
       const requester = await this._userRepo.findById(
         savedConnection.requesterId,
         tx,
       );
-
-      // creating ACCEPTED connection for recipient
-      const recipientConnection = new UserConnection(
-        uuidv7(),
-        recipient.id,
-        requester.id,
-        "ACCEPTED",
-        new Date(),
-        new Date(),
-      );
-
-      await this._connectionRepo.create(recipientConnection, tx);
 
       const eventName: EventName = "connection.accepted";
 
@@ -69,7 +52,7 @@ export class AcceptConnection implements IAcceptConnection {
         accepterUsername: recipient.username,
         requesterId: requester.id,
         requesterUsername: requester.username,
-        timestamp: savedConnection.createdAt,
+        timestamp: new Date(),
       };
 
       await this._outboxRepo.create(

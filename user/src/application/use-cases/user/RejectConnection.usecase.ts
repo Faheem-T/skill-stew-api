@@ -19,7 +19,12 @@ export class RejectConnection implements IRejectConnection {
   exec = async (connectionId: string, userId: string): Promise<void> => {
     const foundConnection = await this._connectionRepo.findById(connectionId);
 
-    if (foundConnection.recipientId !== userId) {
+    const recipientId =
+      foundConnection.userId1 == foundConnection.requesterId
+        ? foundConnection.userId2
+        : foundConnection.userId1;
+
+    if (recipientId !== userId) {
       throw new UnauthorizedError();
     }
 
@@ -27,36 +32,25 @@ export class RejectConnection implements IRejectConnection {
       throw new RejectingAcceptedConnectionError();
     }
 
-    if (foundConnection.status === "REJECTED") {
-      return;
-    }
-
     await this._unitOfWork.transact(async (tx) => {
-      const savedConnection = await this._connectionRepo.update(
-        connectionId,
-        { status: "REJECTED" },
-        tx,
-      );
+      await this._connectionRepo.delete(foundConnection.id, tx);
 
-      const recipient = await this._userRepo.findById(
-        savedConnection.recipientId,
-        tx,
-      );
+      const recipient = await this._userRepo.findById(recipientId, tx);
 
       const requester = await this._userRepo.findById(
-        savedConnection.requesterId,
+        foundConnection.requesterId,
         tx,
       );
 
       const eventName: EventName = "connection.rejected";
 
       const payload: EventPayload<typeof eventName> = {
-        connectionId: savedConnection.id,
+        connectionId: foundConnection.id,
         rejecterId: recipient.id,
         rejecterUsername: recipient.username,
         requesterId: requester.id,
         requesterUsername: requester.username,
-        timestamp: savedConnection.createdAt,
+        timestamp: new Date(),
       };
 
       await this._outboxRepo.create(
