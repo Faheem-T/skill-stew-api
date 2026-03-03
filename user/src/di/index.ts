@@ -42,7 +42,6 @@ import { RejectConnection } from "../application/use-cases/user/RejectConnection
 import { ConnectionController } from "../presentation/controllers/ConnectionController";
 import { UnitOfWork } from "../infrastructure/persistence/UnitOfWork";
 import { OutboxEventRepository } from "../infrastructure/repositories/OutboxEventRepository";
-import { GetConnectionStatuses } from "../application/use-cases/user/GetConnectionStatuses.usecase";
 import { GetUserProfile } from "../application/use-cases/user/GetUserProfile.usecase";
 import { GetConnectionStatusToUser } from "../application/use-cases/user/GetConnectionStatusToUser.usecase";
 import { GetUserAvatar } from "../application/use-cases/user/GetUserAvatar.usecase";
@@ -200,7 +199,6 @@ const rejectConnectionUsecase = new RejectConnection(
   userRepo,
   unitOfWork,
 );
-const getConnectionStatusesUsecase = new GetConnectionStatuses(connectionRepo);
 const getUserProfileUsecase = new GetUserProfile(
   userRepo,
   userProfileRepo,
@@ -247,7 +245,6 @@ export const connectionController = new ConnectionController(
   sendConnectionRequestUsecase,
   acceptConnectionUsecase,
   rejectConnectionUsecase,
-  getConnectionStatusesUsecase,
   getConnectionStatusToUserUsecase,
 );
 
