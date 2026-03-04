@@ -30,4 +30,14 @@ export interface IUserConnectionRepository extends IBaseRepository<UserConnectio
     connection: UserConnection,
     tx?: TransactionContext,
   ): Promise<UserConnection>;
+
+  /**
+   * Finds all connections for a user
+   *
+   * @returns array of connections
+   */
+  findAllForUserId(
+    userId: string,
+    tx?: TransactionContext,
+  ): Promise<UserConnection[]>;
 }

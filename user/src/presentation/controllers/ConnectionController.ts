@@ -7,6 +7,7 @@ import { ValidationError } from "../../application/errors/ValidationError";
 import { HttpStatus } from "@skillstew/common";
 import { getConnectionStatusToUserSchema } from "../../application/dtos/user/GetConnectionStatusToUser.dto";
 import { IGetConnectionStatusToUser } from "../../application/interfaces/user/IGetConnectionStatusToUser";
+import { IGetAllConnectedUserIds } from "../../application/interfaces/user/IGetAllConnectedUserIds";
 
 export class ConnectionController {
   constructor(
@@ -14,6 +15,7 @@ export class ConnectionController {
     private _acceptConnection: IAcceptConnection,
     private _rejectConnection: IRejectConnection,
     private _getConnectionStatusToUser: IGetConnectionStatusToUser,
+    private _getAllConnectedUserIdsUsecase: IGetAllConnectedUserIds,
   ) {}
 
   sendConnectionRequest = async (
@@ -128,7 +130,38 @@ export class ConnectionController {
       const { status, connectionId } =
         await this._getConnectionStatusToUser.exec(dto);
 
-      res.status(200).json({ success: true, data: { status, connectionId } });
+      res
+        .status(HttpStatus.OK)
+        .json({ success: true, data: { status, connectionId } });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getAllConnectedUserIds = async (
+    req: Request<{ userId: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userId = req.params.userId;
+
+      if (!userId) {
+        throw new ValidationError([
+          { message: "userId is required", field: "userId" },
+        ]);
+      }
+
+      if (typeof userId !== "string") {
+        throw new ValidationError([
+          { message: "invalid userId", field: "userId" },
+        ]);
+      }
+
+      const connectedUsers =
+        await this._getAllConnectedUserIdsUsecase.exec(userId);
+
+      res.status(HttpStatus.OK).json({ success: true, data: connectedUsers });
     } catch (err) {
       next(err);
     }

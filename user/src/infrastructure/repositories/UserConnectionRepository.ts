@@ -78,4 +78,27 @@ export class UserConnectionRepository
       throw mapDrizzleError(err);
     }
   };
+
+  findAllForUserId = async (
+    userId: string,
+    tx?: TransactionContext,
+  ): Promise<UserConnection[]> => {
+    try {
+      const runner = tx ?? db;
+
+      const rows = await runner
+        .select()
+        .from(this.table)
+        .where(
+          or(
+            eq(this.table.user_id_1, userId),
+            eq(this.table.user_id_2, userId),
+          ),
+        );
+
+      return rows.map(this.mapper.toDomain);
+    } catch (err) {
+      throw mapDrizzleError(err);
+    }
+  };
 }

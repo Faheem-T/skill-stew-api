@@ -6,6 +6,7 @@ const router = Router()
   .post("/:userId", connectionController.sendConnectionRequest)
   .patch("/:connectionId/accept", connectionController.acceptConnectionRequest)
   .patch("/:connectionId/reject", connectionController.rejectConnectionRequest)
-  .get("/status/:targetId", connectionController.getConnectionStatusToUser);
+  .get("/status/:targetId", connectionController.getConnectionStatusToUser)
+  .get("/:userId/connected-ids", connectionController.getAllConnectedUserIds);
 
 export default router;
