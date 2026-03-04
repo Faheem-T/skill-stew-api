@@ -36,15 +36,19 @@ export class GetConnectionStatusToUser implements IGetConnectionStatusToUser {
         switch (connection.status) {
           case "PENDING":
             status = "PENDING_SENT";
+            break;
           case "ACCEPTED":
             status = "CONNECTED";
+            break;
         }
       } else {
         switch (connection.status) {
           case "PENDING":
             status = "PENDING_RECEIVED";
+            break;
           case "ACCEPTED":
             status = "CONNECTED";
+            break;
         }
       }
 
