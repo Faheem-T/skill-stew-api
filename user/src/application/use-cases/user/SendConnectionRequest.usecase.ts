@@ -10,6 +10,7 @@ import { SelfConnectionError } from "../../../domain/errors/SelfConnectionError"
 import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
 import { IUnitOfWork } from "../../ports/IUnitOfWork";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
+import { UserConnectionStatus } from "../../../domain/entities/UserConnectionStatus";
 
 export class SendConnectionRequest implements ISendConnectionRequest {
   constructor(
@@ -19,7 +20,10 @@ export class SendConnectionRequest implements ISendConnectionRequest {
     private _unitOfWork: IUnitOfWork,
   ) {}
 
-  exec = async (requesterId: string, recipientId: string): Promise<void> => {
+  exec = async (
+    requesterId: string,
+    recipientId: string,
+  ): Promise<UserConnectionStatus> => {
     if (requesterId == recipientId) {
       throw new SelfConnectionError();
     }
@@ -35,7 +39,7 @@ export class SendConnectionRequest implements ISendConnectionRequest {
     );
 
     try {
-      await this._unitOfWork.transact(async (tx) => {
+      return this._unitOfWork.transact(async (tx) => {
         const savedConnection = await this._connectionRepo.upsert(
           newConnection,
           tx,
@@ -102,6 +106,8 @@ export class SendConnectionRequest implements ISendConnectionRequest {
             tx,
           );
         }
+
+        return savedConnection.status;
       });
     } catch (err) {
       if (err instanceof AppError) {

@@ -34,10 +34,26 @@ export class ConnectionController {
         throw new ValidationError([{ message: "recipientId is required" }]);
       }
 
-      await this._sendConnectionRequest.exec(userId, recipientId);
-      res
-        .status(HttpStatus.OK)
-        .json({ success: true, message: "Connection request sent!" });
+      const connectionStatus = await this._sendConnectionRequest.exec(
+        userId,
+        recipientId,
+      );
+
+      if (connectionStatus === "ACCEPTED") {
+        res.status(HttpStatus.OK).json({
+          success: true,
+          data: { connectionStatus },
+          message:
+            "Connection request accepted as you already had a connection request from this user",
+        });
+        return;
+      }
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: { connectionStatus },
+        message: "Connection request sent!",
+      });
     } catch (err) {
       next(err);
     }
