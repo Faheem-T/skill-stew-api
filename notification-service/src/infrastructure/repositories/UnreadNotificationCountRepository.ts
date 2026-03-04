@@ -52,7 +52,7 @@ export class UnreadNotificationCountRepository implements IUnreadNotificationCou
       const savedCount = await this._model.findOneAndUpdate(
         { userId },
         { $inc: { unreadCount: inc } },
-        { session: tx, upsert: true },
+        { session: tx, upsert: true, new: true },
       );
 
       if (!savedCount) {
