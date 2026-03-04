@@ -1,4 +1,4 @@
-import { pgTable, uuid, unique } from "drizzle-orm/pg-core";
+import { pgTable, uuid, unique, index } from "drizzle-orm/pg-core";
 import { InferSelectModel } from "drizzle-orm";
 import { timestamps } from "./timestamps";
 import { userTable } from "./userSchema";
@@ -18,7 +18,12 @@ export const userConnectionsTable = pgTable(
     status: connectionStatusEnum("status").notNull(),
     ...timestamps,
   },
-  (t) => [unique().on(t.user_id_1, t.user_id_2)],
+  (t) => [
+    unique().on(t.user_id_1, t.user_id_2),
+    index().on(t.user_id_1, t.user_id_2),
+    index().on(t.user_id_1),
+    index().on(t.user_id_2),
+  ],
 );
 
 export type UserConnectionsTableType = InferSelectModel<
