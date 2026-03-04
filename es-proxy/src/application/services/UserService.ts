@@ -60,19 +60,20 @@ export class UserService implements IUserService {
       ? { lat: user.location.latitude, lon: user.location.longitude }
       : undefined;
 
-    const recommendedUsers = await this._userRepo.findRecommendedUsers({
+    const connectedUserIds =
+      await this._userConnectionService.getConnectedUserIds(userId);
+
+    const recommendedUsers = await this._userRepo.find({
       languages: user.languages,
       location,
       offeredSkills: user.wantedSkills?.map((skill) => skill.skillId),
       wantedSkills: user.offeredSkills?.map((skill) => skill.skillId),
+      ignoreUserIds: connectedUserIds.map((c) => c.userId),
     });
 
     const filteredUsers = recommendedUsers.filter(
       (recommendedUser) => recommendedUser.id !== userId,
     );
-
-    // TODO: (?) Filter out the users that are aleady being followed from
-    // recommended users?
 
     return filteredUsers.map(
       ({

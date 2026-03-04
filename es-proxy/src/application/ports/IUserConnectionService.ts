@@ -1,3 +1,8 @@
 export interface IUserConnectionService {
-  // TODO: add get connected users method
+  getConnectedUserIds(userId: string): Promise<
+    {
+      userId: string;
+      status: "CONNECTED" | "PENDING_SENT" | "PENDING_RECEIVED";
+    }[]
+  >;
 }
