@@ -262,7 +262,7 @@ Each service has its own `Dockerfile` and is deployed as a separate Kubernetes D
 
 - [Clean Architecture](docs/clean-architecture.md) — Why I chose layered architecture and how the dependency rule is enforced
 - [Transactional Outbox](docs/transactional-outbox.md) — Solving the dual-write problem for reliable event delivery
-- [Unit of Work Pattern](docs/unit-of-work-pattern.md) — Atomic multi-table writes with Drizzle transactions
+- [Unit of Work Pattern](docs/unit-of-work-pattern.md) — Atomic multi-table writes across Drizzle (PostgreSQL) and Mongoose (MongoDB)
 - [Connection Logic](docs/connection-logic.md) — Designing the user connection state machine
 - [Notification Ordering](docs/notification-ordering.md) — Approaches to maintaining message ordering in distributed systems
 - [Error Handling](docs/error-handling.md) — Three-layer error hierarchy across domain, application, and presentation
