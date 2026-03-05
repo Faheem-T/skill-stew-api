@@ -60,17 +60,17 @@ This repository contains the backend — a microservices system that I am buildi
 
 ### Services
 
-| Service              | Responsibility                                                                                                        | Runtime        | Database           | README |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------- | ------------------ | ------ |
-| User service         | Auth, profiles, connections                                                                                           | Node.js (tsx)  | PostgreSQL         | -      |
-| Skill service        | Skill taxonomy, user skill profiles                                                                                   | Bun            | MongoDB            | -      |
-| Notification service | Notification persistence, real-time WebSocket delivery, unread notification count                                     | Bun            | MongoDB            | -      |
-| ES Proxy service     | Proxy between clients and Elasticsearch, read replica for user profiles and skill taxonomy, search, recommended users | Node.js (tsx)  | -                  | -      |
-| Payments service     | Payments (TODO)                                                                                                       | Node.js (tsx)  | -                  | -      |
-| API Gateway          | JWT authentication, request routing, role-based access control                                                        | Node.js (tsx)  | -                  | -      |
-| WebSocket Gateway    | Handles client WebSocket connections                                                                                  | Bun            | -                  | -      |
-| Outbox workers       | Polls respective outbox tables / collections and publishes to RabbitMQ                                                | Bun / Node.js  | Depends on service | -      |
-| Common package       | App event names, payload, and schemas (shared npm package)                                                            | -              | -                  | -      |
+| Service              | Responsibility                                                                                                        | Runtime       | Database           | README |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ | ------ |
+| User service         | Auth, profiles, connections                                                                                           | Node.js (tsx) | PostgreSQL         | -      |
+| Skill service        | Skill taxonomy, user skill profiles                                                                                   | Bun           | MongoDB            | -      |
+| Notification service | Notification persistence, real-time WebSocket delivery, unread notification count                                     | Bun           | MongoDB            | -      |
+| ES Proxy service     | Proxy between clients and Elasticsearch, read replica for user profiles and skill taxonomy, search, recommended users | Node.js (tsx) | -                  | -      |
+| Payments service     | Payments (TODO)                                                                                                       | Node.js (tsx) | -                  | -      |
+| API Gateway          | JWT authentication, request routing, role-based access control                                                        | Node.js (tsx) | -                  | -      |
+| WebSocket Gateway    | Handles client WebSocket connections                                                                                  | Bun           | -                  | -      |
+| Outbox workers       | Polls respective outbox tables / collections and publishes to RabbitMQ                                                | Bun / Node.js | Depends on service | -      |
+| Common package       | App event names, payload, and schemas (shared npm package)                                                            | -             | -                  | -      |
 
 ### Key Architectural Patterns
 
@@ -122,22 +122,22 @@ These are the events currently in the system.
 
 ## Tech Stack
 
-| Category               | Technologies                                                     |
-| ---------------------- | ---------------------------------------------------------------- |
-| Language               | TypeScript (strict mode)                                         |
-| Service Runtimes       | Node.js (tsx), Bun                                               |
-| API Framework          | Express.js                                                       |
-| Databases              | PostgreSQL, MongoDB, Elasticsearch, Redis                        |
-| ORMs                   | Drizzle ORM (PostgreSQL), Mongoose (MongoDB)                     |
-| Validation             | Zod                                                              |
-| Authentication         | JWT (access + refresh tokens, role-based signing keys via `kid`) |
-| Event Broker           | RabbitMQ (amqplib, topic exchange)                               |
-| Real-time              | Socket.io, `@socket.io/redis-adapter`, `@socket.io/redis-emitter` |
-| Storage                | AWS S3                                                           |
-| Orchestration          | Kubernetes (K3s), Skaffold, Docker                               |
-| Observability          | Winston, Grafana Loki, Grafana Alloy, Prometheus                 |
-| Secrets Management     | Infisical                                                        |
-| Dev Tooling            | Husky, Commitlint (Conventional Commits), Jest                   |
+| Category           | Technologies                                                      |
+| ------------------ | ----------------------------------------------------------------- |
+| Language           | TypeScript (strict mode)                                          |
+| Service Runtimes   | Node.js (tsx), Bun                                                |
+| API Framework      | Express.js                                                        |
+| Databases          | PostgreSQL, MongoDB, Elasticsearch, Redis                         |
+| ORMs               | Drizzle ORM (PostgreSQL), Mongoose (MongoDB)                      |
+| Validation         | Zod                                                               |
+| Authentication     | JWT (access + refresh tokens, role-based signing keys via `kid`)  |
+| Event Broker       | RabbitMQ (amqplib, topic exchange)                                |
+| Real-time          | Socket.io, `@socket.io/redis-adapter`, `@socket.io/redis-emitter` |
+| Storage            | AWS S3                                                            |
+| Orchestration      | Kubernetes (K3s), Skaffold, Docker                                |
+| Observability      | Winston, Grafana Loki, Grafana Alloy, Prometheus                  |
+| Secrets Management | Infisical                                                         |
+| Dev Tooling        | Husky, Commitlint (Conventional Commits), Jest                    |
 
 ## Getting Started
 
@@ -151,12 +151,12 @@ These are the events currently in the system.
 
 All databases and message brokers run externally (not inside the cluster). Set up the following:
 
-| Service       | Used By                          | Suggested Provider                                    |
-| ------------- | -------------------------------- | ----------------------------------------------------- |
-| PostgreSQL    | User service, Payments service   | [Aiven](https://aiven.io/)                            |
-| MongoDB       | Skill service, Notification service | [MongoDB Atlas](https://www.mongodb.com/atlas)     |
-| RabbitMQ      | All event producers / consumers  | [CloudAMQP](https://www.cloudamqp.com/)               |
-| Redis         | WebSocket Gateway, Notification service | [CloudAMQP](https://www.cloudamqp.com/)         |
+| Service    | Used By                                 | Suggested Provider                             |
+| ---------- | --------------------------------------- | ---------------------------------------------- |
+| PostgreSQL | User service, Payments service          | [Aiven](https://aiven.io/)                     |
+| MongoDB    | Skill service, Notification service     | [MongoDB Atlas](https://www.mongodb.com/atlas) |
+| RabbitMQ   | All event producers / consumers         | [CloudAMQP](https://www.cloudamqp.com/)        |
+| Redis      | WebSocket Gateway, Notification service | [CloudAMQP](https://www.cloudamqp.com/)        |
 
 **Elasticsearch** runs inside the cluster. Apply the self-managed manifest:
 
@@ -264,7 +264,7 @@ Each service has its own `Dockerfile` and is deployed as a separate Kubernetes D
 - [Transactional Outbox](docs/transactional-outbox.md) — Solving the dual-write problem for reliable event delivery
 - [Unit of Work Pattern](docs/unit-of-work-pattern.md) — Atomic multi-table writes across Drizzle (PostgreSQL) and Mongoose (MongoDB)
 - [Connection Logic](docs/connection-logic.md) — Designing the user connection state machine
-- [Notification Ordering](docs/notification-ordering.md) — Approaches to maintaining message ordering in distributed systems
+- [Ordering in Distributed Systems](docs/ordering-in-distributed-systems.md) — Evaluating ID strategies for ordered data (UUID v7, Snowflake, ULID, and more)
 - [Error Handling](docs/error-handling.md) — Three-layer error hierarchy across domain, application, and presentation
 
 ## Roadmap
