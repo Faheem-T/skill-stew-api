@@ -4,8 +4,8 @@
 
 In a microservices system, a use case often needs to both **persist data** and **publish an event** so that downstream services can react. The failure scenario:
 
-1. Write to the database ✅
-2. App crashes before publishing to RabbitMQ ❌
+1. Write to the database
+2. App crashes before publishing to RabbitMQ
 3. Downstream side effects (notifications, search index updates) never occur
 
 Publishing directly from the use case is unreliable because the database write and the message broker publish are two separate operations — there's no shared transaction between them. This is the **dual-write problem**.
