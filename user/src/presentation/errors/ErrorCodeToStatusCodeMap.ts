@@ -14,7 +14,6 @@ export const ErrorCodeToStatusCodeMap: Record<AllErrorCodes, number> = {
   [DomainErrorCodes.ALREADY_EXISTS]: HttpStatus.CONFLICT,
   [DomainErrorCodes.AUTH_PROVIDER_CONFLICT]: HttpStatus.CONFLICT,
   [DomainErrorCodes.SELF_CONNECTION_ERROR]: HttpStatus.CONFLICT,
-  [DomainErrorCodes.ACCEPTING_REJECTED_CONNECTION_ERROR]: HttpStatus.CONFLICT,
   [DomainErrorCodes.REJECTING_ACCEPTED_CONNECTION_ERROR]: HttpStatus.CONFLICT,
   [DomainErrorCodes.CONFLICTING_CONNECTION_REQUEST_ERROR]: HttpStatus.CONFLICT,
 
