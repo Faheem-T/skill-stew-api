@@ -60,17 +60,17 @@ This repository contains the backend — a microservices system that I am buildi
 
 ### Services
 
-| Service              | Responsibility                                                                                                        | Runtime       | Database           | README |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ | ------ |
-| User service         | Auth, profiles, connections                                                                                           | Node.js (tsx) | PostgreSQL         | -      |
-| Skill service        | Skill taxonomy, user skill profiles                                                                                   | Bun           | MongoDB            | -      |
-| Notification service | Notification persistence, real-time WebSocket delivery, unread notification count                                     | Bun           | MongoDB            | -      |
-| ES Proxy service     | Proxy between clients and Elasticsearch, read replica for user profiles and skill taxonomy, search, recommended users | Node.js (tsx) | -                  | -      |
-| Payments service     | Payments (TODO)                                                                                                       | Node.js (tsx) | -                  | -      |
-| API Gateway          | JWT authentication, request routing, role-based access control                                                        | Node.js (tsx) | -                  | -      |
-| WebSocket Gateway    | Handles client WebSocket connections                                                                                  | Bun           | -                  | -      |
-| Outbox workers       | Polls respective outbox tables / collections and publishes to RabbitMQ                                                | Bun / Node.js | Depends on service | -      |
-| Common package       | App event names, payload, and schemas (shared npm package)                                                            | -             | -                  | -      |
+| Service              | Responsibility                                                                                                        | Runtime       | Database           | README                   |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ | ------------------------ |
+| User service         | Auth, profiles, connections                                                                                           | Node.js (tsx) | PostgreSQL         | [README](user/README.md) |
+| Skill service        | Skill taxonomy, user skill profiles                                                                                   | Bun           | MongoDB            | -                        |
+| Notification service | Notification persistence, real-time WebSocket delivery, unread notification count                                     | Bun           | MongoDB            | -                        |
+| ES Proxy service     | Proxy between clients and Elasticsearch, read replica for user profiles and skill taxonomy, search, recommended users | Node.js (tsx) | -                  | -                        |
+| Payments service     | Payments (TODO)                                                                                                       | Node.js (tsx) | -                  | -                        |
+| API Gateway          | JWT authentication, request routing, role-based access control                                                        | Node.js (tsx) | -                  | -                        |
+| WebSocket Gateway    | Handles client WebSocket connections                                                                                  | Bun           | -                  | -                        |
+| Outbox workers       | Polls respective outbox tables / collections and publishes to RabbitMQ                                                | Bun / Node.js | Depends on service | -                        |
+| Common package       | App event names, payload, and schemas (shared npm package)                                                            | -             | -                  | -                        |
 
 ### Key Architectural Patterns
 
