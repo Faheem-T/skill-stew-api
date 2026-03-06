@@ -2,8 +2,8 @@
 
 A lightweight polling worker that reads pending events from the user service's outbox table and publishes them to RabbitMQ. This is the publishing half of the [transactional outbox pattern](../../docs/transactional-outbox.md).
 
-**Runtime:** Bun
-**Database:** PostgreSQL (same database as user service)
+**Runtime:** Bun  
+**Database:** PostgreSQL (same database as user service)  
 **Infisical Path:** `/user-service-outbox-worker`
 
 ## How It Works

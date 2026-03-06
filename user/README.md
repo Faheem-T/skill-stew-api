@@ -2,8 +2,8 @@
 
 The user service handles authentication, user profiles, onboarding, and user connections. It is the most feature-complete service in the system and the first one built.
 
-**Runtime:** Node.js (tsx)
-**Database:** PostgreSQL (Drizzle ORM)
+**Runtime:** Node.js (tsx)  
+**Database:** PostgreSQL (Drizzle ORM)  
 **Infisical Path:** `/user-service`
 
 ## API Endpoints
