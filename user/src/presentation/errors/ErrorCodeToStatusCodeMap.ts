@@ -1,4 +1,4 @@
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { AllErrorCodes } from "./AllErrorCodes";
 import { DomainErrorCodes } from "../../domain/errors/DomainErrorCodes";
 import { AppErrorCodes } from "../../application/errors/AppErrorCodes";

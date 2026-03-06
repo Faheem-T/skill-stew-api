@@ -4,7 +4,7 @@ import { IRejectConnection } from "../../application/interfaces/user/IRejectConn
 import { ISendConnectionRequest } from "../../application/interfaces/user/ISendConnectionRequest";
 import { ForbiddenError } from "../../domain/errors/ForbiddenError";
 import { ValidationError } from "../../application/errors/ValidationError";
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { getConnectionStatusToUserSchema } from "../../application/dtos/user/GetConnectionStatusToUser.dto";
 import { IGetConnectionStatusToUser } from "../../application/interfaces/user/IGetConnectionStatusToUser";
 import { IGetAllConnectedUserIds } from "../../application/interfaces/user/IGetAllConnectedUserIds";

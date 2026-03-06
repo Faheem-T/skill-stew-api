@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { UserFilters } from "../../domain/repositories/IUserRepository";
 import { IGetUsers } from "../../application/interfaces/admin/IGetUsers";
 import { getUsersSchema } from "../../application/dtos/admin/GetUsers.dto";
