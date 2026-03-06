@@ -7,3 +7,4 @@ build
 Session.vim
 .infisical.json
 /AGENTS.md
+/.agent/workflows
