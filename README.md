@@ -67,10 +67,10 @@ This repository contains the backend — a microservices system that I am buildi
 | Notification service | Notification persistence, real-time WebSocket delivery, unread notification count                                     | Bun           | MongoDB            | [README](notification-service/README.md)              |
 | ES Proxy service     | Proxy between clients and Elasticsearch, read replica for user profiles and skill taxonomy, search, recommended users | Node.js (tsx) | -                  | [README](es-proxy/README.md)                          |
 | Payments service     | Payments (TODO)                                                                                                       | Node.js (tsx) | -                  | -                                                     |
-| API Gateway          | JWT authentication, request routing, role-based access control                                                        | Node.js (tsx) | -                  | -                                                     |
-| WebSocket Gateway    | Handles client WebSocket connections                                                                                  | Bun           | -                  | -                                                     |
+| API Gateway          | JWT authentication, request routing, role-based access control                                                        | Node.js (tsx) | -                  | [README](gateway/README.md)                           |
+| WebSocket Gateway    | Handles client WebSocket connections                                                                                  | Bun           | -                  | [README](websocket-gateway/README.md)                 |
 | Outbox workers       | Polls respective outbox tables / collections and publishes to RabbitMQ                                                | Bun / Node.js | Depends on service | [README](outbox-workers/user-outbox-worker/README.md) |
-| Common package       | App event names, payload, and schemas (shared npm package)                                                            | -             | -                  | -                                                     |
+| Common package       | App event names, payload, and schemas (shared npm package)                                                            | -             | -                  | [README](common/README.md)                            |
 
 ### Key Architectural Patterns
 
