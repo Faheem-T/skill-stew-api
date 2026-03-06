@@ -3,7 +3,7 @@ import { logger } from "../logger";
 import { DomainError } from "../../domain/errors/DomainError.abstract";
 import { AppError } from "../../application/errors/AppError.abstract";
 import { ErrorCodeToStatusCodeMap } from "../errors/ErrorCodeToStatusCodeMap";
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { ZodError } from "zod";
 import { ValidationError } from "../../application/errors/ValidationError";
 

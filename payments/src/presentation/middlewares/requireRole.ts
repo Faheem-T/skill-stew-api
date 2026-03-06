@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { HttpMessages } from "../../constants/HTTPMessages";
 import { UserRoles } from "../../types/UserRoles";
 
