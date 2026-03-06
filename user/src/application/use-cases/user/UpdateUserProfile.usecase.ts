@@ -8,7 +8,6 @@ import {
   UpdateProfileOutputDTO,
 } from "../../dtos/user/UpdateUserProfile.dto";
 import { IUpdateUserProfile } from "../../interfaces/user/IUpdateUserProfile";
-import { ILocationProvider } from "../../ports/ILocationProvider";
 import { IUserProfileRepository } from "../../../domain/repositories/IUserProfileRepository";
 import { IStorageService } from "../../ports/IStorageService";
 import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
@@ -18,7 +17,6 @@ import { v7 as uuidv7 } from "uuid";
 export class UpdateUserProfile implements IUpdateUserProfile {
   constructor(
     private _userProfileRepo: IUserProfileRepository,
-    private _locationProvider: ILocationProvider,
     private _storageService: IStorageService,
     private _outboxRepo: IOutboxEventRepository,
     private _unitOfWork: IUnitOfWork,
@@ -38,22 +36,12 @@ export class UpdateUserProfile implements IUpdateUserProfile {
       bannerKey,
     } = dto;
 
-    let locationDetails: IUserLocation | undefined = undefined;
-    if (location) {
-      const details = await this._locationProvider.getPlaceById(
-        location.placeId,
-      );
-      if (details) {
-        locationDetails = details;
-      }
-    }
-
     const profile: Partial<UserProfile> = {
       userId,
       name,
       about,
       avatarKey,
-      location: locationDetails,
+      location,
       languages,
       phoneNumber,
       socialLinks,

@@ -13,7 +13,6 @@ export const getCurrentUserProfileSchema = z.object({
     .object({
       latitude: z.number(),
       longitude: z.number(),
-      placeId: z.string(),
       formattedAddress: z.string(),
     })
     .optional(),

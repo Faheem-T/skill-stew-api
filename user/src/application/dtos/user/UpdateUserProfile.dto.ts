@@ -2,7 +2,9 @@ import { z } from "zod";
 import { IUserLocation } from "../../../domain/entities/UserProfile";
 
 const userLocationSchema = z.object({
-  placeId: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  formattedAddress: z.string(),
 });
 
 export const updateProfileSchema = z.object({

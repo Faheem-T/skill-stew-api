@@ -10,7 +10,6 @@ import { UpdateUserProfile } from "../application/use-cases/user/UpdateUserProfi
 import { GetCurrentUserProfile } from "../application/use-cases/user/GetCurrentUserProfile.usecase";
 import { UserOnboardingController } from "../presentation/controllers/UserOnboardingController";
 import { OnboardingUpdateProfile } from "../application/use-cases/user/OnboardingUpdateUserProfile.usecase";
-import { GoogleLocationProvider } from "../infrastructure/services/GoogleLocationProvider";
 import { CurrentUserProfileController } from "../presentation/controllers/CurrentUserProfileController";
 import { GetCurrentExpertProfileUsecase } from "../application/use-cases/expert/GetCurrentExpertProfile.usecase";
 import { S3StorageService } from "../infrastructure/services/S3StorageService";
@@ -59,7 +58,6 @@ const jwtService = new JwtService({
   emailJwtSecret: ENV.EMAIL_VERIFICATON_JWT_SECRET,
 });
 const hasherService = new BcryptHasher();
-const locationProvider = new GoogleLocationProvider();
 const s3StorageService = new S3StorageService();
 
 const expectedNumberOfUsers = 1000000; // 1 M
@@ -142,7 +140,6 @@ const createAdminUsecase = new CreateAdmin(
 );
 const updateUserProfileUsecase = new UpdateUserProfile(
   userProfileRepo,
-  locationProvider,
   s3StorageService,
   outboxEventRepo,
   unitOfWork,
@@ -155,7 +152,6 @@ const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
 const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase();
 const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
   userProfileRepo,
-  locationProvider,
   outboxEventRepo,
   unitOfWork,
 );

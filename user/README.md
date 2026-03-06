@@ -92,7 +92,6 @@ The following variables must be set in the Infisical `/user-service` folder:
 | `BASE_SERVER_URL`                | Base URL for the backend                   |
 | `BASE_FRONTEND_URL`              | Base URL for the frontend                  |
 | `GOOGLE_CLIENT_ID`               | Google OAuth client ID                     |
-| `GOOGLE_MAPS_API_KEY`            | Google Maps API key (for location)         |
 | `S3_BUCKET_NAME`                 | AWS S3 bucket for file uploads             |
 | `CDN_DOMAIN_NAME`                | CDN domain for serving uploaded files      |
 | `RABBIT_MQ_CONNECTION_STRING`    | RabbitMQ connection URL                    |
