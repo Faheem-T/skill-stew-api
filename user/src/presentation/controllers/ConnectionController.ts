@@ -10,6 +10,8 @@ import { IGetConnectionStatusToUser } from "../../application/interfaces/user/IG
 import { IGetAllConnectedUserIds } from "../../application/interfaces/user/IGetAllConnectedUserIds";
 import { IGetConnectedUsers } from "../../application/interfaces/user/IGetConnectedUsers";
 import { getConnectedUsersSchema } from "../../application/dtos/user/GetConnectedUsers.dto";
+import { IGetConnectedUsersCount } from "../../application/interfaces/user/IGetConnectedUsersCount";
+import { getConnectedUsersCountSchema } from "../../application/dtos/user/GetConnectedUsersCount.dto";
 
 export class ConnectionController {
   constructor(
@@ -19,6 +21,7 @@ export class ConnectionController {
     private _getConnectionStatusToUser: IGetConnectionStatusToUser,
     private _getAllConnectedUserIdsUsecase: IGetAllConnectedUserIds,
     private _getConnectedUsersUsecase: IGetConnectedUsers,
+    private _getConnectedUsersCountUsecase: IGetConnectedUsersCount,
   ) {}
 
   sendConnectionRequest = async (
@@ -188,6 +191,24 @@ export class ConnectionController {
       res
         .status(HttpStatus.OK)
         .json({ success: true, data: users, hasNextPage, nextCursor });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getConnectedUsersCount = async (
+    req: Request<{ userId: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = getConnectedUsersCountSchema.parse({
+        userId: req.params.userId,
+      });
+
+      const { count } = await this._getConnectedUsersCountUsecase.exec(dto);
+
+      res.status(HttpStatus.OK).json({ success: true, data: { count } });
     } catch (err) {
       next(err);
     }

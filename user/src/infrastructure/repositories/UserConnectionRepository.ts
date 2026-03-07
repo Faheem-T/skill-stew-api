@@ -201,4 +201,28 @@ export class UserConnectionRepository
       throw mapDrizzleError(err);
     }
   };
+
+  countAcceptedConnectionsForUser = async (
+    userId: string,
+    tx?: TransactionContext,
+  ): Promise<number> => {
+    try {
+      const runner = tx ?? db;
+      const rows = await runner
+        .select({
+          count: sql<number>`count(*)`,
+        })
+        .from(this.table)
+        .where(
+          and(
+            eq(this.table.status, "ACCEPTED"),
+            or(eq(this.table.user_id_1, userId), eq(this.table.user_id_2, userId)),
+          ),
+        );
+
+      return Number(rows[0]?.count ?? 0);
+    } catch (err) {
+      throw mapDrizzleError(err);
+    }
+  };
 }

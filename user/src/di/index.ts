@@ -46,6 +46,7 @@ import { GetConnectionStatusToUser } from "../application/use-cases/user/GetConn
 import { GetUserAvatar } from "../application/use-cases/user/GetUserAvatar.usecase";
 import { GetAllConnectedUserIds } from "../application/use-cases/user/GetAllConnectedUserIds.usecase";
 import { GetConnectedUsers } from "../application/use-cases/user/GetConnectedUsers.usecase";
+import { GetConnectedUsersCount } from "../application/use-cases/user/GetConnectedUsersCount.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -217,6 +218,9 @@ const getConnectedUsersUsecase = new GetConnectedUsers(
   connectionRepo,
   s3StorageService,
 );
+const getConnectedUsersCountUsecase = new GetConnectedUsersCount(
+  connectionRepo,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -253,6 +257,7 @@ export const connectionController = new ConnectionController(
   getConnectionStatusToUserUsecase,
   getAllConnectedUserIdsUsecase,
   getConnectedUsersUsecase,
+  getConnectedUsersCountUsecase,
 );
 
 // Internal Usecases

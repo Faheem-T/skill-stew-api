@@ -59,4 +59,9 @@ export interface IUserConnectionRepository extends IBaseRepository<UserConnectio
     hasNextPage: boolean;
     nextCursor: string | undefined;
   }>;
+
+  countAcceptedConnectionsForUser(
+    userId: string,
+    tx?: TransactionContext,
+  ): Promise<number>;
 }
