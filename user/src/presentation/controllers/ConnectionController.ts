@@ -8,6 +8,8 @@ import { HttpStatus } from "../../constants/HttpStatus";
 import { getConnectionStatusToUserSchema } from "../../application/dtos/user/GetConnectionStatusToUser.dto";
 import { IGetConnectionStatusToUser } from "../../application/interfaces/user/IGetConnectionStatusToUser";
 import { IGetAllConnectedUserIds } from "../../application/interfaces/user/IGetAllConnectedUserIds";
+import { IGetConnectedUsers } from "../../application/interfaces/user/IGetConnectedUsers";
+import { getConnectedUsersSchema } from "../../application/dtos/user/GetConnectedUsers.dto";
 
 export class ConnectionController {
   constructor(
@@ -16,6 +18,7 @@ export class ConnectionController {
     private _rejectConnection: IRejectConnection,
     private _getConnectionStatusToUser: IGetConnectionStatusToUser,
     private _getAllConnectedUserIdsUsecase: IGetAllConnectedUserIds,
+    private _getConnectedUsersUsecase: IGetConnectedUsers,
   ) {}
 
   sendConnectionRequest = async (
@@ -162,6 +165,29 @@ export class ConnectionController {
         await this._getAllConnectedUserIdsUsecase.exec(userId);
 
       res.status(HttpStatus.OK).json({ success: true, data: connectedUsers });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getConnectedUsers = async (
+    req: Request<{ userId: string }, any, any, { limit?: string; cursor?: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = getConnectedUsersSchema.parse({
+        userId: req.params.userId,
+        limit: req.query.limit,
+        cursor: req.query.cursor,
+      });
+
+      const { users, hasNextPage, nextCursor } =
+        await this._getConnectedUsersUsecase.exec(dto);
+
+      res
+        .status(HttpStatus.OK)
+        .json({ success: true, data: users, hasNextPage, nextCursor });
     } catch (err) {
       next(err);
     }

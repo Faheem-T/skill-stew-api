@@ -40,4 +40,23 @@ export interface IUserConnectionRepository extends IBaseRepository<UserConnectio
     userId: string,
     tx?: TransactionContext,
   ): Promise<UserConnection[]>;
+
+  getAcceptedConnectionsForUserPaginated(
+    params: {
+      userId: string;
+      limit: number;
+      cursor?: string;
+    },
+    tx?: TransactionContext,
+  ): Promise<{
+    rows: Array<{
+      connectionId: string;
+      connectedAt: Date;
+      connectedUserId: string;
+      username: string | null;
+      avatarKey: string | null;
+    }>;
+    hasNextPage: boolean;
+    nextCursor: string | undefined;
+  }>;
 }

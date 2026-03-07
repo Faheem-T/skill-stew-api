@@ -45,6 +45,7 @@ import { GetUserProfile } from "../application/use-cases/user/GetUserProfile.use
 import { GetConnectionStatusToUser } from "../application/use-cases/user/GetConnectionStatusToUser.usecase";
 import { GetUserAvatar } from "../application/use-cases/user/GetUserAvatar.usecase";
 import { GetAllConnectedUserIds } from "../application/use-cases/user/GetAllConnectedUserIds.usecase";
+import { GetConnectedUsers } from "../application/use-cases/user/GetConnectedUsers.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -212,6 +213,10 @@ const getUserAvatarUsecase = new GetUserAvatar(
 const getAllConnectedUserIdsUsecase = new GetAllConnectedUserIds(
   connectionRepo,
 );
+const getConnectedUsersUsecase = new GetConnectedUsers(
+  connectionRepo,
+  s3StorageService,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -247,6 +252,7 @@ export const connectionController = new ConnectionController(
   rejectConnectionUsecase,
   getConnectionStatusToUserUsecase,
   getAllConnectedUserIdsUsecase,
+  getConnectedUsersUsecase,
 );
 
 // Internal Usecases
