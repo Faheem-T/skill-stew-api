@@ -1,6 +1,9 @@
 import type { NextFunction, Response, Request } from "express";
 import type { ISkillProfileService } from "../../application/interfaces/ISkillProfileService";
-import { saveSkillProfileDTO } from "../../application/dtos/skillProfile.dto";
+import {
+  getSkillProfileDTO,
+  saveSkillProfileDTO,
+} from "../../application/dtos/skillProfile.dto";
 import { HttpStatus } from "../../constants/HttpStatusCodes";
 
 export class SkillProfileController {
@@ -41,6 +44,21 @@ export class SkillProfileController {
       }
 
       const profile = await this._skillProfileService.getProfile(userId);
+      res.status(HttpStatus.OK).json({ success: true, data: profile });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getUserProfile = async (
+    req: Request<{ userId: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = getSkillProfileDTO.parse({ userId: req.params.userId });
+
+      const profile = await this._skillProfileService.getProfile(dto.userId);
       res.status(HttpStatus.OK).json({ success: true, data: profile });
     } catch (err) {
       next(err);

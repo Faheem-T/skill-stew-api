@@ -22,6 +22,12 @@ export const saveSkillProfileDTO = z.object({
 
 export type SaveSkillProfileDTO = z.infer<typeof saveSkillProfileDTO>;
 
+export const getSkillProfileDTO = z.object({
+  userId: z.string().min(1),
+});
+
+export type GetSkillProfileDTO = z.infer<typeof getSkillProfileDTO>;
+
 export const skillProfileResponseDTO = z.object({
   id: z.string(),
   offered: z.array(

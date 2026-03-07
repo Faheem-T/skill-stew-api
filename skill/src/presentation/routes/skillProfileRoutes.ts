@@ -4,4 +4,5 @@ import { skillProfileController } from "../../di/container";
 // /api/v1/skills/profile
 export const skillProfileRouter = Router()
   .put("/", skillProfileController.updateProfile)
-  .get("/me", skillProfileController.getCurrentUserProfile);
+  .get("/me", skillProfileController.getCurrentUserProfile)
+  .get("/:userId", skillProfileController.getUserProfile);
