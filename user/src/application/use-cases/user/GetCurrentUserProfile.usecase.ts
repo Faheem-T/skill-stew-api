@@ -36,6 +36,7 @@ export class GetCurrentUserProfile implements IGetCurrentUserProfile {
       : undefined;
 
     return {
+      id,
       name,
       email,
       role: role as "USER",
