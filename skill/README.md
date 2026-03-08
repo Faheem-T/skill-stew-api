@@ -19,10 +19,11 @@ All routes are prefixed with `/api/v1` and routed through the API Gateway.
 
 ### Skill Profiles (`/skills/profile`)
 
-| Method | Path  | Description                                          |
-| ------ | ----- | ---------------------------------------------------- |
-| PUT    | `/`   | Update current user's skill profile (offered/wanted) |
-| GET    | `/me` | Get current user's skill profile                     |
+| Method | Path       | Description                                          | Auth Required |
+| ------ | ---------- | ---------------------------------------------------- | ------------- |
+| PUT    | `/`        | Update current user's skill profile (offered/wanted) | Yes           |
+| GET    | `/me`      | Get current user's skill profile                     | Yes           |
+| GET    | `/:userId` | Get a user's public skill profile                    | No            |
 
 ## Data Models
 

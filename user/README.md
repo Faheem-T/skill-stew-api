@@ -31,6 +31,8 @@ All routes are prefixed with `/api/v1` and routed through the API Gateway.
 | POST   | `/upload/pre-signed` | Generate S3 pre-signed upload URL | Any authenticated   |
 | PATCH  | `/username`          | Update username                   | Any authenticated   |
 
+`GET /me` returns the authenticated profile in `{ success: true, data }`. For `USER` accounts, the payload now includes the user's `id` alongside the existing profile fields.
+
 ### Users (`/users`)
 
 | Method | Path                     | Description                      | Roles |
@@ -50,6 +52,8 @@ All routes are prefixed with `/api/v1` and routed through the API Gateway.
 | PATCH  | `/:connectionId/accept`  | Accept a connection request       | Yes           |
 | PATCH  | `/:connectionId/reject`  | Reject a connection request       | Yes           |
 | GET    | `/status/:targetId`      | Get connection status with a user | Yes           |
+| GET    | `/:userId/connected-users/count` | Get accepted connection count for a user | Yes |
+| GET    | `/:userId/connected-users` | Get paginated connected users   | Yes           |
 | GET    | `/:userId/connected-ids` | Get all connected user IDs        | Yes           |
 
 ## Database Schema
