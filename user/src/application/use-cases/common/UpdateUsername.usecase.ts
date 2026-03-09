@@ -1,11 +1,13 @@
-import { CreateEvent } from "@skillstew/common";
+import { EventName, EventPayload } from "@skillstew/common";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { UpdateUsernameDTO } from "../../dtos/common/UpdateUsername.dto";
 import { ICheckUsernameAvailability } from "../../interfaces/common/ICheckUsernameAvailability";
 import { IUpdateUsername } from "../../interfaces/common/IUpdateUsername";
 import { IBloomFilter } from "../../ports/IBloomFilter";
 import { ILogger } from "../../ports/ILogger";
-import { IProducer } from "../../ports/IProducer";
+import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
+import { IUnitOfWork } from "../../ports/IUnitOfWork";
+import { v7 as uuidv7 } from "uuid";
 
 export class UpdateUsername implements IUpdateUsername {
   constructor(
@@ -13,7 +15,8 @@ export class UpdateUsername implements IUpdateUsername {
     private _checkUsernameAvailability: ICheckUsernameAvailability,
     private _usernameBloomFilter: IBloomFilter,
     private _logger: ILogger,
-    private _producer: IProducer,
+    private _outboxRepo: IOutboxEventRepository,
+    private _unitOfWork: IUnitOfWork,
   ) {}
 
   exec = async (dto: UpdateUsernameDTO): Promise<void> => {
@@ -30,21 +33,35 @@ export class UpdateUsername implements IUpdateUsername {
     }
 
     const user = await this._userRepo.findById(userId);
-    const updatedUser = await this._userRepo.update(user.id, { username });
 
-    const event = CreateEvent(
-      "user.profileUpdated",
-      {
+    await this._unitOfWork.transact(async (tx) => {
+      const updatedUser = await this._userRepo.update(
+        user.id,
+        { username },
+        tx,
+      );
+
+      const eventName: EventName = "user.profileUpdated";
+      const payload: EventPayload<typeof eventName> = {
         id: updatedUser.id,
         username: updatedUser.username,
-      },
-      "user-service",
-    );
+      };
 
-    this._producer.publish(event);
+      await this._outboxRepo.create(
+        {
+          id: uuidv7(),
+          name: eventName,
+          payload,
+          status: "PENDING",
+          createdAt: new Date(),
+          processedAt: undefined,
+        },
+        tx,
+      );
+    });
 
     this._logger.warn(
-      `User ${user.id} changed username. Old username: ${user.username ?? "No username"}. New username: ${updatedUser.username}`,
+      `User ${user.id} changed username. Old username: ${user.username ?? "No username"}. New username: ${username}`,
     );
     this._usernameBloomFilter.add(username);
   };

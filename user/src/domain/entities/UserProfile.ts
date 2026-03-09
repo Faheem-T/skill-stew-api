@@ -19,7 +19,6 @@ export class UserProfile {
 }
 
 export interface IUserLocation {
-  placeId: string;
   formattedAddress: string;
   latitude: number;
   longitude: number;

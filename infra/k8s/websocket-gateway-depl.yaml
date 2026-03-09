@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: websocket-gateway-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: websocket-gateway
+  template:
+    metadata:
+      labels:
+        app: websocket-gateway
+    spec:
+      containers:
+        - name: websocket-gateway
+          image: faheem222/websocket-gateway
+          envFrom:
+            - secretRef:
+                name: infisical-secrets
+          # ports:
+          #   - containerPort: 3000
+          # Readiness probe for WebSocket
+          # readinessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
+          # Keep container alive
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   initialDelaySeconds: 15
+          #   periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: websocket-gateway-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: websocket-gateway
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800 # 3 hours

@@ -19,9 +19,7 @@ export async function startConsumer() {
 
   const consumer = new MessageConsumer(channel, queue.queue, EXCHANGE_NAME);
 
-  logger.info("Event consumer set up.");
-
-  consumer.registerHandler("user.registered", async (event) => {
+  await consumer.registerHandler("user.registered", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     const { id } = event.data;
     await userService.create({ id });
@@ -29,7 +27,7 @@ export async function startConsumer() {
     return { success: true };
   });
 
-  consumer.registerHandler("user.verified", async (event) => {
+  await consumer.registerHandler("user.verified", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     const { id } = event.data;
 
@@ -45,14 +43,14 @@ export async function startConsumer() {
     return { success: true };
   });
 
-  consumer.registerHandler("user.profileUpdated", async (event) => {
+  await consumer.registerHandler("user.profileUpdated", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     await userService.updateUserProfile(event.data);
     logger.info(`Handled ${event.eventName} successfully`);
     return { success: true };
   });
 
-  consumer.registerHandler("skill.profileUpdated", async (event) => {
+  await consumer.registerHandler("skill.profileUpdated", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     const { userId, offered, wanted } = event.data;
 
@@ -71,19 +69,21 @@ export async function startConsumer() {
     return { success: true };
   });
 
-  consumer.registerHandler("skill.created", async (event) => {
+  await consumer.registerHandler("skill.created", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     await skillService.create(event.data);
     return { success: true };
   });
-  consumer.registerHandler("skill.updated", async (event) => {
+  await consumer.registerHandler("skill.updated", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     await skillService.update(event.data);
     return { success: true };
   });
-  consumer.registerHandler("skill.deleted", async (event) => {
+  await consumer.registerHandler("skill.deleted", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     await skillService.delete(event.data.id);
     return { success: true };
   });
+
+  logger.info("Event consumer set up.");
 }

@@ -11,6 +11,7 @@ import { and, eq, ilike, gt, or, isNotNull } from "drizzle-orm";
 import { BaseRepository } from "./BaseRepository";
 import { NotFoundError } from "../../domain/errors/NotFoundError";
 import { mapDrizzleError } from "../mappers/ErrorMapper";
+import { TransactionContext } from "../../types/TransactionContext";
 
 export class UserRepository
   extends BaseRepository<User, typeof userTable>
@@ -22,15 +23,18 @@ export class UserRepository
 
   mapper = new UserMapper();
 
-  findAll = async ({
-    cursor,
-    limit,
-    filters,
-  }: {
-    cursor?: string; // base 64 encoded
-    limit: number;
-    filters?: UserFilters;
-  }): Promise<{
+  findAll = async (
+    {
+      cursor,
+      limit,
+      filters,
+    }: {
+      cursor?: string; // base 64 encoded
+      limit: number;
+      filters?: UserFilters;
+    },
+    tx?: TransactionContext,
+  ): Promise<{
     users: User[];
     hasNextPage: boolean;
     nextCursor: string | undefined;
@@ -66,7 +70,8 @@ export class UserRepository
 
     let rows;
     try {
-      rows = await db
+      const runner = tx ?? db;
+      rows = await runner
         .select()
         .from(userTable)
         .where(where)
@@ -93,10 +98,14 @@ export class UserRepository
     };
   };
 
-  findByEmail = async (email: string): Promise<User> => {
+  findByEmail = async (
+    email: string,
+    tx?: TransactionContext,
+  ): Promise<User> => {
     let row;
     try {
-      const rows = await db
+      const runner = tx ?? db;
+      const rows = await runner
         .select()
         .from(userTable)
         .where(eq(userTable.email, email));
@@ -112,10 +121,14 @@ export class UserRepository
     return this.mapper.toDomain(row);
   };
 
-  findByUsername = async (username: string): Promise<User> => {
+  findByUsername = async (
+    username: string,
+    tx?: TransactionContext,
+  ): Promise<User> => {
     let row;
     try {
-      const rows = await db
+      const runner = tx ?? db;
+      const rows = await runner
         .select()
         .from(userTable)
         .where(eq(userTable.username, username));
@@ -129,9 +142,10 @@ export class UserRepository
     return this.mapper.toDomain(row);
   };
 
-  getAllUsernames = async (): Promise<string[]> => {
+  getAllUsernames = async (tx?: TransactionContext): Promise<string[]> => {
     try {
-      const rows = await db
+      const runner = tx ?? db;
+      const rows = await runner
         .select({ username: userTable.username })
         .from(userTable)
         .where(isNotNull(userTable.username));

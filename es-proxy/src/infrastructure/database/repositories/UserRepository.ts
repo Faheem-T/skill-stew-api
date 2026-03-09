@@ -37,7 +37,7 @@ export class UserRepository
     return "User";
   }
 
-  findRecommendedUsers = async ({
+  find = async ({
     languages,
     location,
     offeredSkills,
@@ -45,6 +45,7 @@ export class UserRepository
     radius = 10,
     minShouldMatch = 1,
     size = 20,
+    ignoreUserIds = [],
   }: {
     languages?: string[];
     location?: { lat: number; lon: number };
@@ -53,6 +54,7 @@ export class UserRepository
     radius?: number;
     minShouldMatch?: number | string;
     size?: number;
+    ignoreUserIds?: string[];
   }): Promise<User[]> => {
     try {
       const shouldClauses: QueryDslQueryContainer[] = [];
@@ -112,10 +114,20 @@ export class UserRepository
           bool: {
             should: shouldClauses,
             minimum_should_match: minShouldMatch,
+            ...(ignoreUserIds.length > 0 && {
+              must_not: [{ ids: { values: ignoreUserIds } }],
+            }),
           },
         };
       } else {
-        query = { match_all: {} };
+        query = {
+          bool: {
+            must: [{ match_all: {} }],
+            ...(ignoreUserIds.length > 0 && {
+              must_not: [{ ids: { values: ignoreUserIds } }],
+            }),
+          },
+        };
       }
       if (location) {
         const geoFunction = {

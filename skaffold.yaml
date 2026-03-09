@@ -57,3 +57,27 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: faheem222/websocket-gateway
+      context: ./websocket-gateway
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: faheem222/user-service-outbox-worker
+      context: ./outbox-workers/user-outbox-worker
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
+    - image: faheem222/notification
+      context: ./notification-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .

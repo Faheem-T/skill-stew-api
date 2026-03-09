@@ -1,6 +1,7 @@
 import z from "zod";
 
 export const getCurrentUserProfileSchema = z.object({
+  id: z.string(),
   name: z.string().optional(),
   email: z.string(),
   role: z.enum(["USER"]),
@@ -13,7 +14,6 @@ export const getCurrentUserProfileSchema = z.object({
     .object({
       latitude: z.number(),
       longitude: z.number(),
-      placeId: z.string(),
       formattedAddress: z.string(),
     })
     .optional(),

@@ -7,6 +7,7 @@ import { adminProfileTable } from "../db/schemas/adminProfileSchema";
 import { AdminProfileMapper } from "../mappers/AdminProfileMapper";
 import { mapDrizzleError } from "../mappers/ErrorMapper";
 import { BaseRepository } from "./BaseRepository";
+import { TransactionContext } from "../../types/TransactionContext";
 
 export class AdminProfileRepository
   extends BaseRepository<AdminProfile, typeof adminProfileTable>
@@ -18,10 +19,14 @@ export class AdminProfileRepository
 
   mapper = new AdminProfileMapper();
 
-  findByUserId = async (userId: string): Promise<AdminProfile> => {
+  findByUserId = async (
+    userId: string,
+    tx?: TransactionContext,
+  ): Promise<AdminProfile> => {
     let row;
     try {
-      const res = await db
+      const runner = tx ?? db;
+      const res = await runner
         .select()
         .from(this.table)
         .where(eq(this.table.user_id, userId));
@@ -39,12 +44,14 @@ export class AdminProfileRepository
   updateByUserId = async (
     userId: string,
     partial: Partial<AdminProfile>,
+    tx?: TransactionContext,
   ): Promise<AdminProfile> => {
     const data = this.mapper.toPersistencePartial(partial);
 
     let row;
     try {
-      const res = await db
+      const runner = tx ?? db;
+      const res = await runner
         .update(this.table)
         .set(data)
         .where(eq(this.table.user_id, userId))

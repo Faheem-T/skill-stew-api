@@ -8,11 +8,13 @@ import {
 } from "../dtos/UserDTO";
 import { IUserService } from "../interfaces/IUserService";
 import { IStorageService } from "../ports/IStorageService";
+import { IUserConnectionService } from "../ports/IUserConnectionService";
 
 export class UserService implements IUserService {
   constructor(
     private _userRepo: IUserRepository,
     private _storageService: IStorageService,
+    private _userConnectionService: IUserConnectionService,
   ) {}
 
   create = async (dto: SaveUserDTO): Promise<void> => {
@@ -58,11 +60,15 @@ export class UserService implements IUserService {
       ? { lat: user.location.latitude, lon: user.location.longitude }
       : undefined;
 
-    const recommendedUsers = await this._userRepo.findRecommendedUsers({
+    const connectedUserIds =
+      await this._userConnectionService.getConnectedUserIds(userId);
+
+    const recommendedUsers = await this._userRepo.find({
       languages: user.languages,
       location,
       offeredSkills: user.wantedSkills?.map((skill) => skill.skillId),
       wantedSkills: user.offeredSkills?.map((skill) => skill.skillId),
+      ignoreUserIds: connectedUserIds.map((c) => c.userId),
     });
 
     const filteredUsers = recommendedUsers.filter(
@@ -88,7 +94,6 @@ export class UserService implements IUserService {
         wantedSkills,
         offeredSkills,
         location: location?.formattedAddress,
-
         ...(avatarKey
           ? { avatarUrl: this._storageService.getPublicUrl(avatarKey) }
           : {}),

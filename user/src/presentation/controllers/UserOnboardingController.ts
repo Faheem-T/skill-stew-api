@@ -1,4 +1,4 @@
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { NextFunction, Request, Response } from "express";
 import { onboardingUpdateUserProfileSchema } from "../../application/dtos/user/OnboardingUpdateProfile.dto";
 import { IOnboardingUpdateUserProfile } from "../../application/interfaces/user/IOnbaordingUpdateProfile";

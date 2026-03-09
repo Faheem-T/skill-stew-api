@@ -12,7 +12,7 @@ const morganFormat = JSON.stringify({
 export const httpLogger = morgan(morganFormat, {
   stream: {
     write: (message) => {
-      logger.info(JSON.parse(message));
+      logger.http(JSON.parse(message));
     },
   },
 });

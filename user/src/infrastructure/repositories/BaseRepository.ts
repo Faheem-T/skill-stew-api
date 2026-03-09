@@ -5,6 +5,7 @@ import { eq, InferInsertModel, InferSelectModel } from "drizzle-orm";
 import { Mapper } from "../mappers/interfaces/Mapper";
 import { NotFoundError } from "../../domain/errors/NotFoundError";
 import { mapDrizzleError } from "../mappers/ErrorMapper";
+import { TransactionContext } from "../../types/TransactionContext";
 
 export abstract class BaseRepository<
   TEntity,
@@ -15,23 +16,32 @@ export abstract class BaseRepository<
 
   protected abstract mapper: Mapper<TEntity, TPersistence>;
 
-  create = async (entity: TEntity): Promise<TEntity> => {
+  create = async (
+    entity: TEntity,
+    tx?: TransactionContext,
+  ): Promise<TEntity> => {
     try {
       const data = this.mapper.toPersistence(entity);
-      const [row] = await db.insert(this.table).values(data).returning();
+      const runner = tx ?? db;
+      const [row] = await runner.insert(this.table).values(data).returning();
       return this.mapper.toDomain(row as TPersistence);
     } catch (err) {
       throw mapDrizzleError(err);
     }
   };
 
-  update = async (id: string, partial: Partial<TEntity>): Promise<TEntity> => {
+  update = async (
+    id: string,
+    partial: Partial<TEntity>,
+    tx?: TransactionContext,
+  ): Promise<TEntity> => {
     const data = this.mapper.toPersistencePartial(
       partial,
     ) as InferInsertModel<TTable>;
     let row;
     try {
-      const rows = (await db
+      const runner = tx ?? db;
+      const rows = (await runner
         .update(this.table)
         .set(data)
         .where(eq(this.table.id, id))
@@ -48,18 +58,20 @@ export abstract class BaseRepository<
     return this.mapper.toDomain(row as TPersistence);
   };
 
-  delete = async (id: string): Promise<void> => {
+  delete = async (id: string, tx?: TransactionContext): Promise<void> => {
     try {
-      await db.delete(this.table).where(eq(this.table.id, id));
+      const runner = tx ?? db;
+      await runner.delete(this.table).where(eq(this.table.id, id));
     } catch (err) {
       throw mapDrizzleError(err);
     }
   };
 
-  findById = async (id: string): Promise<TEntity> => {
+  findById = async (id: string, tx?: TransactionContext): Promise<TEntity> => {
     let row;
     try {
-      const rows = await db
+      const runner = tx ?? db;
+      const rows = await runner
         .select()
         .from(this.table as any)
         .where(eq(this.table.id, id));

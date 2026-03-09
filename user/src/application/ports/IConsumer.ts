@@ -10,5 +10,5 @@ export interface IConsumer {
   registerHandler: <T extends EventName>(
     eventName: T,
     handler: (event: AppEvent<T>) => Promise<HandlerResult>,
-  ) => void;
+  ) => Promise<void>;
 }

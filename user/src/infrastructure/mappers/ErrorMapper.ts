@@ -5,11 +5,13 @@ import { DbQueryError } from "../../application/errors/infra/DbQueryError";
 import { DbUniqueConstraintError } from "../../application/errors/infra/DbUniqueConstraintError";
 import { DbForeignKeyConstraintError } from "../../application/errors/infra/DbForeignKeyConstraintError";
 import { DbTimeoutError } from "../../application/errors/infra/DbTimeoutError";
+import { DomainError } from "../../domain/errors/DomainError.abstract";
 
 /**
  * Maps any Drizzle / Postgres error to a clean AppError
  */
-export function mapDrizzleError(err: unknown): AppError {
+export function mapDrizzleError(err: unknown): AppError | DomainError {
+  if (err instanceof AppError || err instanceof DomainError) return err;
   // Drizzle usually wraps pg errors, but the original error is still there
   const pgError = extractPostgresError(err);
 

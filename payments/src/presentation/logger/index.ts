@@ -1,9 +1,3 @@
-import winston from "winston";
-const { combine, timestamp, json, errors } = winston.format;
+import { WinstonLogger } from "../../infrastructure/adapters/WinstonLogger";
 
-export const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "info",
-  format: combine(timestamp(), errors({ stack: true }), json()),
-  transports: [new winston.transports.Console()],
-  defaultMeta: { service: "payments" },
-});
+export const logger = new WinstonLogger();

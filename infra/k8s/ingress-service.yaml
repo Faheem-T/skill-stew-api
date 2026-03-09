@@ -4,12 +4,29 @@ metadata:
   name: ingress-service
   annotations:
     # cert-manager.io/cluster-issuer: letsencrypt-staging
-    nginx.ingress.kubernetes.io/use-regex: "true"
     # nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:5173"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, OPTIONS, PATCH, DELETE, PUT"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+
+    # Increase proxy timeout for websocket connections
+    # More info here: https://kubernetes.github.io/ingress-nginx/user-guide/miscellaneous/#websockets
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+
+    # Stick session config for websockets
+    # To learn more: https://kubernetes.github.io/ingress-nginx/examples/affinity/cookie/
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "STEWCOOKIE"
+    nginx.ingress.kubernetes.io/session-cookie-secure: "false"
+    nginx.ingress.kubernetes.io/session-cookie-path: "/"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    # nginx.ingress.kubernetes.io/session-cookie-domain: ""
+    # nginx.ingress.kubernetes.io/session-cookie-samesite: ""
 
 spec:
   ingressClassName: nginx
@@ -18,7 +35,18 @@ spec:
   #       - stew.com
   #     secretName: stew-tls
   rules:
+    - host: ws.stew.stew
+      http:
+        paths:
+          - path: /socket.io
+            pathType: Prefix
+            backend:
+              service:
+                name: websocket-gateway-srv
+                port:
+                  number: 3000
     - host: stew.stew
+      # - host: localhost
       http:
         paths:
           - path: /api/?(.*)

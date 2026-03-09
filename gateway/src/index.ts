@@ -4,6 +4,14 @@ import { logger } from "./utils/logger";
 import { ENV } from "./utils/dotenv";
 import { authMiddleware } from "./middlewares/authMiddleware";
 
+process.on("uncaughtException", (err, origin) => {
+  logger.error(
+    "Critical application error. Exiting process with status code 1.",
+    { err, origin },
+  );
+  process.exit(1);
+});
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -17,6 +25,11 @@ const ServiceConfigs = [
     path: "/api/v1/me",
     url: ENV.ME_SERVICE_URL,
     name: "user-profile-service",
+  },
+  {
+    path: "/api/v1/connections",
+    url: ENV.CONNECTION_SERVICE_URL,
+    name: "connections-service",
   },
   {
     path: "/api/v1/auth",
@@ -37,6 +50,11 @@ const ServiceConfigs = [
     path: "/api/v1/search",
     url: ENV.SEARCH_SERVICE_URL,
     name: "search-service",
+  },
+  {
+    path: "/api/v1/notifications",
+    url: ENV.NOTIFICATION_SERVICE_URL,
+    name: "notification-service",
   },
 ];
 

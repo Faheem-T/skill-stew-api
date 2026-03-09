@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "../../domain/errors/UnauthorizedError";
 import { createAdminSchema } from "../../application/dtos/admin/CreateAdmin.dto";
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { ENV } from "../../utils/dotenv";
 import { IRegisterUser } from "../../application/interfaces/auth/IRegisterUser";
 import { ILoginUser } from "../../application/interfaces/auth/ILoginUser";

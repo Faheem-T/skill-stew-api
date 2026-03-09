@@ -4,6 +4,7 @@ const envVars = [
   "S3_BUCKET_NAME",
   "CDN_DOMAIN_NAME",
   "RABBIT_MQ_CONNECTION_STRING",
+  "USER_SERVICE_URL",
 ] as const;
 
 export function generateEnvVars() {

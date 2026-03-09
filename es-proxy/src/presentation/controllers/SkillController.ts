@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ISkillService } from "../../application/interfaces/ISkillService";
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { ValidationError } from "../../application/errors/ValidationError";
 
 export class SkillController {
@@ -13,10 +13,12 @@ export class SkillController {
   ) => {
     try {
       if (!req.query.query) {
-        throw new ValidationError([{
-          message: "Query parameter is required",
-          field: "query"
-        }]);
+        throw new ValidationError([
+          {
+            message: "Query parameter is required",
+            field: "query",
+          },
+        ]);
       }
       const skills = await this._skillService.search(req.query.query as string);
       res.status(HttpStatus.OK).json({ success: true, data: skills });

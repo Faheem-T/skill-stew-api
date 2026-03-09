@@ -1,4 +1,4 @@
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { NextFunction, Request, Response } from "express";
 import { IGetCurrentUserProfile } from "../../application/interfaces/user/IGetCurrentUserProfile";
 import { USER_ROLES, UserRoles } from "../../domain/entities/UserRoles";

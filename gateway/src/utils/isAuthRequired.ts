@@ -17,27 +17,38 @@ const AuthRequiredEndpoints: IAuthRequiredEndpoints = {
     { path: "/api/v1/me", roles: ["USER", "ADMIN", "EXPERT"] },
     { path: "/api/v1/search/users/recommended", roles: ["USER"] },
     { path: "/api/v1/skills/profile/me", roles: ["USER"] },
+    { path: "/api/v1/notifications", roles: ["USER", "EXPERT", "ADMIN"] },
+    { path: "/api/v1/notifications/*path", roles: ["USER", "EXPERT", "ADMIN"] },
+    { path: "/api/v1/connections/*path", roles: ["USER", "EXPERT", "ADMIN"] },
   ],
   POST: [
-    { path: "/api/v1/payments/subscriptions", roles: ["ADMIN"] },
     { path: "/api/v1/users/dummy", roles: ["ADMIN"] },
     {
       path: "/api/v1/me/upload/pre-signed",
+      roles: ["USER", "EXPERT", "ADMIN"],
+    },
+    {
+      path: "/api/v1/connections/:userId",
       roles: ["USER", "EXPERT", "ADMIN"],
     },
   ],
   PUT: [{ path: "/api/v1/skills/profile", roles: ["USER"] }],
   PATCH: [
     { path: "/api/v1/users/:id/block-status", roles: ["ADMIN"] },
-    { path: "/api/v1/payments/subscriptions/:id", roles: ["ADMIN"] },
     { path: "/api/v1/me", roles: ["USER"] },
     { path: "/api/v1/users/onboarding/profile", roles: ["USER"] },
     {
       path: "/api/v1/me/username",
       roles: ["USER", "EXPERT", "ADMIN"],
     },
+    {
+      path: "/api/v1/connections/*path",
+      roles: ["USER", "EXPERT", "ADMIN"],
+    },
+    { path: "/api/v1/notifications", roles: ["USER", "EXPERT", "ADMIN"] },
+    { path: "/api/v1/notifications/*path", roles: ["USER", "EXPERT", "ADMIN"] },
   ],
-  DELETE: [{ path: "/api/v1/payments/subscriptions/:id", roles: ["ADMIN"] }],
+  DELETE: [],
 };
 
 export const isAuthRequired = (

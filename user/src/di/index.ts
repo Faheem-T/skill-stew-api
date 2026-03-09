@@ -10,7 +10,6 @@ import { UpdateUserProfile } from "../application/use-cases/user/UpdateUserProfi
 import { GetCurrentUserProfile } from "../application/use-cases/user/GetCurrentUserProfile.usecase";
 import { UserOnboardingController } from "../presentation/controllers/UserOnboardingController";
 import { OnboardingUpdateProfile } from "../application/use-cases/user/OnboardingUpdateUserProfile.usecase";
-import { GoogleLocationProvider } from "../infrastructure/services/GoogleLocationProvider";
 import { CurrentUserProfileController } from "../presentation/controllers/CurrentUserProfileController";
 import { GetCurrentExpertProfileUsecase } from "../application/use-cases/expert/GetCurrentExpertProfile.usecase";
 import { S3StorageService } from "../infrastructure/services/S3StorageService";
@@ -27,7 +26,6 @@ import { UpdateUserBlockStatus } from "../application/use-cases/admin/UpdateUser
 import { GetUsers } from "../application/use-cases/admin/GetUsers.usecase";
 import amqp from "amqplib";
 import { EventConsumer } from "../infrastructure/services/EventConsumer";
-import { EventProducer } from "../infrastructure/services/EventProducer";
 import { BloomFilter } from "../infrastructure/services/BloomFilter";
 import { CheckUsernameAvailability } from "../application/use-cases/common/CheckUsernameAvailability.usecase";
 import { logger } from "../presentation/logger";
@@ -36,6 +34,19 @@ import { InitializeUsernameBloomfilter } from "../application/use-cases/internal
 import { GetCurrentAdminProfile } from "../application/use-cases/admin/GetCurrentAdminProfile.usecase";
 import { AdminProfileRepository } from "../infrastructure/repositories/AdminProfileRepository";
 import { SetOnboardingComplete } from "../application/use-cases/user/SetOnboardingComplete.usecase";
+import { SendConnectionRequest } from "../application/use-cases/user/SendConnectionRequest.usecase";
+import { UserConnectionRepository } from "../infrastructure/repositories/UserConnectionRepository";
+import { AcceptConnection } from "../application/use-cases/user/AcceptConnection.usecase";
+import { RejectConnection } from "../application/use-cases/user/RejectConnection.usecase";
+import { ConnectionController } from "../presentation/controllers/ConnectionController";
+import { UnitOfWork } from "../infrastructure/persistence/UnitOfWork";
+import { OutboxEventRepository } from "../infrastructure/repositories/OutboxEventRepository";
+import { GetUserProfile } from "../application/use-cases/user/GetUserProfile.usecase";
+import { GetConnectionStatusToUser } from "../application/use-cases/user/GetConnectionStatusToUser.usecase";
+import { GetUserAvatar } from "../application/use-cases/user/GetUserAvatar.usecase";
+import { GetAllConnectedUserIds } from "../application/use-cases/user/GetAllConnectedUserIds.usecase";
+import { GetConnectedUsers } from "../application/use-cases/user/GetConnectedUsers.usecase";
+import { GetConnectedUsersCount } from "../application/use-cases/user/GetConnectedUsersCount.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -49,7 +60,6 @@ const jwtService = new JwtService({
   emailJwtSecret: ENV.EMAIL_VERIFICATON_JWT_SECRET,
 });
 const hasherService = new BcryptHasher();
-const locationProvider = new GoogleLocationProvider();
 const s3StorageService = new S3StorageService();
 
 const expectedNumberOfUsers = 1000000; // 1 M
@@ -60,6 +70,9 @@ const usernameBloomFilter = new BloomFilter(
   desiredErrorRate,
 );
 
+// Unit of work
+const unitOfWork = new UnitOfWork();
+
 // OAuthClient
 const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 
@@ -67,6 +80,8 @@ const oAuthClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 const userRepo = new UserRepository();
 const userProfileRepo = new UserProfileRepository();
 const adminProfileRepo = new AdminProfileRepository();
+const connectionRepo = new UserConnectionRepository();
+const outboxEventRepo = new OutboxEventRepository();
 
 // RabbitMQ
 const EXCHANGE_NAME = "stew_exchange";
@@ -89,13 +104,13 @@ export const consumer = new EventConsumer(
   logger,
   setOnboardingComplete,
 );
-const producer = new EventProducer(channel, "stew_exchange");
 
 // Usecases
 const registerUserUsecase = new RegisterUser(
   userRepo,
   userProfileRepo,
-  producer,
+  outboxEventRepo,
+  unitOfWork,
   hasherService,
   jwtService,
 );
@@ -104,7 +119,8 @@ const googleAuthUsecase = new GoogleAuth(
   userRepo,
   userProfileRepo,
   oAuthClient,
-  producer,
+  outboxEventRepo,
+  unitOfWork,
   jwtService,
 );
 const sendVerificationLinkUsecase = new SendVerificationLink(
@@ -112,7 +128,12 @@ const sendVerificationLinkUsecase = new SendVerificationLink(
   jwtService,
   emailService,
 );
-const verifyUserUsecase = new VerifyUser(userRepo, jwtService, producer);
+const verifyUserUsecase = new VerifyUser(
+  userRepo,
+  jwtService,
+  outboxEventRepo,
+  unitOfWork,
+);
 const generateAccessTokenUsecase = new GenerateAccessToken(jwtService);
 const createAdminUsecase = new CreateAdmin(
   userRepo,
@@ -120,10 +141,10 @@ const createAdminUsecase = new CreateAdmin(
   hasherService,
 );
 const updateUserProfileUsecase = new UpdateUserProfile(
-  producer,
   userProfileRepo,
-  locationProvider,
   s3StorageService,
+  outboxEventRepo,
+  unitOfWork,
 );
 const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
   userRepo,
@@ -132,9 +153,9 @@ const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
 );
 const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase();
 const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
-  producer,
   userProfileRepo,
-  locationProvider,
+  outboxEventRepo,
+  unitOfWork,
 );
 const generatePresignedUploadUrlUsecase = new GeneratePresignedUploadUrl(
   s3StorageService,
@@ -151,13 +172,54 @@ const updateUsernameUsecase = new UpdateUsername(
   checkUsernameAvailabilityUsecase,
   usernameBloomFilter,
   logger,
-  producer,
+  outboxEventRepo,
+  unitOfWork,
 );
-
 const getCurrentAdminProfileUsecase = new GetCurrentAdminProfile(
   userRepo,
   adminProfileRepo,
   s3StorageService,
+);
+const sendConnectionRequestUsecase = new SendConnectionRequest(
+  connectionRepo,
+  outboxEventRepo,
+  userRepo,
+  unitOfWork,
+);
+const acceptConnectionUsecase = new AcceptConnection(
+  connectionRepo,
+  outboxEventRepo,
+  userRepo,
+  unitOfWork,
+);
+const rejectConnectionUsecase = new RejectConnection(
+  connectionRepo,
+  outboxEventRepo,
+  userRepo,
+  unitOfWork,
+);
+const getUserProfileUsecase = new GetUserProfile(
+  userRepo,
+  userProfileRepo,
+  connectionRepo,
+  s3StorageService,
+);
+const getConnectionStatusToUserUsecase = new GetConnectionStatusToUser(
+  connectionRepo,
+);
+const getUserAvatarUsecase = new GetUserAvatar(
+  userProfileRepo,
+  s3StorageService,
+);
+const getAllConnectedUserIdsUsecase = new GetAllConnectedUserIds(
+  connectionRepo,
+);
+const getConnectedUsersUsecase = new GetConnectedUsers(
+  connectionRepo,
+  s3StorageService,
+);
+const getConnectedUsersCountUsecase = new GetConnectedUsersCount(
+  connectionRepo,
 );
 
 // Controllers
@@ -175,6 +237,8 @@ export const userController = new UserController(
   updateUserBlockStatusUsecase,
   checkUsernameAvailabilityUsecase,
   updateUsernameUsecase,
+  getUserProfileUsecase,
+  getUserAvatarUsecase,
 );
 export const onboardingController = new UserOnboardingController(
   onboardingUpdateUserProfileUsecase,
@@ -185,6 +249,15 @@ export const currentUserProfileController = new CurrentUserProfileController(
   generatePresignedUploadUrlUsecase,
   getCurrentAdminProfileUsecase,
   updateUserProfileUsecase,
+);
+export const connectionController = new ConnectionController(
+  sendConnectionRequestUsecase,
+  acceptConnectionUsecase,
+  rejectConnectionUsecase,
+  getConnectionStatusToUserUsecase,
+  getAllConnectedUserIdsUsecase,
+  getConnectedUsersUsecase,
+  getConnectedUsersCountUsecase,
 );
 
 // Internal Usecases

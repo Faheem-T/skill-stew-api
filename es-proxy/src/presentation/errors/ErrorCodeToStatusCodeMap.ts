@@ -1,4 +1,4 @@
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { AllErrorCodes } from "./AllErrorCodes";
 import { DomainErrorCodes } from "../../domain/errors/DomainErrorCodes";
 import { AppErrorCodes } from "../../application/errors/AppErrorCodes";
@@ -20,5 +20,7 @@ export const ErrorCodeToStatusCodeMap: Record<AllErrorCodes, number> = {
   [AppErrorCodes.ES_TIMEOUT_ERROR]: HttpStatus.REQUEST_TIMEOUT,
   [AppErrorCodes.ES_INDEX_NOT_FOUND]: HttpStatus.NOT_FOUND,
   [AppErrorCodes.ES_MAPPING_ERROR]: HttpStatus.BAD_REQUEST,
-};
 
+  // Internal Service Errors
+  [AppErrorCodes.INTERNAL_SERVICE_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,
+};

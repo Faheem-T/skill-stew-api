@@ -7,6 +7,7 @@ import { UserProfileMapper } from "../mappers/UserProfileMapper";
 import { BaseRepository } from "./BaseRepository";
 import { NotFoundError } from "../../domain/errors/NotFoundError";
 import { mapDrizzleError } from "../mappers/ErrorMapper";
+import { TransactionContext } from "../../types/TransactionContext";
 
 export class UserProfileRepository
   extends BaseRepository<UserProfile, typeof userProfileTable>
@@ -17,10 +18,14 @@ export class UserProfileRepository
   }
 
   mapper = new UserProfileMapper();
-  findByUserId = async (userId: string): Promise<UserProfile> => {
+  findByUserId = async (
+    userId: string,
+    tx?: TransactionContext,
+  ): Promise<UserProfile> => {
     let row;
     try {
-      const res = await db
+      const runner = tx ?? db;
+      const res = await runner
         .select()
         .from(this.table)
         .where(eq(this.table.user_id, userId));
@@ -38,12 +43,14 @@ export class UserProfileRepository
   updateByUserId = async (
     userId: string,
     partial: Partial<UserProfile>,
+    tx?: TransactionContext,
   ): Promise<UserProfile> => {
     const data = this.mapper.toPersistencePartial(partial);
 
     let row;
     try {
-      const res = await db
+      const runner = tx ?? db;
+      const res = await runner
         .update(this.table)
         .set(data)
         .where(eq(this.table.user_id, userId))

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { HttpStatus } from "@skillstew/common";
+import { HttpStatus } from "../../constants/HttpStatus";
 import { UserFilters } from "../../domain/repositories/IUserRepository";
 import { IGetUsers } from "../../application/interfaces/admin/IGetUsers";
 import { getUsersSchema } from "../../application/dtos/admin/GetUsers.dto";
@@ -9,6 +9,10 @@ import { checkUsernameAvailabilitySchema } from "../../application/dtos/common/C
 import { ICheckUsernameAvailability } from "../../application/interfaces/common/ICheckUsernameAvailability";
 import { updateUsernameSchema } from "../../application/dtos/common/UpdateUsername.dto";
 import { IUpdateUsername } from "../../application/interfaces/common/IUpdateUsername";
+import { getUserProfileSchema } from "../../application/dtos/user/GetUserProfile.dto";
+import { IGetUserProfile } from "../../application/interfaces/user/IGetUserProfile";
+import { getUserAvatarSchema } from "../../application/dtos/user/GetUserAvatar.dto";
+import { IGetUserAvatar } from "../../application/interfaces/user/IGetUserAvatar";
 
 export class UserController {
   constructor(
@@ -16,6 +20,8 @@ export class UserController {
     private _updateUserBlockStatus: IUpdateUserBlockStatus,
     private _checkUsernameAvailability: ICheckUsernameAvailability,
     private _updateUsername: IUpdateUsername,
+    private _getUserProfile: IGetUserProfile,
+    private _getUserAvatar: IGetUserAvatar,
   ) {}
 
   getAllUsers = async (
@@ -117,6 +123,40 @@ export class UserController {
       res
         .status(HttpStatus.OK)
         .json({ success: true, message: "Your username has been changed." });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getUserProfile = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = getUserProfileSchema.parse({
+        userId: req.params.id,
+      });
+
+      const profile = await this._getUserProfile.exec(dto);
+
+      res.status(HttpStatus.OK).json({ success: true, data: profile });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getUserAvatar = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = getUserAvatarSchema.parse({ userId: req.params.id });
+
+      const { avatarUrl } = await this._getUserAvatar.exec(dto);
+
+      res.status(HttpStatus.OK).json({ success: true, data: { avatarUrl } });
     } catch (err) {
       next(err);
     }
