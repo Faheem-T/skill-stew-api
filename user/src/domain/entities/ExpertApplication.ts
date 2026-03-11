@@ -9,33 +9,33 @@ export class ExpertApplication {
   public rejectionReason: string;
 
   // Identity
-  public full_name: string;
+  public fullName: string;
   public email: string;
   public phone: string;
-  public linkedin_url: string;
+  public linkedinUrl: string;
 
   // Expertise
-  public years_experience: number;
-  public evidence_links: string[];
-  public has_teaching_experience: boolean;
-  public teaching_experience_desc: string;
+  public yearsExperience: number;
+  public evidenceLinks: string[];
+  public hasTeachingExperience: boolean;
+  public teachingExperienceDesc: string;
 
   // Bio
   public bio: string;
 
   // Workshop Intent
-  public proposed_title: string;
-  public proposed_description: string;
-  public target_audience: string;
+  public proposedTitle: string;
+  public proposedDescription: string;
+  public targetAudience: string;
 
   // Technical readiness
-  public confirmed_internet: boolean;
-  public confirmed_camera: boolean;
-  public confirmed_microphone: boolean;
+  public confirmedInternet: boolean;
+  public confirmedCamera: boolean;
+  public confirmedMicrophone: boolean;
 
   // Legal
-  public terms_agreed: boolean;
-  public terms_agreed_at: boolean;
+  public termsAgreed: boolean;
+  public termsAgreedAt: boolean;
 
   constructor(args: ExpertApplication) {
     this.id = args.id;
@@ -46,32 +46,32 @@ export class ExpertApplication {
     this.rejectionReason = args.rejectionReason;
 
     // Identity
-    this.full_name = args.full_name;
+    this.fullName = args.fullName;
     this.email = args.email;
     this.phone = args.phone;
-    this.linkedin_url = args.linkedin_url;
+    this.linkedinUrl = args.linkedinUrl;
 
     // Expertise
-    this.years_experience = args.years_experience;
-    this.evidence_links = args.evidence_links;
-    this.has_teaching_experience = args.has_teaching_experience;
-    this.teaching_experience_desc = args.teaching_experience_desc;
+    this.yearsExperience = args.yearsExperience;
+    this.evidenceLinks = args.evidenceLinks;
+    this.hasTeachingExperience = args.hasTeachingExperience;
+    this.teachingExperienceDesc = args.teachingExperienceDesc;
 
     // Bio
     this.bio = args.bio;
 
     // Workshop Intent
-    this.proposed_title = args.proposed_title;
-    this.proposed_description = args.proposed_description;
-    this.target_audience = args.target_audience;
+    this.proposedTitle = args.proposedTitle;
+    this.proposedDescription = args.proposedDescription;
+    this.targetAudience = args.targetAudience;
 
     // Technical readiness
-    this.confirmed_internet = args.confirmed_internet;
-    this.confirmed_camera = args.confirmed_camera;
-    this.confirmed_microphone = args.confirmed_microphone;
+    this.confirmedInternet = args.confirmedInternet;
+    this.confirmedCamera = args.confirmedCamera;
+    this.confirmedMicrophone = args.confirmedMicrophone;
 
     // Legal
-    this.terms_agreed = args.terms_agreed;
-    this.terms_agreed_at = args.terms_agreed_at;
+    this.termsAgreed = args.termsAgreed;
+    this.termsAgreedAt = args.termsAgreedAt;
   }
 }
