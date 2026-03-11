@@ -45,7 +45,7 @@ export const expertApplicationTable = pgTable("expert_applications", {
 
   // Legal
   terms_agreed: boolean().notNull(),
-  terms_agreed_at: boolean().notNull(),
+  terms_agreed_at: timestamp().notNull(),
 });
 
 export type ExpertApplicationTableType = InferSelectModel<

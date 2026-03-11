@@ -35,7 +35,7 @@ export class ExpertApplication {
 
   // Legal
   public termsAgreed: boolean;
-  public termsAgreedAt: boolean;
+  public termsAgreedAt: Date;
 
   constructor(args: ExpertApplication) {
     this.id = args.id;
