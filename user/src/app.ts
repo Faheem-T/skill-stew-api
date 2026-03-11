@@ -7,6 +7,7 @@ import authRouter from "./presentation/routers/AuthRouter";
 import userRouter from "./presentation/routers/UserRouter";
 import meRouter from "./presentation/routers/MeRouter";
 import connectionRouter from "./presentation/routers/ConnectionRouter";
+import expertRouter from "./presentation/routers/ExpertRouter";
 import { HttpStatus } from "./constants/HttpStatus";
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/me", meRouter);
 app.use("/api/v1/connections", connectionRouter);
+app.use("/api/v1/experts", expertRouter);
 
 // health check
 app.get("/health", (_req, res) => {

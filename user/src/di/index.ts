@@ -47,6 +47,9 @@ import { GetUserAvatar } from "../application/use-cases/user/GetUserAvatar.useca
 import { GetAllConnectedUserIds } from "../application/use-cases/user/GetAllConnectedUserIds.usecase";
 import { GetConnectedUsers } from "../application/use-cases/user/GetConnectedUsers.usecase";
 import { GetConnectedUsersCount } from "../application/use-cases/user/GetConnectedUsersCount.usecase";
+import { ExpertApplicationRepository } from "../infrastructure/repositories/ExpertApplicationRepository";
+import { SubmitExpertApplication } from "../application/use-cases/expert/SubmitExpertApplication.usecase";
+import { ExpertController } from "../presentation/controllers/ExpertController";
 
 // Services
 const emailService = new EmailService();
@@ -82,6 +85,7 @@ const userProfileRepo = new UserProfileRepository();
 const adminProfileRepo = new AdminProfileRepository();
 const connectionRepo = new UserConnectionRepository();
 const outboxEventRepo = new OutboxEventRepository();
+const expertApplicationRepo = new ExpertApplicationRepository();
 
 // RabbitMQ
 const EXCHANGE_NAME = "stew_exchange";
@@ -222,6 +226,10 @@ const getConnectedUsersCountUsecase = new GetConnectedUsersCount(
   connectionRepo,
 );
 
+const submitExpertApplicationUsecase = new SubmitExpertApplication(
+  expertApplicationRepo,
+);
+
 // Controllers
 export const authController = new AuthController(
   registerUserUsecase,
@@ -258,6 +266,9 @@ export const connectionController = new ConnectionController(
   getAllConnectedUserIdsUsecase,
   getConnectedUsersUsecase,
   getConnectedUsersCountUsecase,
+);
+export const expertController = new ExpertController(
+  submitExpertApplicationUsecase,
 );
 
 // Internal Usecases
