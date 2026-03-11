@@ -4,9 +4,9 @@ export class ExpertApplication {
   public id: string;
   public status: ExpertApplicationStatus;
   public submittedAt: Date;
-  public reviewedAt: Date;
-  public reviewedByAdminId: string;
-  public rejectionReason: string;
+  public reviewedAt?: Date;
+  public reviewedByAdminId?: string;
+  public rejectionReason?: string;
 
   // Identity
   public fullName: string;
@@ -18,7 +18,7 @@ export class ExpertApplication {
   public yearsExperience: number;
   public evidenceLinks: string[];
   public hasTeachingExperience: boolean;
-  public teachingExperienceDesc: string;
+  public teachingExperienceDesc?: string;
 
   // Bio
   public bio: string;

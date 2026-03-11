@@ -12,7 +12,7 @@ import { expertApplicationStatusEnum } from "./expertApplicationStatusEnum";
 
 export const expertApplicationTable = pgTable("expert_applications", {
   id: uuid().primaryKey(),
-  status: expertApplicationStatusEnum("status"),
+  status: expertApplicationStatusEnum("status").notNull(),
   submitted_at: timestamp().notNull(),
   reviewed_at: timestamp(),
   reviewed_by_admin_id: uuid().references(() => userTable.id),
@@ -26,7 +26,7 @@ export const expertApplicationTable = pgTable("expert_applications", {
 
   // Expertise
   years_experience: integer().notNull(),
-  evidence_links: text().array(),
+  evidence_links: text().array().notNull(),
   has_teaching_experience: boolean().notNull(),
   teaching_experience_desc: text(),
 
