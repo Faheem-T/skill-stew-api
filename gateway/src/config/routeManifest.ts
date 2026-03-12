@@ -116,6 +116,11 @@ export const routeGroups: RouteGroup[] = [
     service: "notification",
     auth: { required: true, roles: ["USER", "EXPERT", "ADMIN"] },
   },
+  {
+    prefix: "/api/v1/experts/apply",
+    service: "user",
+    auth: { required: false },
+  },
 ];
 
 export function getMatchingRouteGroup(path: string): RouteGroup | undefined {
