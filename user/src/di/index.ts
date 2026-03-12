@@ -48,6 +48,8 @@ import { GetAllConnectedUserIds } from "../application/use-cases/user/GetAllConn
 import { GetConnectedUsers } from "../application/use-cases/user/GetConnectedUsers.usecase";
 import { GetConnectedUsersCount } from "../application/use-cases/user/GetConnectedUsersCount.usecase";
 import { ExpertApplicationRepository } from "../infrastructure/repositories/ExpertApplicationRepository";
+import { GetExpertApplicationDetails } from "../application/use-cases/expert/GetExpertApplicationDetails.usecase";
+import { GetExpertApplications } from "../application/use-cases/expert/GetExpertApplications.usecase";
 import { SubmitExpertApplication } from "../application/use-cases/expert/SubmitExpertApplication.usecase";
 import { ExpertController } from "../presentation/controllers/ExpertController";
 
@@ -229,6 +231,12 @@ const getConnectedUsersCountUsecase = new GetConnectedUsersCount(
 const submitExpertApplicationUsecase = new SubmitExpertApplication(
   expertApplicationRepo,
 );
+const getExpertApplicationsUsecase = new GetExpertApplications(
+  expertApplicationRepo,
+);
+const getExpertApplicationDetailsUsecase = new GetExpertApplicationDetails(
+  expertApplicationRepo,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -269,6 +277,8 @@ export const connectionController = new ConnectionController(
 );
 export const expertController = new ExpertController(
   submitExpertApplicationUsecase,
+  getExpertApplicationsUsecase,
+  getExpertApplicationDetailsUsecase,
 );
 
 // Internal Usecases
