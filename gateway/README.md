@@ -1,94 +1,111 @@
 # API Gateway
 
-The API Gateway is the single entry point for all client requests. It handles JWT authentication, role-based access control, and request routing to backend services via [`http-proxy-middleware`](https://github.com/chimurai/http-proxy-middleware).
+The API Gateway is the single entry point for client requests. It performs JWT authentication and role checks, then proxies requests to backend services through [`http-proxy-middleware`](https://github.com/chimurai/http-proxy-middleware).
 
 **Runtime:** Node.js (tsx)  
 **Package Manager:** pnpm  
 **Infisical Path:** `/api-gateway`
 
-## How It Works
+## Routing Model
 
-```
-Client → Gateway (auth + RBAC) → Backend Service
-                ↓
-        x-user-id header
-        x-user-role header
-```
+The gateway is configured through a single route manifest. Each entry represents a **prefix group**:
 
-1. **Every request** hits the auth middleware first
-2. The middleware checks if the path + method combination requires authentication (via the `AuthRequiredEndpoints` map)
-3. If auth is required, it verifies the JWT access token and checks that the user's role is in the allowed roles for that endpoint
-4. If auth passes, `x-user-id` and `x-user-role` headers are forwarded to the backend service
-5. If auth is not required (e.g., login, register), the request is proxied directly
+- `prefix`: the incoming API prefix handled by the gateway
+- `service`: the backend service that receives requests for that prefix
+- `auth`: the default auth policy for that prefix
+- `overrides`: optional method + path exceptions for routes that need different auth rules
 
-## Route Map
+This keeps routing and authorization in one place.
 
-| Path Prefix             | Backend Service      |
-| ----------------------- | -------------------- |
-| `/api/v1/auth`          | User service         |
-| `/api/v1/me`            | User service         |
-| `/api/v1/users`         | User service         |
-| `/api/v1/connections`   | User service         |
-| `/api/v1/skills`        | Skill service        |
-| `/api/v1/search`        | ES Proxy service     |
-| `/api/v1/notifications` | Notification service |
-| `/api/v1/payments`      | Payments service     |
+## How Requests Flow
 
-## Authentication & Authorization
-
-The gateway uses **role-based JWT signing keys** — each role (`USER`, `EXPERT`, `ADMIN`) has its own access and refresh token secrets. The JWT's `kid` (Key ID) header identifies which role's secret to use for verification.
-
-The [`isAuthRequired`](src/utils/isAuthRequired.ts) function maintains a declarative map of all protected endpoints:
-
-```ts
-{
-  GET: [
-    { path: "/api/v1/users", roles: ["ADMIN"] },
-    { path: "/api/v1/me", roles: ["USER", "ADMIN", "EXPERT"] },
-    ...
-  ],
-  POST: [...],
-  PUT: [...],
-  PATCH: [...],
-  DELETE: [...],
-}
+```text
+Client -> Gateway -> Backend Service
+          |  auth policy from route manifest
+          |  JWT verification when required
+          v
+   x-user-id / x-user-role headers
 ```
 
-Unmatched paths are treated as public (no auth required).
+For a request like `POST /api/v1/connections/:userId`:
+
+1. The gateway matches the `/api/v1/connections` route group
+2. The group's auth policy is resolved, including any override match
+3. If the route is protected, the gateway verifies the access token
+4. The gateway forwards the request to the configured service target
+5. If authentication succeeded, `x-user-id` and `x-user-role` are injected
 
 ## Environment Variables
+
+Use **base service URLs**, not route-specific URLs:
 
 | Variable                      | Description                            |
 | ----------------------------- | -------------------------------------- |
 | `PORT`                        | Gateway port                           |
-| `USER_SERVICE_URL`            | User service URL                       |
-| `AUTH_SERVICE_URL`            | Auth routes URL (user service)         |
-| `ME_SERVICE_URL`              | Profile routes URL (user service)      |
-| `CONNECTION_SERVICE_URL`      | Connection routes URL (user service)   |
-| `SKILL_SERVICE_URL`           | Skill service URL                      |
-| `SEARCH_SERVICE_URL`          | ES Proxy service URL                   |
-| `NOTIFICATION_SERVICE_URL`    | Notification service URL               |
-| `PAYMENTS_SERVICE_URL`        | Payments service URL                   |
+| `USER_SERVICE_URL`            | Base URL of the user service           |
+| `SKILL_SERVICE_URL`           | Base URL of the skill service          |
+| `SEARCH_SERVICE_URL`          | Base URL of the ES proxy service       |
+| `NOTIFICATION_SERVICE_URL`    | Base URL of the notification service   |
+| `PAYMENTS_SERVICE_URL`        | Base URL of the payments service       |
 | `USER_ACCESS_TOKEN_SECRET`    | JWT access token secret (USER role)    |
-| `USER_REFRESH_TOKEN_SECRET`   | JWT refresh token secret (USER role)   |
 | `EXPERT_ACCESS_TOKEN_SECRET`  | JWT access token secret (EXPERT role)  |
-| `EXPERT_REFRESH_TOKEN_SECRET` | JWT refresh token secret (EXPERT role) |
 | `ADMIN_ACCESS_TOKEN_SECRET`   | JWT access token secret (ADMIN role)   |
-| `ADMIN_REFRESH_TOKEN_SECRET`  | JWT refresh token secret (ADMIN role)  |
 
-## Directory Structure
+Example:
 
+```env
+USER_SERVICE_URL=http://user-srv.default.svc.cluster.local:3000
+SKILL_SERVICE_URL=http://skill-srv.default.svc.cluster.local:3000
+SEARCH_SERVICE_URL=http://es-proxy.default.svc.cluster.local:3000
+NOTIFICATION_SERVICE_URL=http://notification-srv.default.svc.cluster.local:3000
+PAYMENTS_SERVICE_URL=http://payments-srv.default.svc.cluster.local:3000
 ```
-gateway/src/
-├── index.ts                 # Express app, proxy config, service routing
-├── middlewares/
-│   └── authMiddleware.ts    # JWT verification + RBAC
-├── utils/
-│   ├── JwtService.ts        # Token verification with role-based secrets
-│   ├── isAuthRequired.ts    # Declarative auth endpoint map
-│   ├── dotenv.ts            # Env var validation
-│   └── logger.ts            # Winston logger
-├── constants/               # HttpStatus, HttpMessages
-├── errors/                  # JWT-specific error classes
-└── types/                   # UserRoles, HTTPMethod, Express augmentation
+
+The gateway preserves the original request path when proxying, so:
+
+- `POST /api/v1/auth/login` -> `${USER_SERVICE_URL}/api/v1/auth/login`
+- `PATCH /api/v1/me` -> `${USER_SERVICE_URL}/api/v1/me`
+
+## Current Prefix Map
+
+| Prefix                  | Backend Service | Default Auth |
+| ----------------------- | --------------- | ------------ |
+| `/api/v1/auth`          | User            | Public       |
+| `/api/v1/me`            | User            | Protected    |
+| `/api/v1/users`         | User            | Public       |
+| `/api/v1/connections`   | User            | Protected    |
+| `/api/v1/skills`        | Skill           | Public       |
+| `/api/v1/search`        | ES Proxy        | Public       |
+| `/api/v1/notifications` | Notification    | Protected    |
+| `/api/v1/payments`      | Payments        | Public       |
+
+Some prefixes have overrides. Example:
+
+- `/api/v1/users` is public by default
+- `GET /api/v1/users` is restricted to `ADMIN`
+- `PATCH /api/v1/users/onboarding/profile` is restricted to `USER`
+
+## Adding a New Feature Route
+
+1. If the new route fits an existing prefix and shares its default auth rule, no gateway change is needed
+2. If it fits an existing prefix but needs different auth, add an override to the prefix group
+3. If it belongs to a new backend area, add a new prefix group and point it at the correct service
+
+This is the main reason for the refactor: most feature work should not require gateway surgery.
+
+## Testing
+
+Run:
+
+```bash
+cd gateway && npm test
 ```
+
+The tests cover:
+
+- route-manifest auth resolution
+- public vs protected routing
+- role-restricted overrides
+- header forwarding to upstream services
+- unknown route handling
+- upstream proxy failures
