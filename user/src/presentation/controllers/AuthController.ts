@@ -14,6 +14,8 @@ import { registerSchema } from "../../application/dtos/auth/Register.dto";
 import { loginSchema } from "../../application/dtos/auth/Login.dto";
 import { verifyUserSchema } from "../../application/dtos/auth/VerifyUser.dto";
 import { sendVerificationLinkSchema } from "../../application/dtos/auth/SendVerificationLink.dto";
+import { IRegisterExpert } from "../../application/interfaces/auth/IRegisterExpert";
+import { registerExpertSchema } from "../../application/dtos/auth/RegisterExpert.dto";
 
 export class AuthController {
   constructor(
@@ -24,6 +26,7 @@ export class AuthController {
     private _verifyUser: IVerifyUser,
     private _generateAccessToken: IGenerateAccessToken,
     private _createAdmin: ICreateAdmin,
+    private _registerExpert: IRegisterExpert,
   ) {}
 
   registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -190,6 +193,17 @@ export class AuthController {
   logout = async (_req: Request, res: Response, next: NextFunction) => {
     try {
       res.clearCookie("refreshToken");
+      res.status(HttpStatus.OK).json({ success: true });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  registerExpert = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dto = registerExpertSchema.parse(req.body);
+      await this._registerExpert.exec(dto);
+
       res.status(HttpStatus.OK).json({ success: true });
     } catch (err) {
       next(err);

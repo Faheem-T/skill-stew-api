@@ -52,6 +52,7 @@ import { GetExpertApplicationDetails } from "../application/use-cases/expert/Get
 import { GetExpertApplications } from "../application/use-cases/expert/GetExpertApplications.usecase";
 import { SubmitExpertApplication } from "../application/use-cases/expert/SubmitExpertApplication.usecase";
 import { ExpertController } from "../presentation/controllers/ExpertController";
+import { RegisterExpert } from "../application/use-cases/auth/RegisterExpert.usecase";
 
 // Services
 const emailService = new EmailService();
@@ -237,6 +238,12 @@ const getExpertApplicationsUsecase = new GetExpertApplications(
 const getExpertApplicationDetailsUsecase = new GetExpertApplicationDetails(
   expertApplicationRepo,
 );
+const registerExpertUsecase = new RegisterExpert(
+  userRepo,
+  hasherService,
+  unitOfWork,
+  outboxEventRepo,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -247,6 +254,7 @@ export const authController = new AuthController(
   verifyUserUsecase,
   generateAccessTokenUsecase,
   createAdminUsecase,
+  registerExpertUsecase,
 );
 export const userController = new UserController(
   getUsersUsecase,

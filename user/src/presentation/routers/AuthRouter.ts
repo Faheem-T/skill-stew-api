@@ -10,6 +10,7 @@ const router = Router()
   .post("/refresh", authController.refresh)
   .post("/google-auth", authController.googleAuth)
   .post("/logout", authController.logout)
+  .post("/experts/register", authController.registerExpert)
   // TODO: Remove in production
   .post("/admin/create", authController.createAdmin);
 
