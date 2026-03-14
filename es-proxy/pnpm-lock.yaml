@@ -18,8 +18,8 @@ importers:
         specifier: ^9.2.0
         version: 9.2.0
       '@skillstew/common':
-        specifier: ^1.0.37
-        version: 1.0.37
+        specifier: ^1.0.38
+        version: 1.0.38
       '@types/cookie-parser':
         specifier: ^1.4.10
         version: 1.4.10(@types/express@5.0.5)
@@ -464,8 +464,8 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
-  '@skillstew/common@1.0.37':
-    resolution: {integrity: sha512-NzyN6g+y2rAkj9bm1ElxbtHu462oPgAkoCOaaUCM+CviVUrnvt2FfHbSlupol6WDRfzN0p3tz6dt4vg9Aod2GQ==}
+  '@skillstew/common@1.0.38':
+    resolution: {integrity: sha512-8YzYiCnIUtRVjRVUgnqRi1ugzO872a8nIDwZ/Ub+QUoI+PmzrmntyVcx3hu+6TpePMdvpLng2L8cOKFzds7IPQ==}
 
   '@smithy/abort-controller@4.2.8':
     resolution: {integrity: sha512-peuVfkYHAmS5ybKxWcfraK7WBBP0J+rkfUcbHJJKQ4ir3UAUNQI+Y4Vt/PqSzGqgloJ5O1dk7+WzNL8wcCSXbw==}
@@ -2170,7 +2170,7 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
-  '@skillstew/common@1.0.37':
+  '@skillstew/common@1.0.38':
     dependencies:
       '@types/express': 5.0.5
       '@types/jsonwebtoken': 9.0.10

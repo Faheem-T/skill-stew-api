@@ -17,7 +17,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@skillstew/common": "^1.0.37",
+    "@skillstew/common": "1.0.38",
     "@socket.io/redis-emitter": "^5.1.0",
     "amqplib": "^0.10.9",
     "cors": "^2.8.6",
