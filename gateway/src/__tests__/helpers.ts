@@ -29,6 +29,7 @@ export function createAccessToken(
     USER: env.USER_ACCESS_TOKEN_SECRET,
     EXPERT: env.EXPERT_ACCESS_TOKEN_SECRET,
     ADMIN: env.ADMIN_ACCESS_TOKEN_SECRET,
+    EXPERT_APPLICANT: env.EXPERT_ACCESS_TOKEN_SECRET,
   };
 
   return jwt.sign(payload, secretByRole[payload.role], {

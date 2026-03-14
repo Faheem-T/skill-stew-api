@@ -38,6 +38,7 @@ export class JwtService {
       USER: userAccessTokenSecret,
       EXPERT: expertAccessTokenSecret,
       ADMIN: adminAccessTokenSecret,
+      EXPERT_APPLICANT: expertAccessTokenSecret,
     };
   }
   verifyAccessToken = (jwtToken: string): JWTPayload => {

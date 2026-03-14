@@ -47,6 +47,10 @@ export class JwtService implements IJwtService {
         access: adminAccessTokenSecret,
         refresh: adminRefreshTokenSecret,
       },
+      EXPERT_APPLICANT: {
+        access: expertAccessTokenSecret,
+        refresh: expertRefreshTokenSecret,
+      },
     };
   }
   generateEmailVerificationJwt(input: generateEmailVerificationJwtDto): string {
