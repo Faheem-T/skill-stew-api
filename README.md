@@ -267,6 +267,7 @@ Each service has its own `Dockerfile` and is deployed as a separate Kubernetes D
 - [Ordering in Distributed Systems](docs/ordering-in-distributed-systems.md) — Evaluating ID strategies for ordered data (UUID v7, Snowflake, ULID, and more)
 - [Error Handling](docs/error-handling.md) — Three-layer error hierarchy across domain, application, and presentation
 - [Kubernetes Probes](docs/kubernetes-probes.md) — Configuring liveness, readiness, and startup probes for microservices
+- [Expert Applications](docs/expert-applications.md) — Decision record for authenticated expert applications, role promotion flow, and review lifecycle
 
 ## Roadmap
 
