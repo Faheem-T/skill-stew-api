@@ -2,6 +2,7 @@ import { ExpertApplicationStatus } from "./ExpertApplicationStatus.enum";
 
 export class ExpertApplication {
   public id: string;
+  public expertId: string;
   public status: ExpertApplicationStatus;
   public submittedAt: Date;
   public reviewedAt?: Date;
@@ -10,9 +11,8 @@ export class ExpertApplication {
 
   // Identity
   public fullName: string;
-  public email: string;
   public phone: string;
-  public linkedinUrl: string;
+  public socialLinks: string[];
 
   // Expertise
   public yearsExperience: number;
@@ -39,6 +39,7 @@ export class ExpertApplication {
 
   constructor(args: ExpertApplication) {
     this.id = args.id;
+    this.expertId = args.expertId;
     this.status = args.status;
     this.submittedAt = args.submittedAt;
     this.reviewedAt = args.reviewedAt;
@@ -47,9 +48,8 @@ export class ExpertApplication {
 
     // Identity
     this.fullName = args.fullName;
-    this.email = args.email;
     this.phone = args.phone;
-    this.linkedinUrl = args.linkedinUrl;
+    this.socialLinks = args.socialLinks;
 
     // Expertise
     this.yearsExperience = args.yearsExperience;
