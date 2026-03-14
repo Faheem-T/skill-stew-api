@@ -17,15 +17,15 @@ export type GetExpertApplicationsDTO = z.infer<
 
 export type ExpertApplicationListItemDTO = {
   id: string;
+  expertId: string;
   status: ExpertApplicationStatus;
   submittedAt: Date;
   reviewedAt?: Date;
   reviewedByAdminId?: string;
 
   fullName: string;
-  email: string;
   phone: string;
-  linkedinUrl: string;
+  socialLinks: string[];
 
   yearsExperience: number;
   hasTeachingExperience: boolean;

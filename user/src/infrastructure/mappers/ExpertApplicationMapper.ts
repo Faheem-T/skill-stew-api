@@ -9,6 +9,7 @@ export class ExpertApplicationMapper implements Mapper<
   toDomain = (raw: ExpertApplicationTableType): ExpertApplication => {
     return new ExpertApplication({
       id: raw.id,
+      expertId: raw.expert_id,
       status: raw.status,
       submittedAt: raw.submitted_at,
       reviewedAt: raw.reviewed_at ?? undefined,
@@ -17,9 +18,8 @@ export class ExpertApplicationMapper implements Mapper<
 
       // Identity
       fullName: raw.full_name,
-      email: raw.email,
       phone: raw.phone,
-      linkedinUrl: raw.linkedin_url,
+      socialLinks: raw.social_links,
 
       // Expertise
       yearsExperience: raw.years_experience,
@@ -49,6 +49,7 @@ export class ExpertApplicationMapper implements Mapper<
   toPersistence = (entity: ExpertApplication): ExpertApplicationTableType => {
     return {
       id: entity.id,
+      expert_id: entity.expertId,
       status: entity.status,
       submitted_at: entity.submittedAt,
       reviewed_at: entity.reviewedAt ?? null,
@@ -57,9 +58,8 @@ export class ExpertApplicationMapper implements Mapper<
 
       // Identity
       full_name: entity.fullName,
-      email: entity.email,
       phone: entity.phone,
-      linkedin_url: entity.linkedinUrl,
+      social_links: entity.socialLinks,
 
       // Expertise
       years_experience: entity.yearsExperience,
@@ -92,6 +92,7 @@ export class ExpertApplicationMapper implements Mapper<
     const result: Partial<ExpertApplicationTableType> = {};
 
     if (partial.id !== undefined) result.id = partial.id;
+    if (partial.expertId !== undefined) result.expert_id = partial.expertId;
     if (partial.status !== undefined) result.status = partial.status;
     if (partial.submittedAt !== undefined)
       result.submitted_at = partial.submittedAt;
@@ -104,10 +105,9 @@ export class ExpertApplicationMapper implements Mapper<
 
     // Identity
     if (partial.fullName !== undefined) result.full_name = partial.fullName;
-    if (partial.email !== undefined) result.email = partial.email;
     if (partial.phone !== undefined) result.phone = partial.phone;
-    if (partial.linkedinUrl !== undefined)
-      result.linkedin_url = partial.linkedinUrl;
+    if (partial.socialLinks !== undefined)
+      result.social_links = partial.socialLinks;
 
     // Expertise
     if (partial.yearsExperience !== undefined)

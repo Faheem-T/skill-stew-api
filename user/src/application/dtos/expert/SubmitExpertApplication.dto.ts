@@ -3,10 +3,10 @@ import { ExpertApplicationStatus } from "../../../domain/entities/ExpertApplicat
 
 export const submitExpertApplicationSchema = z.object({
   // Identity
+  expertId: z.string().min(1, "Expert ID is required"),
   fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email(),
   phone: z.string().min(1, "Phone number is required"),
-  linkedinUrl: z.string().url("Must be a valid URL"),
+  socialLinks: z.array(z.string().url("Must be a valid URL")),
 
   // Expertise
   yearsExperience: z.number().int().nonnegative(),

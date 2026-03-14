@@ -20,11 +20,6 @@ export type FindAllExpertApplicationsOutput = {
 };
 
 export interface IExpertApplicationRepository extends IBaseRepository<ExpertApplication> {
-  findPendingByEmail(
-    email: string,
-    tx?: TransactionContext,
-  ): Promise<ExpertApplication | null>;
-
   findAll(
     input: FindAllExpertApplicationsInput,
     tx?: TransactionContext,

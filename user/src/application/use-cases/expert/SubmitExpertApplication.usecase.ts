@@ -1,6 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
 import { ExpertApplication } from "../../../domain/entities/ExpertApplication";
-import { AlreadyExistsError } from "../../../domain/errors/AlreadyExistsError";
 import { IExpertApplicationRepository } from "../../../domain/repositories/IExpertApplicationRepository";
 import {
   SubmitExpertApplicationDTO,
@@ -14,26 +13,18 @@ export class SubmitExpertApplication implements ISubmitExpertApplication {
   exec = async (
     dto: SubmitExpertApplicationDTO,
   ): Promise<SubmitExpertApplicationOutputDTO> => {
-    const existing = await this._expertApplicationRepo.findPendingByEmail(
-      dto.email,
-    );
-
-    if (existing) {
-      throw new AlreadyExistsError("Expert application");
-    }
-
     const now = new Date();
 
     const application = new ExpertApplication({
       id: uuidv7(),
+      expertId: dto.expertId,
       status: "pending",
       submittedAt: now,
 
       // Identity
       fullName: dto.fullName,
-      email: dto.email,
       phone: dto.phone,
-      linkedinUrl: dto.linkedinUrl,
+      socialLinks: dto.socialLinks,
 
       // Expertise
       yearsExperience: dto.yearsExperience,

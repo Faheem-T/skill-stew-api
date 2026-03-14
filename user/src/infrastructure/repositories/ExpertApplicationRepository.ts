@@ -21,26 +21,6 @@ export class ExpertApplicationRepository
   }
   mapper = new ExpertApplicationMapper();
 
-  findPendingByEmail = async (
-    email: string,
-    tx?: TransactionContext,
-  ): Promise<ExpertApplication | null> => {
-    try {
-      const runner = tx ?? db;
-      const rows = await runner
-        .select()
-        .from(this.table)
-        .where(
-          and(eq(this.table.email, email), eq(this.table.status, "pending")),
-        )
-        .limit(1);
-
-      return rows[0] ? this.mapper.toDomain(rows[0]) : null;
-    } catch (err) {
-      throw mapDrizzleError(err);
-    }
-  };
-
   findAll = async (
     input: FindAllExpertApplicationsInput,
     tx?: TransactionContext,
@@ -71,9 +51,7 @@ export class ExpertApplicationRepository
       return {
         applications,
         hasNextPage,
-        nextCursor: hasNextPage
-          ? pageRows[pageRows.length - 1]?.id
-          : undefined,
+        nextCursor: hasNextPage ? pageRows[pageRows.length - 1]?.id : undefined,
       };
     } catch (err) {
       throw mapDrizzleError(err);
