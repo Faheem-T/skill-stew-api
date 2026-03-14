@@ -2,6 +2,7 @@ import z from "zod";
 import { UserEventSchemas } from "./schemas/userEventsSchema";
 import { SkillsEventSchemas } from "./schemas/skillsEventSchemas";
 import { ConnectionEventSchemas } from "./schemas/userConnectionEventSchemas";
+import { ExpertEventSchemas } from "./schemas/expertEventsSchema";
 
 // Union of all app event schemas
 
@@ -9,6 +10,7 @@ export const EventSchemas = {
   ...UserEventSchemas,
   ...SkillsEventSchemas,
   ...ConnectionEventSchemas,
+  ...ExpertEventSchemas,
 } as const;
 
 // Array of all event names
