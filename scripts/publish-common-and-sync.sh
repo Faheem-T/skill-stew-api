@@ -5,6 +5,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMMON_DIR="$ROOT_DIR/common"
 COMMON_PACKAGE_NAME="@skillstew/common"
+POLL_INTERVAL_SECONDS=5
+POLL_TIMEOUT_SECONDS=120
 
 # Optional version bump level for publish path.
 BUMP_LEVEL="${1:-patch}"
@@ -28,6 +30,30 @@ run_in_dir() {
     cd "$dir"
     "$@"
   )
+}
+
+# Wait until npm registry returns the exact published version.
+wait_for_published_version() {
+  local expected_version="$1"
+  local waited=0
+
+  echo "Waiting for $COMMON_PACKAGE_NAME@$expected_version to be visible on npm..."
+  while (( waited < POLL_TIMEOUT_SECONDS )); do
+    local visible_version
+    visible_version="$(npm view "$COMMON_PACKAGE_NAME" version 2>/dev/null || true)"
+
+    if [[ "$visible_version" == "$expected_version" ]]; then
+      echo "Confirmed on npm: $COMMON_PACKAGE_NAME@$expected_version"
+      return 0
+    fi
+
+    echo "Not visible yet (saw: ${visible_version:-none}). Retrying in ${POLL_INTERVAL_SECONDS}s..."
+    sleep "$POLL_INTERVAL_SECONDS"
+    waited=$((waited + POLL_INTERVAL_SECONDS))
+  done
+
+  echo "Timed out after ${POLL_TIMEOUT_SECONDS}s waiting for $COMMON_PACKAGE_NAME@$expected_version on npm."
+  return 1
 }
 
 # Ensure npm auth is available before attempting publish.
@@ -80,6 +106,12 @@ has_common_changes() {
   return 1
 }
 
+prompt_common_change_note() {
+  local note
+  read -r -p "Enter commit message for common changes (optional): " note
+  echo "$note"
+}
+
 require_cmd git
 require_cmd npm
 require_cmd pnpm
@@ -103,6 +135,7 @@ if has_common_changes; then
   run_in_dir "$COMMON_DIR" npm run build
   publish_with_auth_retry
   TARGET_VERSION="$(node -p "require('$COMMON_DIR/package.json').version")"
+  wait_for_published_version "$TARGET_VERSION"
 else
   echo "No local changes in common/. Running sync-only flow..."
   TARGET_VERSION="$(npm view "$COMMON_PACKAGE_NAME" version)"
@@ -125,35 +158,46 @@ run_in_dir "$ROOT_DIR/skill" bun add "$COMMON_PACKAGE_NAME@$TARGET_VERSION"
 run_in_dir "$ROOT_DIR/notification-service" bun add "$COMMON_PACKAGE_NAME@$TARGET_VERSION"
 run_in_dir "$ROOT_DIR/outbox-workers/user-outbox-worker" bun add "$COMMON_PACKAGE_NAME@$TARGET_VERSION"
 
-# Stage only files that this workflow is expected to touch.
-git -C "$ROOT_DIR" add \
-  common/package.json \
-  common/package-lock.json \
-  user/package.json \
-  user/pnpm-lock.yaml \
-  es-proxy/package.json \
-  es-proxy/pnpm-lock.yaml \
-  payments/package.json \
-  payments/pnpm-lock.yaml \
-  skill/package.json \
-  skill/bun.lock \
-  notification-service/package.json \
-  notification-service/bun.lock \
-  outbox-workers/user-outbox-worker/package.json \
+CONSUMER_PATHS=(
+  user/package.json
+  user/pnpm-lock.yaml
+  es-proxy/package.json
+  es-proxy/pnpm-lock.yaml
+  payments/package.json
+  payments/pnpm-lock.yaml
+  skill/package.json
+  skill/bun.lock
+  notification-service/package.json
+  notification-service/bun.lock
+  outbox-workers/user-outbox-worker/package.json
   outbox-workers/user-outbox-worker/bun.lock
+)
 
-if git -C "$ROOT_DIR" diff --cached --quiet; then
-  echo "No changes to commit after sync."
+if [[ "$PUBLISH_MODE" == "publish-and-sync" ]]; then
+  CHANGE_NOTE="$(prompt_common_change_note)"
+  COMMON_COMMIT_MESSAGE="chore(common): publish $TARGET_VERSION"
+  if [[ -n "$CHANGE_NOTE" ]]; then
+    COMMON_COMMIT_MESSAGE="$CHANGE_NOTE"
+  fi
+
+  # First commit: all common package changes.
+  git -C "$ROOT_DIR" add common
+  if ! git -C "$ROOT_DIR" diff --cached --quiet -- common; then
+    git -C "$ROOT_DIR" commit -m "$COMMON_COMMIT_MESSAGE" -- common
+    echo "Created common commit: $COMMON_COMMIT_MESSAGE"
+  else
+    echo "No common changes to commit."
+  fi
+fi
+
+# Second commit: dependency sync across consumer services.
+git -C "$ROOT_DIR" add "${CONSUMER_PATHS[@]}"
+if git -C "$ROOT_DIR" diff --cached --quiet -- "${CONSUMER_PATHS[@]}"; then
+  echo "No consumer dependency changes to commit."
   exit 0
 fi
 
-# Commit message differs by selected mode for clearer history.
-if [[ "$PUBLISH_MODE" == "publish-and-sync" ]]; then
-  COMMIT_MESSAGE="chore(common): publish $TARGET_VERSION and sync consumers"
-else
-  COMMIT_MESSAGE="chore(common): sync consumers to $TARGET_VERSION"
-fi
-
-git -C "$ROOT_DIR" commit -m "$COMMIT_MESSAGE"
-echo "Created local commit: $COMMIT_MESSAGE"
+CONSUMER_COMMIT_MESSAGE="chore(common): sync consumers to $TARGET_VERSION"
+git -C "$ROOT_DIR" commit -m "$CONSUMER_COMMIT_MESSAGE" -- "${CONSUMER_PATHS[@]}"
+echo "Created consumer commit: $CONSUMER_COMMIT_MESSAGE"
 echo "Done. No push performed."
