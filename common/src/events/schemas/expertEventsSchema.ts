@@ -3,6 +3,7 @@ import z from "zod";
 export const expertRegisteredSchema = z.object({
   id: z.uuid(),
   email: z.email(),
+  token: z.string(),
 });
 
 export const newExpertOnboardedSchema = z.object({
