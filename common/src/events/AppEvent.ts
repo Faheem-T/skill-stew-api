@@ -9,7 +9,4 @@ export interface AppEvent<T extends EventName> {
   traceId?: string;
 }
 
-export type UserRegisteredEvent = AppEvent<"user.registered">;
-export type UserVerifiedEvent = AppEvent<"user.verified">;
-
 export type AnyAppEvent = AppEvent<EventName>;
