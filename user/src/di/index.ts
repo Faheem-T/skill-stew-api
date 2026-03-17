@@ -243,6 +243,7 @@ const registerExpertUsecase = new RegisterExpert(
   hasherService,
   unitOfWork,
   outboxEventRepo,
+  jwtService,
 );
 
 // Controllers

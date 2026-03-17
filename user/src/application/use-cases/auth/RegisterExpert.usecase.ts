@@ -7,6 +7,9 @@ import { IHasherService } from "../../ports/IHasherService";
 import { IUnitOfWork } from "../../ports/IUnitOfWork";
 import { IOutboxEventRepository } from "../../../domain/repositories/IOutboxEventRepository";
 import { EventName, EventPayload } from "@skillstew/common";
+import { IJwtService } from "../../ports/IJwtService";
+import { DbUniqueConstraintError } from "../../errors/infra/DbUniqueConstraintError";
+import { AlreadyExistsError } from "../../../domain/errors/AlreadyExistsError";
 
 export class RegisterExpert implements IRegisterExpert {
   constructor(
@@ -14,6 +17,7 @@ export class RegisterExpert implements IRegisterExpert {
     private _hasherService: IHasherService,
     private _unitOfWork: IUnitOfWork,
     private _outboxRepo: IOutboxEventRepository,
+    private _jwtService: IJwtService,
   ) {}
 
   exec = async (dto: RegisterExpertDTO): Promise<void> => {
@@ -32,12 +36,26 @@ export class RegisterExpert implements IRegisterExpert {
     );
 
     await this._unitOfWork.transact(async (tx) => {
-      const savedExpert = await this._userRepo.create(expert, tx);
+      let savedExpert;
+      try {
+        savedExpert = await this._userRepo.create(expert, tx);
+      } catch (err) {
+        if (err instanceof DbUniqueConstraintError) {
+          throw new AlreadyExistsError("Email");
+        } else {
+          throw err;
+        }
+      }
+
+      const token = this._jwtService.generateEmailVerificationJwt({
+        email: savedExpert.email,
+      });
 
       const eventName: EventName = "expert.registered";
       const payload: EventPayload<typeof eventName> = {
         id: savedExpert.id,
         email: savedExpert.email,
+        token,
       };
 
       await this._outboxRepo.create(
