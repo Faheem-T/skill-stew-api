@@ -17,7 +17,12 @@ export const newExpertOnboardedSchema = z.object({
   teachingExperienceDesc: z.string(),
 });
 
+export const expertVerifiedSchema = z.object({
+  id: z.uuid(),
+});
+
 export const ExpertEventSchemas = {
   "expert.registered": expertRegisteredSchema,
   "expert.onboarded": newExpertOnboardedSchema,
+  "expert.verified": expertVerifiedSchema,
 } as const;
