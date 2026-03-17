@@ -42,8 +42,6 @@ export class AuthController {
         return;
       }
 
-      await this._sendVerificationLink.exec({ email: dto.email });
-
       const { accessToken, refreshToken } = result;
 
       res

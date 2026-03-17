@@ -1,6 +1,5 @@
 import { AuthController } from "../presentation/controllers/AuthController";
 import { UserRepository } from "../infrastructure/repositories/UserRepository";
-import { EmailService } from "../infrastructure/services/EmailService";
 import { JwtService } from "../infrastructure/services/JwtService";
 import { BcryptHasher } from "../infrastructure/services/HashService";
 import { ENV } from "../utils/dotenv";
@@ -55,7 +54,6 @@ import { ExpertController } from "../presentation/controllers/ExpertController";
 import { RegisterExpert } from "../application/use-cases/auth/RegisterExpert.usecase";
 
 // Services
-const emailService = new EmailService();
 const jwtService = new JwtService({
   adminAccessTokenSecret: ENV.ADMIN_ACCESS_TOKEN_SECRET,
   adminRefreshTokenSecret: ENV.ADMIN_REFRESH_TOKEN_SECRET,
@@ -133,7 +131,7 @@ const googleAuthUsecase = new GoogleAuth(
 const sendVerificationLinkUsecase = new SendVerificationLink(
   userRepo,
   jwtService,
-  emailService,
+  outboxEventRepo,
 );
 const verifyUserUsecase = new VerifyUser(
   userRepo,
