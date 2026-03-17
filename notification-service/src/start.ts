@@ -9,6 +9,7 @@ import type { IRealtimeEventPublisher } from "./application/ports/IRealtimeEmitt
 import { connectDB } from "./infrastructure/config/mongoConnection";
 import { app } from "./http/server";
 import { ENV } from "./utils/dotenv";
+import type { IEmailService } from "./application/ports/IEmailService";
 
 process.on("uncaughtException", (err, origin) => {
   logger.error(
@@ -28,6 +29,7 @@ const notificationService = container.get<INotificationService>(
 const realtimeEventPublisher = container.get<IRealtimeEventPublisher>(
   TYPES.RealtimeEventPublisher,
 );
+const emailService = container.get<IEmailService>(TYPES.EmailService);
 
 await connectDB();
 
@@ -36,6 +38,7 @@ await setupEventHandlers(
   notificationService,
   realtimeEventPublisher,
   logger,
+  emailService,
 );
 
 app.listen(ENV.PORT, () => {

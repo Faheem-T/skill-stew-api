@@ -19,4 +19,5 @@ export const TYPES = {
   RedisClient: Symbol.for("RedisClient"),
   UnreadNotificationCountCache: Symbol.for("UnreadNotificationCountCache"),
   UnitOfWork: Symbol.for("UnitOfWork"),
+  EmailService: Symbol.for("EmailService"),
 } as const;

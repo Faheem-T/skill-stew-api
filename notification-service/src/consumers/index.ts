@@ -1,3 +1,4 @@
+import type { IEmailService } from "../application/ports/IEmailService";
 import type { IEventConsumer } from "../application/ports/IEventConsumer";
 import type { ILogger } from "../application/ports/ILogger";
 import type { IRealtimeEventPublisher } from "../application/ports/IRealtimeEmitter";
@@ -5,12 +6,14 @@ import type { INotificationService } from "../application/service-interfaces/INo
 import { connectionAcceptedHandler } from "./handlers/connectionAccepted.handler";
 import { connectionRejectedHandler } from "./handlers/connectionRejected.handler";
 import { connectionRequestedHandler } from "./handlers/connectionRequested.handler";
+import { expertRegisteredHandler } from "./handlers/expertRegistered.handler";
 
 export async function setupEventHandlers(
   eventConsumer: IEventConsumer,
   notificationService: INotificationService,
   realtimeEventPublisher: IRealtimeEventPublisher,
   logger: ILogger,
+  emailService: IEmailService,
 ) {
   await eventConsumer.registerHandler(
     "connection.requested",
@@ -27,6 +30,10 @@ export async function setupEventHandlers(
   await eventConsumer.registerHandler(
     "connection.rejected",
     connectionRejectedHandler(notificationService, realtimeEventPublisher),
+  );
+  await eventConsumer.registerHandler(
+    "expert.registered",
+    expertRegisteredHandler(emailService, logger),
   );
 
   logger.info("RabbitMQ event consumer set up successfully");
