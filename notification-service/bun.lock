@@ -5,7 +5,7 @@
     "": {
       "name": "notification-service",
       "dependencies": {
-        "@skillstew/common": "1.0.40",
+        "@skillstew/common": "1.0.41",
         "@socket.io/redis-emitter": "^5.1.0",
         "@types/nodemailer": "^7.0.11",
         "amqplib": "^0.10.9",
@@ -61,7 +61,7 @@
 
     "@sindresorhus/merge-streams": ["@sindresorhus/merge-streams@2.3.0", "", {}, "sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg=="],
 
-    "@skillstew/common": ["@skillstew/common@1.0.40", "", { "dependencies": { "@types/express": "^5.0.3", "@types/jsonwebtoken": "^9.0.10", "amqplib": "^0.10.8", "del-cli": "^6.0.0", "express": "^5.1.0", "jsonwebtoken": "^9.0.2", "zod": "^4.0.10" } }, "sha512-0uzHF/UoBUkWEXvrJ2cvcAUE8hOWKF40sjNvjz8uz1ZQM0Uy91OiCvg6a237SvNx2U+2IANh42j2nsCWig38Yg=="],
+    "@skillstew/common": ["@skillstew/common@1.0.41", "", { "dependencies": { "@types/express": "^5.0.3", "@types/jsonwebtoken": "^9.0.10", "amqplib": "^0.10.8", "del-cli": "^6.0.0", "express": "^5.1.0", "jsonwebtoken": "^9.0.2", "zod": "^4.0.10" } }, "sha512-QNrNX6c18Mub+NN6ASvxci+wEkFGGK/X5zukQL7ufshkjwL2D1rKJQnFpSvMcteY119aBYQiqu5YuyGScbM3Mw=="],
 
     "@so-ric/colorspace": ["@so-ric/colorspace@1.1.6", "", { "dependencies": { "color": "^5.0.2", "text-hex": "1.0.x" } }, "sha512-/KiKkpHNOBgkFJwu9sh48LkHSMYGyuTcSFK/qMBdnOAlrRJzRSXAOFB5qwzaVQuDl8wAvHVMkaASQDReTahxuw=="],
 
