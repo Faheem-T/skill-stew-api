@@ -14,12 +14,14 @@ Automates publishing `@skillstew/common` and syncing all consumer services.
    - builds the package,
    - ensures npm authentication,
    - publishes to npm.
-   - waits for the exact published version to become visible on npm registry.
+   - waits for the exact published version and tarball to become available on npm registry.
+   - creates the `common/` commit before updating consumer services.
 3. If no changes exist:
    - skips publish and resolves the latest published npm version.
 4. Updates all consumer services to the resolved `@skillstew/common` version:
    - `user`, `es-proxy`, `payments` via `pnpm add`
    - `skill`, `notification-service`, `outbox-workers/user-outbox-worker` via `bun add`
+   - retries automatically when npm registry propagation causes version-not-found errors.
 5. Creates local commits (no push):
    - publish mode: two commits
      - one commit for `common/` changes (uses your entered message, or defaults to `chore(common): publish <version>`)
@@ -48,7 +50,8 @@ npm run common:publish-sync
 
 - If npm auth is missing, the script prompts `npm login` and continues.
 - If publish fails with an auth-related error, it prompts login and retries once.
-- After publish, the script polls npm until the new version is visible (up to 2 minutes).
+- After publish, the script polls npm until the exact version and tarball are available (up to 5 minutes).
+- Consumer updates retry automatically on transient registry propagation errors.
 - No `git push` is performed automatically.
 
 ## Adding a New Consumer Service
