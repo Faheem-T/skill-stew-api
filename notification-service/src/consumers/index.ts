@@ -7,6 +7,8 @@ import { connectionAcceptedHandler } from "./handlers/connectionAccepted.handler
 import { connectionRejectedHandler } from "./handlers/connectionRejected.handler";
 import { connectionRequestedHandler } from "./handlers/connectionRequested.handler";
 import { expertRegisteredHandler } from "./handlers/expertRegistered.handler";
+import { resendVerificationLinkRequestedHandler } from "./handlers/resendVerificationLinkRequested.handler";
+import { userRegisteredHandler } from "./handlers/userRegistered.handler";
 
 export async function setupEventHandlers(
   eventConsumer: IEventConsumer,
@@ -34,6 +36,14 @@ export async function setupEventHandlers(
   await eventConsumer.registerHandler(
     "expert.registered",
     expertRegisteredHandler(emailService, logger),
+  );
+  await eventConsumer.registerHandler(
+    "user.registered",
+    userRegisteredHandler(emailService, logger),
+  );
+  await eventConsumer.registerHandler(
+    "resendVerificationLink.requested",
+    resendVerificationLinkRequestedHandler(emailService, logger),
   );
 
   logger.info("RabbitMQ event consumer set up successfully");

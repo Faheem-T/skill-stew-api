@@ -3,18 +3,10 @@ import type { IEmailService } from "../../application/ports/IEmailService";
 import { ENV } from "../../utils/dotenv";
 import type { ILogger } from "../../application/ports/ILogger";
 
-export const expertRegisteredHandler =
+export const resendVerificationLinkRequestedHandler =
   (emailService: IEmailService, logger: ILogger) =>
-  async (event: AppEvent<"expert.registered">) => {
+  async (event: AppEvent<"resendVerificationLink.requested">) => {
     const { email, token } = event.data;
-
-    if (!token) {
-      logger.info("Not sending verification email as token is empty", {
-        email,
-      });
-
-      return { success: true };
-    }
 
     const verificationLink = `${ENV.EMAIL_VERIFICATION_REDIRECT_URL}?token=${token}`;
 
