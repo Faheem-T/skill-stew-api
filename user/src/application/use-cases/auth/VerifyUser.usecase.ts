@@ -30,7 +30,11 @@ export class VerifyUser implements IVerifyUser {
     await this._unitOfWork.transact(async (tx) => {
       const updatedUser = await this._userRepo.update(user.id, user, tx);
 
-      const eventName: EventName = "user.verified";
+      const eventName: EventName =
+        updatedUser.role == "EXPERT_APPLICANT"
+          ? "expert.verified"
+          : "user.verified";
+
       const eventPayload: EventPayload<typeof eventName> = {
         id: updatedUser.id,
       };
