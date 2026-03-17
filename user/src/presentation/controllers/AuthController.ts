@@ -63,10 +63,16 @@ export class AuthController {
     }
   };
 
-  verify = async (req: Request, res: Response, next: NextFunction) => {
+  verify = async (
+    req: Request<{}, any, any, { token: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const dto = verifyUserSchema.parse(req.body);
+      const dto = verifyUserSchema.parse({ token: req.query.token });
+
       await this._verifyUser.exec(dto);
+
       res.status(HttpStatus.OK).json({
         success: true,
         message: "User has been verified.",

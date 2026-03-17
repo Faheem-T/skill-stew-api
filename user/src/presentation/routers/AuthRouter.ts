@@ -4,7 +4,7 @@ import { authController } from "../../di";
 // /api/v1/auth
 const router = Router()
   .post("/register", authController.registerUser)
-  .post("/verify", authController.verify)
+  .get("/verify", authController.verify)
   .post("/resend-verification-link", authController.resendVerifyLink)
   .post("/login", authController.login)
   .post("/refresh", authController.refresh)
