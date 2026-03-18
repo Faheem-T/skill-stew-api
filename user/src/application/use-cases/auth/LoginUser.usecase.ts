@@ -21,7 +21,7 @@ export class LoginUser implements ILoginUser {
     accessToken: string;
   }> => {
     const user = await this._userRepo.findByEmail(email);
-    if (user.isGoogleLogin) {
+    if (!user.hasPasswordAuth) {
       throw new AccountAuthProviderConflictError(user.email, "google", "local");
     }
     if (!this._hasherService.compare(password, user.passwordHash!)) {

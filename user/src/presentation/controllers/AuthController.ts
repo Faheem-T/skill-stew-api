@@ -16,6 +16,7 @@ import { verifyUserSchema } from "../../application/dtos/auth/VerifyUser.dto";
 import { sendVerificationLinkSchema } from "../../application/dtos/auth/SendVerificationLink.dto";
 import { IRegisterExpert } from "../../application/interfaces/auth/IRegisterExpert";
 import { registerExpertSchema } from "../../application/dtos/auth/RegisterExpert.dto";
+import { googleAuthSchema } from "../../application/dtos/auth/GoogleAuth.dto";
 
 export class AuthController {
   constructor(
@@ -164,17 +165,10 @@ export class AuthController {
 
   googleAuth = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const credential = req.body.credential;
-
-      if (!credential) {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: "" });
-        return;
-      }
+      const dto = googleAuthSchema.parse(req.body);
 
       const { accessToken, refreshToken } =
-        await this._googleAuth.exec(credential);
+        await this._googleAuth.exec(dto);
 
       res
         .status(HttpStatus.OK)
