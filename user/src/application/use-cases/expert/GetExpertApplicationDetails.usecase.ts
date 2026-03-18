@@ -1,3 +1,4 @@
+import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { IExpertApplicationRepository } from "../../../domain/repositories/IExpertApplicationRepository";
 import {
   GetExpertApplicationDetailsDTO,
@@ -8,11 +9,22 @@ import { IGetExpertApplicationDetails } from "../../interfaces/expert/IGetExpert
 export class GetExpertApplicationDetails
   implements IGetExpertApplicationDetails
 {
-  constructor(private _expertApplicationRepo: IExpertApplicationRepository) {}
+  constructor(
+    private _expertApplicationRepo: IExpertApplicationRepository,
+    private _userRepo: IUserRepository,
+  ) {}
 
   exec = async (
     dto: GetExpertApplicationDetailsDTO,
   ): Promise<GetExpertApplicationDetailsOutputDTO> => {
-    return await this._expertApplicationRepo.findById(dto.applicationId);
+    const application = await this._expertApplicationRepo.findById(
+      dto.applicationId,
+    );
+    const user = await this._userRepo.findById(application.expertId);
+
+    return {
+      ...application,
+      email: user.email,
+    };
   };
 }

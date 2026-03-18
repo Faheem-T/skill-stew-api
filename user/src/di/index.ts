@@ -236,6 +236,7 @@ const getExpertApplicationsUsecase = new GetExpertApplications(
 );
 const getExpertApplicationDetailsUsecase = new GetExpertApplicationDetails(
   expertApplicationRepo,
+  userRepo,
 );
 const registerExpertUsecase = new RegisterExpert(
   userRepo,

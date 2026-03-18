@@ -9,4 +9,6 @@ export type GetExpertApplicationDetailsDTO = z.infer<
   typeof getExpertApplicationDetailsSchema
 >;
 
-export type GetExpertApplicationDetailsOutputDTO = ExpertApplication;
+export type GetExpertApplicationDetailsOutputDTO = ExpertApplication & {
+  email: string;
+};
