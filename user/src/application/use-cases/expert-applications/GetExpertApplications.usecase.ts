@@ -4,7 +4,7 @@ import {
   ExpertApplicationListItemDTO,
   GetExpertApplicationsOutputDTO,
 } from "../../dtos/expert/GetExpertApplications.dto";
-import { IGetExpertApplications } from "../../interfaces/expert/IGetExpertApplications";
+import { IGetExpertApplications } from "../../interfaces/expert-applications/IGetExpertApplications";
 
 export class GetExpertApplications implements IGetExpertApplications {
   constructor(private _expertApplicationRepo: IExpertApplicationRepository) {}

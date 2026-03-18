@@ -1,5 +1,5 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import { GetExpertApplicationDetails } from "../../../../application/use-cases/expert/GetExpertApplicationDetails.usecase";
+import { GetExpertApplicationDetails } from "../../../../application/use-cases/expert-applications/GetExpertApplicationDetails.usecase";
 import { IExpertApplicationRepository } from "../../../../domain/repositories/IExpertApplicationRepository";
 import { IUserRepository } from "../../../../domain/repositories/IUserRepository";
 import { ExpertApplication } from "../../../../domain/entities/ExpertApplication";

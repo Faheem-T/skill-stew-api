@@ -47,10 +47,10 @@ import { GetAllConnectedUserIds } from "../application/use-cases/user/GetAllConn
 import { GetConnectedUsers } from "../application/use-cases/user/GetConnectedUsers.usecase";
 import { GetConnectedUsersCount } from "../application/use-cases/user/GetConnectedUsersCount.usecase";
 import { ExpertApplicationRepository } from "../infrastructure/repositories/ExpertApplicationRepository";
-import { GetExpertApplicationDetails } from "../application/use-cases/expert/GetExpertApplicationDetails.usecase";
-import { GetExpertApplications } from "../application/use-cases/expert/GetExpertApplications.usecase";
-import { SubmitExpertApplication } from "../application/use-cases/expert/SubmitExpertApplication.usecase";
-import { ExpertController } from "../presentation/controllers/ExpertController";
+import { GetExpertApplicationDetails } from "../application/use-cases/expert-applications/GetExpertApplicationDetails.usecase";
+import { GetExpertApplications } from "../application/use-cases/expert-applications/GetExpertApplications.usecase";
+import { SubmitExpertApplication } from "../application/use-cases/expert-applications/SubmitExpertApplication.usecase";
+import { ExpertApplicationsController } from "../presentation/controllers/ExpertApplicationsController";
 import { RegisterExpert } from "../application/use-cases/auth/RegisterExpert.usecase";
 import { GetCurrentExpertApplicantProfile } from "../application/use-cases/expert-applicant/GetCurrentExpertApplicantProfile.usecase";
 
@@ -287,7 +287,7 @@ export const connectionController = new ConnectionController(
   getConnectedUsersUsecase,
   getConnectedUsersCountUsecase,
 );
-export const expertController = new ExpertController(
+export const expertController = new ExpertApplicationsController(
   submitExpertApplicationUsecase,
   getExpertApplicationsUsecase,
   getExpertApplicationDetailsUsecase,

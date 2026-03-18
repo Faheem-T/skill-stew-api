@@ -5,7 +5,7 @@ import {
   SubmitExpertApplicationDTO,
   SubmitExpertApplicationOutputDTO,
 } from "../../dtos/expert/SubmitExpertApplication.dto";
-import { ISubmitExpertApplication } from "../../interfaces/expert/ISubmitExpertApplication";
+import { ISubmitExpertApplication } from "../../interfaces/expert-applications/ISubmitExpertApplication";
 
 export class SubmitExpertApplication implements ISubmitExpertApplication {
   constructor(private _expertApplicationRepo: IExpertApplicationRepository) {}

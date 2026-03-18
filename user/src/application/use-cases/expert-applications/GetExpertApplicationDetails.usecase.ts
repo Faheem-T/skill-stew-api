@@ -4,11 +4,9 @@ import {
   GetExpertApplicationDetailsDTO,
   GetExpertApplicationDetailsOutputDTO,
 } from "../../dtos/expert/GetExpertApplicationDetails.dto";
-import { IGetExpertApplicationDetails } from "../../interfaces/expert/IGetExpertApplicationDetails";
+import { IGetExpertApplicationDetails } from "../../interfaces/expert-applications/IGetExpertApplicationDetails";
 
-export class GetExpertApplicationDetails
-  implements IGetExpertApplicationDetails
-{
+export class GetExpertApplicationDetails implements IGetExpertApplicationDetails {
   constructor(
     private _expertApplicationRepo: IExpertApplicationRepository,
     private _userRepo: IUserRepository,

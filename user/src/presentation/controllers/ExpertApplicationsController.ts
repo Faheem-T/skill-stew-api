@@ -2,12 +2,12 @@ import { NextFunction, Request, Response } from "express";
 import { getExpertApplicationDetailsSchema } from "../../application/dtos/expert/GetExpertApplicationDetails.dto";
 import { getExpertApplicationsSchema } from "../../application/dtos/expert/GetExpertApplications.dto";
 import { submitExpertApplicationSchema } from "../../application/dtos/expert/SubmitExpertApplication.dto";
-import { IGetExpertApplicationDetails } from "../../application/interfaces/expert/IGetExpertApplicationDetails";
-import { IGetExpertApplications } from "../../application/interfaces/expert/IGetExpertApplications";
-import { ISubmitExpertApplication } from "../../application/interfaces/expert/ISubmitExpertApplication";
+import { IGetExpertApplicationDetails } from "../../application/interfaces/expert-applications/IGetExpertApplicationDetails";
+import { IGetExpertApplications } from "../../application/interfaces/expert-applications/IGetExpertApplications";
+import { ISubmitExpertApplication } from "../../application/interfaces/expert-applications/ISubmitExpertApplication";
 import { HttpStatus } from "../../constants/HttpStatus";
 
-export class ExpertController {
+export class ExpertApplicationsController {
   constructor(
     private _submitExpertApplication: ISubmitExpertApplication,
     private _getExpertApplications: IGetExpertApplications,
