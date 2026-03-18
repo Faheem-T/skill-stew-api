@@ -8,7 +8,7 @@ const router = Router();
 router
   .get(
     "/",
-    requireRole("USER", "EXPERT", "ADMIN"),
+    requireRole("USER", "EXPERT", "ADMIN", "EXPERT_APPLICANT"),
     currentUserProfileController.getCurrentUserProfile,
   )
   .patch(

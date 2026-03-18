@@ -43,6 +43,9 @@ export class CurrentUserProfileController {
         case "ADMIN":
           profile = await this._getCurrentAdminProfile.exec(id);
           break;
+        case "EXPERT_APPLICANT":
+          profile = { id, role };
+          break;
       }
 
       res.status(HttpStatus.OK).json({ success: true, data: profile });

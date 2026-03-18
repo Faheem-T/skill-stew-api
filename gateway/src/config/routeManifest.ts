@@ -36,7 +36,10 @@ export const routeGroups: RouteGroup[] = [
   {
     prefix: "/api/v1/me",
     service: "user",
-    auth: { required: true, roles: ["USER", "EXPERT", "ADMIN"] },
+    auth: {
+      required: true,
+      roles: ["USER", "EXPERT", "ADMIN", "EXPERT_APPLICANT"],
+    },
     overrides: [
       {
         method: "PATCH",
