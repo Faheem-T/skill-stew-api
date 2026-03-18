@@ -16,6 +16,6 @@ router.get(
   requireRole("ADMIN"),
   expertController.getApplicationDetails,
 );
-router.post("/apply", expertController.apply);
+router.post("/apply", requireRole("EXPERT_APPLICANT"), expertController.apply);
 
 export default router;
