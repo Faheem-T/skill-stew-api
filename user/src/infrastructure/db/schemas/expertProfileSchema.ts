@@ -11,7 +11,9 @@ import { InferSelectModel } from "drizzle-orm";
 
 export const expertProfileTable = pgTable("expert_profiles", {
   id: uuid().primaryKey(),
-  expert_id: uuid().references(() => userTable.id),
+  expert_id: uuid()
+    .references(() => userTable.id)
+    .notNull(),
   full_name: text().notNull(),
   phone: text().notNull(),
   social_links: text().array().notNull(),
