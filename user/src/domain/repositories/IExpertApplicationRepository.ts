@@ -24,4 +24,8 @@ export interface IExpertApplicationRepository extends IBaseRepository<ExpertAppl
     input: FindAllExpertApplicationsInput,
     tx?: TransactionContext,
   ): Promise<FindAllExpertApplicationsOutput>;
+  findByExpertId(
+    expertId: string,
+    tx?: TransactionContext,
+  ): Promise<ExpertApplication>;
 }

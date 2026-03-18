@@ -11,6 +11,7 @@ import { expertApplicationTable } from "../db/schemas/expertApplicationSchema";
 import { ExpertApplicationMapper } from "../mappers/ExpertApplicationMapper";
 import { mapDrizzleError } from "../mappers/ErrorMapper";
 import { BaseRepository } from "./BaseRepository";
+import { NotFoundError } from "../../domain/errors/NotFoundError";
 
 export class ExpertApplicationRepository
   extends BaseRepository<ExpertApplication, typeof expertApplicationTable>
@@ -53,6 +54,29 @@ export class ExpertApplicationRepository
         hasNextPage,
         nextCursor: hasNextPage ? pageRows[pageRows.length - 1]?.id : undefined,
       };
+    } catch (err) {
+      throw mapDrizzleError(err);
+    }
+  };
+
+  findByExpertId = async (
+    expertId: string,
+    tx?: TransactionContext,
+  ): Promise<ExpertApplication> => {
+    try {
+      const runner = tx ?? db;
+      const rows = await runner
+        .select()
+        .from(this.table)
+        .where(eq(this.table.expert_id, expertId));
+
+      const row = rows[0];
+
+      if (!row) {
+        throw new NotFoundError("Expert application");
+      }
+
+      return this.mapper.toDomain(row);
     } catch (err) {
       throw mapDrizzleError(err);
     }

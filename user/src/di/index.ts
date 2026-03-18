@@ -52,6 +52,7 @@ import { GetExpertApplications } from "../application/use-cases/expert/GetExpert
 import { SubmitExpertApplication } from "../application/use-cases/expert/SubmitExpertApplication.usecase";
 import { ExpertController } from "../presentation/controllers/ExpertController";
 import { RegisterExpert } from "../application/use-cases/auth/RegisterExpert.usecase";
+import { GetCurrentExpertApplicantProfile } from "../application/use-cases/expert-applicant/GetCurrentExpertApplicantProfile.usecase";
 
 // Services
 const jwtService = new JwtService({
@@ -243,6 +244,8 @@ const registerExpertUsecase = new RegisterExpert(
   outboxEventRepo,
   jwtService,
 );
+const getCurrentExpertApplicantProfileUsecase =
+  new GetCurrentExpertApplicantProfile(userRepo, expertApplicationRepo);
 
 // Controllers
 export const authController = new AuthController(
@@ -272,6 +275,7 @@ export const currentUserProfileController = new CurrentUserProfileController(
   generatePresignedUploadUrlUsecase,
   getCurrentAdminProfileUsecase,
   updateUserProfileUsecase,
+  getCurrentExpertApplicantProfileUsecase,
 );
 export const connectionController = new ConnectionController(
   sendConnectionRequestUsecase,

@@ -127,7 +127,7 @@ export const routeGroups: RouteGroup[] = [
       {
         method: "POST",
         path: "/api/v1/experts/apply",
-        auth: { required: false },
+        auth: { required: true, roles: ["EXPERT_APPLICANT"] },
       },
       {
         method: "GET",
