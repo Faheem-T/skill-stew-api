@@ -55,6 +55,7 @@ import { RegisterExpert } from "../application/use-cases/auth/RegisterExpert.use
 import { GetCurrentExpertApplicantProfile } from "../application/use-cases/expert-applicant/GetCurrentExpertApplicantProfile.usecase";
 import { ExpertProfileRepository } from "../infrastructure/repositories/ExpertProfileRepository";
 import { ApproveExpertApplication } from "../application/use-cases/expert-applications/ApproveExpertApplication.usecase";
+import { RejectExpertApplication } from "../application/use-cases/expert-applications/RejectExpertApplication.usecase";
 
 // Services
 const jwtService = new JwtService({
@@ -257,6 +258,12 @@ const registerExpertUsecase = new RegisterExpert(
 );
 const getCurrentExpertApplicantProfileUsecase =
   new GetCurrentExpertApplicantProfile(userRepo, expertApplicationRepo);
+const rejectExpertApplicationUsecase = new RejectExpertApplication(
+  expertApplicationRepo,
+  userRepo,
+  outboxEventRepo,
+  unitOfWork,
+);
 
 // Controllers
 export const authController = new AuthController(
@@ -302,6 +309,7 @@ export const expertController = new ExpertApplicationsController(
   getExpertApplicationsUsecase,
   getExpertApplicationDetailsUsecase,
   approveExpertApplicationUsecase,
+  rejectExpertApplicationUsecase,
 );
 
 // Internal Usecases

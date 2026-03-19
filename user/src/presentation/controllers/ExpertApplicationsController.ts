@@ -7,6 +7,7 @@ import { IGetExpertApplications } from "../../application/interfaces/expert-appl
 import { IApproveExpertApplication } from "../../application/interfaces/expert-applications/IApproveExpertApplication";
 import { ISubmitExpertApplication } from "../../application/interfaces/expert-applications/ISubmitExpertApplication";
 import { HttpStatus } from "../../constants/HttpStatus";
+import { IRejectExpertApplication } from "../../application/interfaces/expert-applications/IRejectExpertApplication";
 
 export class ExpertApplicationsController {
   constructor(
@@ -14,6 +15,7 @@ export class ExpertApplicationsController {
     private _getExpertApplications: IGetExpertApplications,
     private _getExpertApplicationDetails: IGetExpertApplicationDetails,
     private _approveExpertApplication: IApproveExpertApplication,
+    private _rejectExpertApplication: IRejectExpertApplication,
   ) {}
 
   apply = async (
@@ -116,6 +118,27 @@ export class ExpertApplicationsController {
       const adminId = req.headers["x-user-id"] as string;
 
       await this._approveExpertApplication.exec(
+        req.params.applicationId,
+        adminId,
+      );
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  rejectApplication = async (
+    req: Request<{ applicationId: string }>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const adminId = req.headers["x-user-id"] as string;
+
+      await this._rejectExpertApplication.exec(
         req.params.applicationId,
         adminId,
       );

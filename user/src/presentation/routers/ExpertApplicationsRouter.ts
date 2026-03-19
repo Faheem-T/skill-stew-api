@@ -11,6 +11,11 @@ const router = Router()
     requireRole("ADMIN"),
     expertController.approveApplication,
   )
+  .patch(
+    "/:applicationId/reject",
+    requireRole("ADMIN"),
+    expertController.rejectApplication,
+  )
   .post("/apply", requireRole("EXPERT_APPLICANT"), expertController.apply);
 
 export default router;
