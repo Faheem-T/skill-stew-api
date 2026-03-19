@@ -4,6 +4,7 @@ import { getExpertApplicationsSchema } from "../../application/dtos/expert/GetEx
 import { submitExpertApplicationSchema } from "../../application/dtos/expert/SubmitExpertApplication.dto";
 import { IGetExpertApplicationDetails } from "../../application/interfaces/expert-applications/IGetExpertApplicationDetails";
 import { IGetExpertApplications } from "../../application/interfaces/expert-applications/IGetExpertApplications";
+import { IApproveExpertApplication } from "../../application/interfaces/expert-applications/IApproveExpertApplication";
 import { ISubmitExpertApplication } from "../../application/interfaces/expert-applications/ISubmitExpertApplication";
 import { HttpStatus } from "../../constants/HttpStatus";
 
@@ -12,6 +13,7 @@ export class ExpertApplicationsController {
     private _submitExpertApplication: ISubmitExpertApplication,
     private _getExpertApplications: IGetExpertApplications,
     private _getExpertApplicationDetails: IGetExpertApplicationDetails,
+    private _approveExpertApplication: IApproveExpertApplication,
   ) {}
 
   apply = async (
@@ -99,6 +101,27 @@ export class ExpertApplicationsController {
       res.status(HttpStatus.OK).json({
         success: true,
         data: application,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  approveApplication = async (
+    req: Request<{ applicationId: string }>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      const adminId = req.headers["x-user-id"] as string;
+
+      await this._approveExpertApplication.exec(
+        req.params.applicationId,
+        adminId,
+      );
+
+      res.status(HttpStatus.OK).json({
+        success: true,
       });
     } catch (err) {
       next(err);

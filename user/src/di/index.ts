@@ -53,6 +53,8 @@ import { SubmitExpertApplication } from "../application/use-cases/expert-applica
 import { ExpertApplicationsController } from "../presentation/controllers/ExpertApplicationsController";
 import { RegisterExpert } from "../application/use-cases/auth/RegisterExpert.usecase";
 import { GetCurrentExpertApplicantProfile } from "../application/use-cases/expert-applicant/GetCurrentExpertApplicantProfile.usecase";
+import { ExpertProfileRepository } from "../infrastructure/repositories/ExpertProfileRepository";
+import { ApproveExpertApplication } from "../application/use-cases/expert-applications/ApproveExpertApplication.usecase";
 
 // Services
 const jwtService = new JwtService({
@@ -88,6 +90,7 @@ const adminProfileRepo = new AdminProfileRepository();
 const connectionRepo = new UserConnectionRepository();
 const outboxEventRepo = new OutboxEventRepository();
 const expertApplicationRepo = new ExpertApplicationRepository();
+const expertProfileRepo = new ExpertProfileRepository();
 
 // RabbitMQ
 const EXCHANGE_NAME = "stew_exchange";
@@ -238,6 +241,13 @@ const getExpertApplicationDetailsUsecase = new GetExpertApplicationDetails(
   expertApplicationRepo,
   userRepo,
 );
+const approveExpertApplicationUsecase = new ApproveExpertApplication(
+  expertApplicationRepo,
+  userRepo,
+  expertProfileRepo,
+  outboxEventRepo,
+  unitOfWork,
+);
 const registerExpertUsecase = new RegisterExpert(
   userRepo,
   hasherService,
@@ -291,6 +301,7 @@ export const expertController = new ExpertApplicationsController(
   submitExpertApplicationUsecase,
   getExpertApplicationsUsecase,
   getExpertApplicationDetailsUsecase,
+  approveExpertApplicationUsecase,
 );
 
 // Internal Usecases
