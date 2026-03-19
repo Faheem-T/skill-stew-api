@@ -21,6 +21,7 @@ export class GetCurrentAdminProfile implements IGetCurrentAdminProfile {
     }
 
     return {
+      id: adminInfo.id,
       email: adminInfo.email,
       username: adminInfo.username,
       role: "ADMIN",
