@@ -8,5 +8,9 @@ export class ExpertProfileRepository
   extends BaseRepository<ExpertProfile, typeof expertProfileTable>
   implements IExpertProfileRepository
 {
+  constructor() {
+    super(expertProfileTable);
+  }
+
   protected mapper = new ExpertProfileMapper();
 }
