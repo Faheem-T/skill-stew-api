@@ -123,16 +123,16 @@ export const routeGroups: RouteGroup[] = [
     prefix: "/api/v1/experts",
     service: "user",
     auth: { required: true, roles: ["EXPERT", "ADMIN"] },
+  },
+  {
+    prefix: "/api/v1/expert-applications",
+    service: "user",
+    auth: { required: true, roles: ["ADMIN"] },
     overrides: [
       {
         method: "POST",
-        path: "/api/v1/experts/apply",
+        path: "/api/v1/expert-applications/apply",
         auth: { required: true, roles: ["EXPERT_APPLICANT"] },
-      },
-      {
-        method: "GET",
-        path: "/api/v1/experts/applications",
-        auth: { required: true, roles: ["ADMIN"] },
       },
     ],
   },
