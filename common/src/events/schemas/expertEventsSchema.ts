@@ -25,7 +25,7 @@ export const expertApplicationRejectedSchema = z.object({
   expertId: z.uuid(),
   email: z.email(),
   rejectedReason: z.string().optional(),
-  rejectedAt: z.date(),
+  rejectedAt: z.coerce.date(),
 });
 
 export const ExpertEventSchemas = {
