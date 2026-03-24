@@ -144,7 +144,10 @@ const verifyUserUsecase = new VerifyUser(
   outboxEventRepo,
   unitOfWork,
 );
-const generateAccessTokenUsecase = new GenerateAccessToken(jwtService);
+const generateAccessTokenUsecase = new GenerateAccessToken(
+  jwtService,
+  userRepo,
+);
 const createAdminUsecase = new CreateAdmin(
   userRepo,
   adminProfileRepo,
