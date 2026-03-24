@@ -15,8 +15,8 @@ importers:
         specifier: ^3.1003.0
         version: 3.1003.0
       '@skillstew/common':
-        specifier: 1.0.44
-        version: 1.0.44
+        specifier: 1.0.45
+        version: 1.0.45
       amqplib:
         specifier: ^0.10.9
         version: 0.10.9
@@ -1060,8 +1060,8 @@ packages:
   '@sinonjs/fake-timers@13.0.5':
     resolution: {integrity: sha512-36/hTbH2uaWuGVERyC6da9YwGWnzUZXuPro/F2LfsdOsLnCojz/iSH8MxUt/FD2S5XBSVPhmArFUXcpCQ2Hkiw==}
 
-  '@skillstew/common@1.0.44':
-    resolution: {integrity: sha512-kiIa8VYaebzYaczHCanNklLn8VJhAzv5WNyH7QyqUpkXjoU86HUJQ6uCr+ekUQ2BY53Wk/KpvUG3TznOtC2RaA==}
+  '@skillstew/common@1.0.45':
+    resolution: {integrity: sha512-zBrtRanJoUcSzPQdy9D+bfRdiajUtCDGif/83ZAJ6YbDmeSGcuTfsrEwyYvdwxfx4vpQJ+Km381Rn6EVYgvnTw==}
 
   '@smithy/abort-controller@4.2.11':
     resolution: {integrity: sha512-Hj4WoYWMJnSpM6/kchsm4bUNTL9XiSyhvoMb2KIq4VJzyDt7JpGHUZHkVNPZVC7YE1tf8tPeVauxpFBKGW4/KQ==}
@@ -4331,7 +4331,7 @@ snapshots:
     dependencies:
       '@sinonjs/commons': 3.0.1
 
-  '@skillstew/common@1.0.44':
+  '@skillstew/common@1.0.45':
     dependencies:
       '@types/express': 5.0.6
       '@types/jsonwebtoken': 9.0.10
