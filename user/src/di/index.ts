@@ -161,7 +161,11 @@ const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
   userProfileRepo,
   s3StorageService,
 );
-const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase();
+const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase(
+  userRepo,
+  expertProfileRepo,
+  s3StorageService,
+);
 const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
   userProfileRepo,
   outboxEventRepo,
