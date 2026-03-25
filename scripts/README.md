@@ -54,6 +54,32 @@ npm run common:publish-sync
 - Consumer updates retry automatically on transient registry propagation errors.
 - No `git push` is performed automatically.
 
+## `setup-k3s.sh`
+
+Automates the local K3s setup flow documented in `infra/docs/k3s-setup-notes.md`.
+
+### What it does
+
+1. Validates required commands are already installed: `curl`, `sudo`, `docker`, `helm`.
+2. Installs K3s with Docker runtime enabled and Traefik disabled.
+3. Changes `/etc/rancher/k3s/` ownership to the current invoking user.
+4. Adds `export KUBECONFIG=/etc/rancher/k3s/k3s.yaml` to `~/.bashrc` only if it is not already present.
+5. Installs or upgrades `ingress-nginx` via Helm.
+6. Exports `KUBECONFIG` for the current script process and runs `kubectl get nodes`.
+7. Prints the remaining manual follow-up steps for `/etc/hosts`, shell reload, and optional `socat`.
+
+### Usage
+
+```bash
+./scripts/setup-k3s.sh
+```
+
+### Notes
+
+- The script assumes Docker and Helm are already installed.
+- `/etc/hosts` is not edited automatically; the script prints the required change.
+- Re-running the script does not duplicate the `KUBECONFIG` export line in `~/.bashrc`.
+
 ## Adding a New Consumer Service
 
 When a new service starts depending on `@skillstew/common`, update this automation so it stays in sync.

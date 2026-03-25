@@ -2,6 +2,14 @@
 
 This document records the steps used to install and configure **K3s** along with **Docker** and **Ingress NGINX**.
 
+If you want to automate most of this flow, use the repo script:
+
+```bash
+./scripts/setup-k3s.sh
+```
+
+The script installs K3s with the flags documented below, updates `~/.bashrc` only if the `KUBECONFIG` export is missing, installs `ingress-nginx`, and prints the remaining manual follow-up steps such as the `/etc/hosts` change.
+
 ## 1. Install K3s
 
 ### Base Command (From Official Docs)
