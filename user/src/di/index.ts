@@ -241,6 +241,9 @@ const getConnectedUsersCountUsecase = new GetConnectedUsersCount(
 
 const submitExpertApplicationUsecase = new SubmitExpertApplication(
   expertApplicationRepo,
+  userRepo,
+  outboxEventRepo,
+  unitOfWork,
 );
 const getExpertApplicationsUsecase = new GetExpertApplications(
   expertApplicationRepo,

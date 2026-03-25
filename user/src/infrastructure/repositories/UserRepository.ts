@@ -23,6 +23,19 @@ export class UserRepository
 
   mapper = new UserMapper();
 
+  findAdminUserIds = async (tx?: TransactionContext): Promise<string[]> => {
+    try {
+      const runner = tx ?? db;
+      const rows = await runner
+        .select({ id: userTable.id })
+        .from(userTable)
+        .where(eq(userTable.role, "ADMIN"));
+      return rows.map((row) => row.id);
+    } catch (err) {
+      throw mapDrizzleError(err);
+    }
+  };
+
   findAll = async (
     {
       cursor,
