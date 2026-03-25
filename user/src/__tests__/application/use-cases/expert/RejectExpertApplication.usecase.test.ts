@@ -1,11 +1,10 @@
 import { describe, expect, it, jest } from "@jest/globals";
-import { ApproveExpertApplication } from "../../../../application/use-cases/expert-applications/ApproveExpertApplication.usecase";
+import { RejectExpertApplication } from "../../../../application/use-cases/expert-applications/RejectExpertApplication.usecase";
 import { ValidationError } from "../../../../application/errors/ValidationError";
 import { IUnitOfWork } from "../../../../application/ports/IUnitOfWork";
 import { ExpertApplication } from "../../../../domain/entities/ExpertApplication";
 import { User } from "../../../../domain/entities/User";
 import { IExpertApplicationRepository } from "../../../../domain/repositories/IExpertApplicationRepository";
-import { IExpertProfileRepository } from "../../../../domain/repositories/IExpertProfileRepository";
 import { IOutboxEventRepository } from "../../../../domain/repositories/IOutboxEventRepository";
 import { IUserRepository } from "../../../../domain/repositories/IUserRepository";
 
@@ -13,7 +12,7 @@ jest.mock("uuid", () => ({
   v7: () => "generated-id",
 }));
 
-describe("ApproveExpertApplication", () => {
+describe("RejectExpertApplication", () => {
   const application = new ExpertApplication({
     id: "app-1",
     expertId: "user-1",
@@ -71,35 +70,9 @@ describe("ApproveExpertApplication", () => {
       .fn<IUserRepository["findById"]>()
       .mockResolvedValue(applicant);
 
-    const updateUser = jest
-      .fn<IUserRepository["update"]>()
-      .mockImplementation(async (id, partial) => {
-        return new User(
-          id,
-          applicant.email,
-          partial.role ?? applicant.role,
-          applicant.isVerified,
-          applicant.isBlocked,
-          applicant.hasGoogleAuth,
-          applicant.username,
-          applicant.passwordHash,
-          applicant.createdAt,
-          applicant.updatedAt,
-        );
-      });
-
     const userRepo = {
       findById: findUserById,
-      update: updateUser,
     } as unknown as IUserRepository;
-
-    const createExpertProfile = jest
-      .fn<IExpertProfileRepository["create"]>()
-      .mockImplementation(async (profile) => profile);
-
-    const expertProfileRepo = {
-      create: createExpertProfile,
-    } as unknown as IExpertProfileRepository;
 
     const createOutboxEvent = jest
       .fn<IOutboxEventRepository["create"]>()
@@ -117,10 +90,9 @@ describe("ApproveExpertApplication", () => {
       transact,
     } as IUnitOfWork;
 
-    const usecase = new ApproveExpertApplication(
+    const usecase = new RejectExpertApplication(
       expertApplicationRepo,
       userRepo,
-      expertProfileRepo,
       outboxRepo,
       unitOfWork,
     );
@@ -129,92 +101,49 @@ describe("ApproveExpertApplication", () => {
       usecase,
       findApplicationById,
       updateApplication,
-      findUserById,
-      updateUser,
-      createExpertProfile,
       createOutboxEvent,
       transact,
     };
   };
 
-  it("approves a pending application, promotes the user, creates a profile, and emits the expected outbox events", async () => {
-    const {
-      usecase,
-      updateApplication,
-      updateUser,
-      createExpertProfile,
-      createOutboxEvent,
-      transact,
-    } = buildUsecase();
+  it("rejects a pending application and emits an outbox event with the reason", async () => {
+    const { usecase, updateApplication, createOutboxEvent, transact } =
+      buildUsecase();
 
-    const result = await usecase.exec("app-1", "admin-1");
+    const result = await usecase.exec(
+      "app-1",
+      "admin-1",
+      "We need more workshop evidence.",
+    );
 
     expect(result).toBe(true);
     expect(transact).toHaveBeenCalledTimes(1);
     expect(updateApplication).toHaveBeenCalledWith(
       "app-1",
       expect.objectContaining({
-        status: "approved",
+        status: "rejected",
+        rejectionReason: "We need more workshop evidence.",
         reviewedByAdminId: "admin-1",
         reviewedAt: expect.any(Date),
       }),
       expect.anything(),
     );
-    expect(updateUser).toHaveBeenCalledWith(
-      "user-1",
-      { role: "EXPERT" },
-      expect.anything(),
-    );
-    expect(createExpertProfile).toHaveBeenCalledWith(
+    expect(createOutboxEvent).toHaveBeenCalledWith(
       expect.objectContaining({
-        expertId: "user-1",
-        fullName: application.fullName,
-        phone: application.phone,
-        socialLinks: application.socialLinks,
-        bio: application.bio,
-        yearsExperience: application.yearsExperience,
-        evidenceLinks: application.evidenceLinks,
-        hasTeachingExperience: application.hasTeachingExperience,
-        teachingExperienceDesc: application.teachingExperienceDesc,
-        languages: [],
-        joinedAt: expect.any(Date),
-      }),
-      expect.anything(),
-    );
-    expect(createOutboxEvent).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        name: "expert.onboarded",
-        status: "PENDING",
-        payload: {
-          expertId: "user-1",
-          fullName: application.fullName,
-          bio: application.bio,
-          socialLinks: application.socialLinks,
-          username: "janeexpert",
-          yearsExperience: application.yearsExperience,
-          hasTeachingExperience: application.hasTeachingExperience,
-          teachingExperienceDesc: application.teachingExperienceDesc,
-        },
-      }),
-      expect.anything(),
-    );
-    expect(createOutboxEvent).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({
-        name: "expert.application.approved",
+        name: "expert.application.rejected",
         status: "PENDING",
         payload: {
           expertId: "user-1",
           email: "jane@example.com",
-          approvedAt: expect.any(Date),
+          rejectedAt: expect.any(Date),
+          rejectedReason: "We need more workshop evidence.",
         },
       }),
       expect.anything(),
     );
   });
 
-  it("rejects approval when the application is not pending", async () => {
+  it("rejects when the application is not pending", async () => {
     const { usecase, findApplicationById, transact } = buildUsecase();
 
     findApplicationById.mockResolvedValueOnce(
@@ -222,27 +151,6 @@ describe("ApproveExpertApplication", () => {
         ...application,
         status: "approved",
       }),
-    );
-
-    await expect(usecase.exec("app-1", "admin-1")).rejects.toBeInstanceOf(
-      ValidationError,
-    );
-    expect(transact).not.toHaveBeenCalled();
-  });
-
-  it("rejects approval when the applicant is not an expert applicant", async () => {
-    const { usecase, findUserById, transact } = buildUsecase();
-
-    findUserById.mockResolvedValueOnce(
-      new User(
-        "user-1",
-        "jane@example.com",
-        "EXPERT",
-        true,
-        false,
-        true,
-        "janeexpert",
-      ),
     );
 
     await expect(usecase.exec("app-1", "admin-1")).rejects.toBeInstanceOf(
