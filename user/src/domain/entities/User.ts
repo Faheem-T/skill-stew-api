@@ -7,10 +7,14 @@ export class User {
     public role: UserRoles,
     public isVerified: boolean,
     public isBlocked: boolean,
-    public isGoogleLogin: boolean,
+    public hasGoogleAuth: boolean,
     public username?: string,
     public passwordHash?: string,
     public createdAt?: Date,
     public updatedAt?: Date,
   ) {}
+
+  get hasPasswordAuth(): boolean {
+    return this.passwordHash !== undefined;
+  }
 }

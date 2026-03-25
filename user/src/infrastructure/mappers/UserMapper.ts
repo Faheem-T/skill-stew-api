@@ -12,7 +12,7 @@ export class UserMapper implements Mapper<User, UserTableType> {
       password_hash,
       is_verified,
       is_blocked,
-      is_google_login,
+      has_google_auth,
       created_at,
       updated_at,
     } = raw;
@@ -23,7 +23,7 @@ export class UserMapper implements Mapper<User, UserTableType> {
       role,
       is_verified,
       is_blocked,
-      is_google_login,
+      has_google_auth,
       username ?? undefined,
       password_hash ?? undefined,
       created_at,
@@ -37,7 +37,7 @@ export class UserMapper implements Mapper<User, UserTableType> {
       isVerified,
       role,
       isBlocked,
-      isGoogleLogin,
+      hasGoogleAuth,
       passwordHash = null,
       username = null,
       createdAt = new Date(),
@@ -51,7 +51,7 @@ export class UserMapper implements Mapper<User, UserTableType> {
       username,
       password_hash: passwordHash,
       is_blocked: isBlocked,
-      is_google_login: isGoogleLogin,
+      has_google_auth: hasGoogleAuth,
       created_at: createdAt,
       updated_at: updatedAt,
     };
@@ -64,7 +64,7 @@ export class UserMapper implements Mapper<User, UserTableType> {
       isVerified,
       role,
       isBlocked,
-      isGoogleLogin,
+      hasGoogleAuth,
       passwordHash,
       username,
       createdAt,
@@ -80,7 +80,7 @@ export class UserMapper implements Mapper<User, UserTableType> {
     if (username !== undefined) result.username = username ?? null;
     if (passwordHash !== undefined) result.password_hash = passwordHash ?? null;
     if (isBlocked !== undefined) result.is_blocked = isBlocked;
-    if (isGoogleLogin !== undefined) result.is_google_login = isGoogleLogin;
+    if (hasGoogleAuth !== undefined) result.has_google_auth = hasGoogleAuth;
     if (createdAt !== undefined) result.created_at = createdAt;
     if (updatedAt !== undefined) result.updated_at = updatedAt;
 

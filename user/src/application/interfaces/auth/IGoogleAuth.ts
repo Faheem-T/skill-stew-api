@@ -1,5 +1,8 @@
+import { GoogleAuthDTO } from "../../dtos/auth/GoogleAuth.dto";
+
 export interface IGoogleAuth {
-  exec(
-    credential: string,
-  ): Promise<{ refreshToken: string; accessToken: string }>;
+  exec(dto: GoogleAuthDTO): Promise<{
+    refreshToken: string;
+    accessToken: string;
+  }>;
 }

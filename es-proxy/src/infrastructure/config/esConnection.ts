@@ -45,6 +45,18 @@ export const INDEXES: { name: string; mappings: MappingTypeMapping }[] = [
       },
     },
   },
+  {
+    name: "experts",
+    mappings: {
+      properties: {
+        id: { type: "keyword" },
+        username: { type: "text" },
+        fullName: { type: "text" },
+        bio: { type: "text" },
+        yearsExperience: { type: "integer" },
+      },
+    },
+  },
 ] as const;
 
 export const es = new Client({

@@ -14,6 +14,9 @@ import { registerSchema } from "../../application/dtos/auth/Register.dto";
 import { loginSchema } from "../../application/dtos/auth/Login.dto";
 import { verifyUserSchema } from "../../application/dtos/auth/VerifyUser.dto";
 import { sendVerificationLinkSchema } from "../../application/dtos/auth/SendVerificationLink.dto";
+import { IRegisterExpert } from "../../application/interfaces/auth/IRegisterExpert";
+import { registerExpertSchema } from "../../application/dtos/auth/RegisterExpert.dto";
+import { googleAuthSchema } from "../../application/dtos/auth/GoogleAuth.dto";
 
 export class AuthController {
   constructor(
@@ -24,6 +27,7 @@ export class AuthController {
     private _verifyUser: IVerifyUser,
     private _generateAccessToken: IGenerateAccessToken,
     private _createAdmin: ICreateAdmin,
+    private _registerExpert: IRegisterExpert,
   ) {}
 
   registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -38,8 +42,6 @@ export class AuthController {
           .json({ success: false, userAlreadyExists });
         return;
       }
-
-      await this._sendVerificationLink.exec({ email: dto.email });
 
       const { accessToken, refreshToken } = result;
 
@@ -60,10 +62,16 @@ export class AuthController {
     }
   };
 
-  verify = async (req: Request, res: Response, next: NextFunction) => {
+  verify = async (
+    req: Request<{}, any, any, { token: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const dto = verifyUserSchema.parse(req.body);
+      const dto = verifyUserSchema.parse({ token: req.query.token });
+
       await this._verifyUser.exec(dto);
+
       res.status(HttpStatus.OK).json({
         success: true,
         message: "User has been verified.",
@@ -157,17 +165,10 @@ export class AuthController {
 
   googleAuth = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const credential = req.body.credential;
-
-      if (!credential) {
-        res
-          .status(HttpStatus.BAD_REQUEST)
-          .json({ success: false, message: "" });
-        return;
-      }
+      const dto = googleAuthSchema.parse(req.body);
 
       const { accessToken, refreshToken } =
-        await this._googleAuth.exec(credential);
+        await this._googleAuth.exec(dto);
 
       res
         .status(HttpStatus.OK)
@@ -190,6 +191,17 @@ export class AuthController {
   logout = async (_req: Request, res: Response, next: NextFunction) => {
     try {
       res.clearCookie("refreshToken");
+      res.status(HttpStatus.OK).json({ success: true });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  registerExpert = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dto = registerExpertSchema.parse(req.body);
+      await this._registerExpert.exec(dto);
+
       res.status(HttpStatus.OK).json({ success: true });
     } catch (err) {
       next(err);

@@ -12,7 +12,7 @@ export const userTable = pgTable("users", {
   role: roleEnum("role").notNull(),
   is_verified: boolean().default(false).notNull(),
   is_blocked: boolean().default(false).notNull(),
-  is_google_login: boolean().default(false).notNull(),
+  has_google_auth: boolean().default(false).notNull(),
   username: text().unique(),
   password_hash: text(),
   ...timestamps,

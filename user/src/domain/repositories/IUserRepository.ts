@@ -8,6 +8,7 @@ export interface UserFilters {
 }
 
 export interface IUserRepository extends IBaseRepository<User> {
+  findAdminUserIds(tx?: TransactionContext): Promise<string[]>;
   findAll(
     {
       cursor,

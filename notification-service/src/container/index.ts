@@ -23,6 +23,9 @@ import type { IUnreadNotificationCountService } from "../application/service-int
 import { UnreadNotificationCountService } from "../application/services/UnreadNotificationCountService";
 import type { IUnitOfWork } from "../application/ports/IUnitOfWork";
 import { UnitOfWork } from "../infrastructure/adapters/UnitOfWork";
+import type { IEmailService } from "../application/ports/IEmailService";
+import { ResendEmailService } from "../infrastructure/adapters/ResendEmailService";
+import { NodeMailerEmailService } from "../infrastructure/adapters/NodeMailerEmailService";
 
 const container = new Container();
 
@@ -91,5 +94,11 @@ container
   .inSingletonScope();
 
 container.bind<IUnitOfWork>(TYPES.UnitOfWork).to(UnitOfWork).inSingletonScope();
+
+container
+  .bind<IEmailService>(TYPES.EmailService)
+  // .to(ResendEmailService)
+  .to(NodeMailerEmailService)
+  .inRequestScope();
 
 export { container };

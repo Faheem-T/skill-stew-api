@@ -1,7 +1,7 @@
 import amqp from "amqplib";
 import { ENV } from "../utils/dotenv";
 import { logger } from "../utils/logger";
-import { skillService, userService } from "../di/container";
+import { expertService, skillService, userService } from "../di/container";
 import { MessageConsumer } from "../infrastructure/adapters/MessageConsumer";
 
 export async function startConsumer() {
@@ -46,6 +46,21 @@ export async function startConsumer() {
   await consumer.registerHandler("user.profileUpdated", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     await userService.updateUserProfile(event.data);
+    logger.info(`Handled ${event.eventName} successfully`);
+    return { success: true };
+  });
+
+  await consumer.registerHandler("expert.onboarded", async (event) => {
+    logger.info(`Handling ${event.eventName}`);
+
+    await expertService.upsert({
+      id: event.data.expertId,
+      username: event.data.username,
+      fullName: event.data.fullName,
+      bio: event.data.bio,
+      yearsExperience: event.data.yearsExperience,
+    });
+
     logger.info(`Handled ${event.eventName} successfully`);
     return { success: true };
   });

@@ -28,11 +28,15 @@ export class VerifyUser implements IVerifyUser {
     }
     user.isVerified = true;
     await this._unitOfWork.transact(async (tx) => {
-      await this._userRepo.update(user.id, user, tx);
+      const updatedUser = await this._userRepo.update(user.id, user, tx);
 
-      const eventName: EventName = "user.verified";
+      const eventName: EventName =
+        updatedUser.role == "EXPERT_APPLICANT"
+          ? "expert.verified"
+          : "user.verified";
+
       const eventPayload: EventPayload<typeof eventName> = {
-        id: user.id!,
+        id: updatedUser.id,
       };
 
       await this._outboxRepo.create(

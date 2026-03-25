@@ -11,7 +11,7 @@ import { InvalidAuthTokenError } from "../../application/errors/infra/InvalidAut
 
 // type guard for user roles
 function isUserRole(role: string): role is UserRoles {
-  return ["ADMIN", "EXPERT", "USER"].includes(role);
+  return ["ADMIN", "EXPERT", "EXPERT_APPLICANT", "USER"].includes(role);
 }
 
 export class JwtService implements IJwtService {
@@ -46,6 +46,10 @@ export class JwtService implements IJwtService {
       ADMIN: {
         access: adminAccessTokenSecret,
         refresh: adminRefreshTokenSecret,
+      },
+      EXPERT_APPLICANT: {
+        access: expertAccessTokenSecret,
+        refresh: expertRefreshTokenSecret,
       },
     };
   }

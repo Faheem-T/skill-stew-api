@@ -1,5 +1,5 @@
 import { ENV } from "./utils/dotenv";
-import { app } from "./app";
+import { app, markReady } from "./app";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import { logger } from "./presentation/logger";
@@ -28,6 +28,9 @@ async function start() {
   app.listen(ENV.PORT, () => {
     logger.info(`Listening on port ${ENV.PORT}`);
   });
+
+  // mark server as ready for traffic
+  markReady();
 }
 start();
 

@@ -6,6 +6,7 @@ import { IJwtService } from "../../ports/IJwtService";
 import { InvalidCredentialsError } from "../../../domain/errors/InvalidCredentialsError";
 import { BlockedUserError } from "../../../domain/errors/BlockedUserError";
 import { AccountAuthProviderConflictError } from "../../../domain/errors/AccountAuthProviderConflictError";
+import { NotVerifiedError } from "../../../domain/errors/NotVerifiedError";
 
 export class LoginUser implements ILoginUser {
   constructor(
@@ -21,7 +22,7 @@ export class LoginUser implements ILoginUser {
     accessToken: string;
   }> => {
     const user = await this._userRepo.findByEmail(email);
-    if (user.isGoogleLogin) {
+    if (!user.hasPasswordAuth) {
       throw new AccountAuthProviderConflictError(user.email, "google", "local");
     }
     if (!this._hasherService.compare(password, user.passwordHash!)) {
@@ -29,6 +30,10 @@ export class LoginUser implements ILoginUser {
     }
     if (user.isBlocked) {
       throw new BlockedUserError();
+    }
+
+    if (user.role === "EXPERT_APPLICANT" && !user.isVerified) {
+      throw new NotVerifiedError();
     }
 
     const role = user.role;

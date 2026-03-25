@@ -1,75 +1,106 @@
 import { RequestHandler } from "express";
-import { AccessTokenVerifyError, InvalidTokenError } from "../errors/JwtErrors";
-import { JwtService } from "../utils/JwtService";
+import {
+  AccessTokenVerifyError,
+  InvalidTokenError,
+  InvalidTokenRoleError,
+  TokenRoleMismatchError,
+} from "../errors/JwtErrors";
 import { HttpStatus } from "../constants/HttpStatus";
-import { HttpMessages } from "../constants/HttpMessages";
-import { ENV } from "../utils/dotenv";
-import { isAuthRequired } from "../utils/isAuthRequired";
+import { RouteGroup, resolveAuthPolicy } from "../config/routeManifest";
+import { Env } from "../config/env";
 import { HTTPMethod } from "../types/HTTPMethod";
+import { JwtService } from "../utils/JwtService";
 import { logger } from "../utils/logger";
 
-export const authMiddleware: RequestHandler = (req, res, next) => {
-  const path = req.path;
-  const method = req.method as HTTPMethod;
+function createJwtService(env: Env): JwtService {
+  return new JwtService({
+    adminAccessTokenSecret: env.ADMIN_ACCESS_TOKEN_SECRET,
+    expertAccessTokenSecret: env.EXPERT_ACCESS_TOKEN_SECRET,
+    userAccessTokenSecret: env.USER_ACCESS_TOKEN_SECRET,
+  });
+}
 
-  const { matched, roles } = isAuthRequired(path, method);
+function unauthorized(
+  res: Parameters<RequestHandler>[1],
+  message: string,
+  code?: string,
+) {
+  res.status(HttpStatus.UNAUTHORIZED).json({
+    success: false,
+    errors: [{ message }],
+    ...(code ? { code } : {}),
+  });
+}
 
-  // auth not required
-  if (!matched) {
-    next();
-    return;
-  }
+function forbidden(res: Parameters<RequestHandler>[1], message: string) {
+  res.status(HttpStatus.FORBIDDEN).json({
+    success: false,
+    errors: [{ message }],
+  });
+}
 
-  try {
-    const token = req.headers["authorization"]?.split(" ")[1];
-    if (!token) {
-      res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ success: false, message: HttpMessages.UNAUTHENTICATED });
+export function authMiddleware(group: RouteGroup, env: Env): RequestHandler {
+  const jwtService = createJwtService(env);
 
-      logger.warn("Blocking access due to missing token");
+  return (req, res, next) => {
+    const method = req.method as HTTPMethod;
+    const path = req.originalUrl.split("?")[0];
+    const policy = resolveAuthPolicy(path, method, group);
 
+    if (!policy.required) {
+      next();
       return;
     }
-    const payload = jwtService.verifyAccessToken(token);
-    (req as any).user = {
-      id: payload.userId,
-      email: payload.email,
-      role: payload.role,
-    };
 
-    if (!roles.includes(payload.role)) {
-      logger.error("Blocking access due to wrong role");
-      res
-        .status(HttpStatus.FORBIDDEN)
-        .json({ success: false, message: HttpMessages.FORBIDDEN });
-      return;
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) {
+        logger.warn("Blocking access due to missing token", {
+          method,
+          path,
+          service: group.service,
+        });
+        unauthorized(res, "You are not authenticated");
+        return;
+      }
+
+      const payload = jwtService.verifyAccessToken(token);
+      req.user = {
+        id: payload.userId,
+        email: payload.email,
+        role: payload.role,
+      };
+
+      if (!policy.roles.includes(payload.role)) {
+        logger.warn("Blocking access due to role mismatch", {
+          method,
+          path,
+          service: group.service,
+          role: payload.role,
+        });
+        forbidden(res, "You do not have the permission to access this.");
+        return;
+      }
+
+      next();
+    } catch (error) {
+      if (
+        error instanceof AccessTokenVerifyError ||
+        error instanceof InvalidTokenError ||
+        error instanceof InvalidTokenRoleError ||
+        error instanceof TokenRoleMismatchError
+      ) {
+        logger.warn("Blocking access due to invalid token", {
+          method,
+          path,
+          service: group.service,
+          code: error.code,
+        });
+        unauthorized(res, error.message, error.code);
+        return;
+      }
+
+      next(error);
     }
-
-    next();
-  } catch (err) {
-    if (err instanceof AccessTokenVerifyError) {
-      res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ success: false, message: err.message, code: err.code });
-      logger.warn("Blocking access due to access token verify error");
-      return;
-    } else if (err instanceof InvalidTokenError) {
-      res
-        .status(HttpStatus.UNAUTHORIZED)
-        .json({ success: false, message: err.message, code: err.code });
-      logger.warn("Blocking access due to invalid access token");
-      return;
-    }
-    next(err);
-  }
-};
-
-const jwtService = new JwtService({
-  adminAccessTokenSecret: ENV.ADMIN_ACCESS_TOKEN_SECRET,
-  adminRefreshTokenSecret: ENV.ADMIN_REFRESH_TOKEN_SECRET,
-  expertAccessTokenSecret: ENV.EXPERT_ACCESS_TOKEN_SECRET,
-  expertRefreshTokenSecret: ENV.EXPERT_REFRESH_TOKEN_SECRET,
-  userAccessTokenSecret: ENV.USER_ACCESS_TOKEN_SECRET,
-  userRefreshTokenSecret: ENV.USER_REFRESH_TOKEN_SECRET,
-});
+  };
+}

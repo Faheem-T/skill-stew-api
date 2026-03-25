@@ -1,6 +1,6 @@
 # User Service
 
-The user service handles authentication, user profiles, onboarding, and user connections. It is the most feature-complete service in the system and the first one built.
+The user service handles authentication, user profiles, onboarding, user connections, and expert applications. It is the most feature-complete service in the system and the first one built.
 
 **Runtime:** Node.js (tsx)  
 **Database:** PostgreSQL (Drizzle ORM)  
@@ -21,6 +21,7 @@ All routes are prefixed with `/api/v1` and routed through the API Gateway.
 | POST   | `/refresh`                  | Refresh access token              | No            |
 | POST   | `/google-auth`              | Google OAuth login/registration   | No            |
 | POST   | `/logout`                   | Logout (invalidate refresh token) | No            |
+| POST   | `/experts/register`         | Register an expert applicant      | No            |
 
 ### Current User (`/me`)
 
@@ -31,7 +32,7 @@ All routes are prefixed with `/api/v1` and routed through the API Gateway.
 | POST   | `/upload/pre-signed` | Generate S3 pre-signed upload URL | Any authenticated   |
 | PATCH  | `/username`          | Update username                   | Any authenticated   |
 
-`GET /me` returns the authenticated profile in `{ success: true, data }`. For `USER` accounts, the payload now includes the user's `id` alongside the existing profile fields.
+`GET /me` returns the authenticated profile in `{ success: true, data }`. For `USER`, `EXPERT`, `ADMIN`, and `EXPERT_APPLICANT` accounts, the payload includes the current profile shape for that role.
 
 ### Users (`/users`)
 
@@ -46,15 +47,25 @@ All routes are prefixed with `/api/v1` and routed through the API Gateway.
 
 ### Connections (`/connections`)
 
-| Method | Path                     | Description                       | Auth Required |
-| ------ | ------------------------ | --------------------------------- | ------------- |
-| POST   | `/:userId`               | Send connection request to user   | Yes           |
-| PATCH  | `/:connectionId/accept`  | Accept a connection request       | Yes           |
-| PATCH  | `/:connectionId/reject`  | Reject a connection request       | Yes           |
-| GET    | `/status/:targetId`      | Get connection status with a user | Yes           |
-| GET    | `/:userId/connected-users/count` | Get accepted connection count for a user | Yes |
-| GET    | `/:userId/connected-users` | Get paginated connected users   | Yes           |
-| GET    | `/:userId/connected-ids` | Get all connected user IDs        | Yes           |
+| Method | Path                             | Description                              | Auth Required |
+| ------ | -------------------------------- | ---------------------------------------- | ------------- |
+| POST   | `/:userId`                       | Send connection request to user          | Yes           |
+| PATCH  | `/:connectionId/accept`          | Accept a connection request              | Yes           |
+| PATCH  | `/:connectionId/reject`          | Reject a connection request              | Yes           |
+| GET    | `/status/:targetId`              | Get connection status with a user        | Yes           |
+| GET    | `/:userId/connected-users/count` | Get accepted connection count for a user | Yes           |
+| GET    | `/:userId/connected-users`       | Get paginated connected users            | Yes           |
+| GET    | `/:userId/connected-ids`         | Get all connected user IDs               | Yes           |
+
+### Expert Applications (`/expert-applications`)
+
+| Method | Path                      | Description                    | Roles            |
+| ------ | ------------------------- | ------------------------------ | ---------------- |
+| POST   | `/apply`                  | Submit expert application      | EXPERT_APPLICANT |
+| GET    | `/`                       | List expert applications       | ADMIN            |
+| GET    | `/:id`                    | Get expert application details | ADMIN            |
+| PATCH  | `/:applicationId/approve` | Approve expert application     | ADMIN            |
+| PATCH  | `/:applicationId/reject`  | Reject expert application      | ADMIN            |
 
 ## Database Schema
 
@@ -89,12 +100,7 @@ The following variables must be set in the Infisical `/user-service` folder:
 | `EXPERT_REFRESH_TOKEN_SECRET`    | JWT signing key for expert refresh tokens  |
 | `ADMIN_ACCESS_TOKEN_SECRET`      | JWT signing key for admin access tokens    |
 | `ADMIN_REFRESH_TOKEN_SECRET`     | JWT signing key for admin refresh tokens   |
-| `NODE_MAILER_HOST`               | SMTP host for sending emails               |
-| `NODE_MAILER_PORT`               | SMTP port                                  |
-| `NODE_MAILER_GMAIL`              | Gmail address for sending emails           |
-| `NODE_MAILER_GMAIL_APP_PASSWORD` | Gmail app password                         |
 | `BASE_SERVER_URL`                | Base URL for the backend                   |
-| `BASE_FRONTEND_URL`              | Base URL for the frontend                  |
 | `GOOGLE_CLIENT_ID`               | Google OAuth client ID                     |
 | `S3_BUCKET_NAME`                 | AWS S3 bucket for file uploads             |
 | `CDN_DOMAIN_NAME`                | CDN domain for serving uploaded files      |
@@ -108,6 +114,7 @@ The following variables must be set in the Infisical `/user-service` folder:
 - **Bloom filter** for username availability checks — avoids a database query on every keystroke during onboarding.
 - **Upsert-based mutual request acceptance** — if both users send a connection request, the second one auto-accepts via `onConflictDoUpdate`. See [Connection Logic](../docs/connection-logic.md).
 - **Role-based JWT signing keys** — separate secrets for USER, EXPERT, and ADMIN tokens, identified via `kid` header field.
+- **Expert applicant onboarding** — `EXPERT_APPLICANT` is the transitional role used while an application is under review.
 
 ## Directory Structure
 

@@ -21,7 +21,29 @@ export interface ConnectionRejectedData {
   connectionId: string;
 }
 
+export interface ExpertApplicationApprovedData {
+  type: NotificationType.EXPERT_APPLICATION_APPROVED;
+  approvedAt: Date;
+}
+
+export interface ExpertApplicationSubmittedData {
+  type: NotificationType.EXPERT_APPLICATION_SUBMITTED;
+  applicationId: string;
+  expertId: string;
+  expertUsername?: string;
+  submittedAt: Date;
+}
+
+export interface ExpertApplicationRejectedData {
+  type: NotificationType.EXPERT_APPLICATION_REJECTED;
+  rejectedAt: Date;
+  rejectionReason?: string;
+}
+
 export type NotificationData =
   | ConnectionRequestData
   | ConnectionAcceptedData
-  | ConnectionRejectedData;
+  | ConnectionRejectedData
+  | ExpertApplicationSubmittedData
+  | ExpertApplicationApprovedData
+  | ExpertApplicationRejectedData;

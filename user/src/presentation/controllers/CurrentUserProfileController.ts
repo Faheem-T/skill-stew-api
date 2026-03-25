@@ -9,6 +9,7 @@ import { generatePresignedUploadUrlSchema } from "../../application/dtos/common/
 import { IGetCurrentAdminProfile } from "../../application/interfaces/admin/IGetCurrentAdminProfile";
 import { updateProfileSchema } from "../../application/dtos/user/UpdateUserProfile.dto";
 import { IUpdateUserProfile } from "../../application/interfaces/user/IUpdateUserProfile";
+import { IGetCurrentExpertApplicantProfile } from "../../application/interfaces/expert-applicant/IGetCurrentExpertApplicantProfile";
 
 export class CurrentUserProfileController {
   constructor(
@@ -17,6 +18,7 @@ export class CurrentUserProfileController {
     private _generatePresignedUploadUrl: IGeneratePresignedUploadUrl,
     private _getCurrentAdminProfile: IGetCurrentAdminProfile,
     private _updateUserProfile: IUpdateUserProfile,
+    private _getCurrentExpertApplicantProfile: IGetCurrentExpertApplicantProfile,
   ) {}
 
   getCurrentUserProfile = async (
@@ -42,6 +44,9 @@ export class CurrentUserProfileController {
           break;
         case "ADMIN":
           profile = await this._getCurrentAdminProfile.exec(id);
+          break;
+        case "EXPERT_APPLICANT":
+          profile = await this._getCurrentExpertApplicantProfile.exec(id);
           break;
       }
 

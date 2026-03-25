@@ -19,7 +19,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@skillstew/common": "^1.0.37",
+    "@skillstew/common": "1.0.46",
     "@types/amqplib": "^0.10.8",
     "amqplib": "^0.10.9",
     "cookie-parser": "^1.4.7",

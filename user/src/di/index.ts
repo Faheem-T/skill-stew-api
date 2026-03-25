@@ -1,6 +1,5 @@
 import { AuthController } from "../presentation/controllers/AuthController";
 import { UserRepository } from "../infrastructure/repositories/UserRepository";
-import { EmailService } from "../infrastructure/services/EmailService";
 import { JwtService } from "../infrastructure/services/JwtService";
 import { BcryptHasher } from "../infrastructure/services/HashService";
 import { ENV } from "../utils/dotenv";
@@ -47,13 +46,22 @@ import { GetUserAvatar } from "../application/use-cases/user/GetUserAvatar.useca
 import { GetAllConnectedUserIds } from "../application/use-cases/user/GetAllConnectedUserIds.usecase";
 import { GetConnectedUsers } from "../application/use-cases/user/GetConnectedUsers.usecase";
 import { GetConnectedUsersCount } from "../application/use-cases/user/GetConnectedUsersCount.usecase";
+import { ExpertApplicationRepository } from "../infrastructure/repositories/ExpertApplicationRepository";
+import { GetExpertApplicationDetails } from "../application/use-cases/expert-applications/GetExpertApplicationDetails.usecase";
+import { GetExpertApplications } from "../application/use-cases/expert-applications/GetExpertApplications.usecase";
+import { SubmitExpertApplication } from "../application/use-cases/expert-applications/SubmitExpertApplication.usecase";
+import { ExpertApplicationsController } from "../presentation/controllers/ExpertApplicationsController";
+import { RegisterExpert } from "../application/use-cases/auth/RegisterExpert.usecase";
+import { GetCurrentExpertApplicantProfile } from "../application/use-cases/expert-applicant/GetCurrentExpertApplicantProfile.usecase";
+import { ExpertProfileRepository } from "../infrastructure/repositories/ExpertProfileRepository";
+import { ApproveExpertApplication } from "../application/use-cases/expert-applications/ApproveExpertApplication.usecase";
+import { RejectExpertApplication } from "../application/use-cases/expert-applications/RejectExpertApplication.usecase";
 
 // Services
-const emailService = new EmailService();
 const jwtService = new JwtService({
   adminAccessTokenSecret: ENV.ADMIN_ACCESS_TOKEN_SECRET,
   adminRefreshTokenSecret: ENV.ADMIN_REFRESH_TOKEN_SECRET,
-  expertAccessTokenSecret: ENV.EXPERT_REFRESH_TOKEN_SECRET,
+  expertAccessTokenSecret: ENV.EXPERT_ACCESS_TOKEN_SECRET,
   expertRefreshTokenSecret: ENV.EXPERT_REFRESH_TOKEN_SECRET,
   userAccessTokenSecret: ENV.USER_ACCESS_TOKEN_SECRET,
   userRefreshTokenSecret: ENV.USER_REFRESH_TOKEN_SECRET,
@@ -82,6 +90,8 @@ const userProfileRepo = new UserProfileRepository();
 const adminProfileRepo = new AdminProfileRepository();
 const connectionRepo = new UserConnectionRepository();
 const outboxEventRepo = new OutboxEventRepository();
+const expertApplicationRepo = new ExpertApplicationRepository();
+const expertProfileRepo = new ExpertProfileRepository();
 
 // RabbitMQ
 const EXCHANGE_NAME = "stew_exchange";
@@ -126,7 +136,7 @@ const googleAuthUsecase = new GoogleAuth(
 const sendVerificationLinkUsecase = new SendVerificationLink(
   userRepo,
   jwtService,
-  emailService,
+  outboxEventRepo,
 );
 const verifyUserUsecase = new VerifyUser(
   userRepo,
@@ -134,7 +144,10 @@ const verifyUserUsecase = new VerifyUser(
   outboxEventRepo,
   unitOfWork,
 );
-const generateAccessTokenUsecase = new GenerateAccessToken(jwtService);
+const generateAccessTokenUsecase = new GenerateAccessToken(
+  jwtService,
+  userRepo,
+);
 const createAdminUsecase = new CreateAdmin(
   userRepo,
   adminProfileRepo,
@@ -151,7 +164,11 @@ const getCurrentUserProfileUsecase = new GetCurrentUserProfile(
   userProfileRepo,
   s3StorageService,
 );
-const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase();
+const getCurrentExpertProfileUsecase = new GetCurrentExpertProfileUsecase(
+  userRepo,
+  expertProfileRepo,
+  s3StorageService,
+);
 const onboardingUpdateUserProfileUsecase = new OnboardingUpdateProfile(
   userProfileRepo,
   outboxEventRepo,
@@ -222,6 +239,42 @@ const getConnectedUsersCountUsecase = new GetConnectedUsersCount(
   connectionRepo,
 );
 
+const submitExpertApplicationUsecase = new SubmitExpertApplication(
+  expertApplicationRepo,
+  userRepo,
+  outboxEventRepo,
+  unitOfWork,
+);
+const getExpertApplicationsUsecase = new GetExpertApplications(
+  expertApplicationRepo,
+);
+const getExpertApplicationDetailsUsecase = new GetExpertApplicationDetails(
+  expertApplicationRepo,
+  userRepo,
+);
+const approveExpertApplicationUsecase = new ApproveExpertApplication(
+  expertApplicationRepo,
+  userRepo,
+  expertProfileRepo,
+  outboxEventRepo,
+  unitOfWork,
+);
+const registerExpertUsecase = new RegisterExpert(
+  userRepo,
+  hasherService,
+  unitOfWork,
+  outboxEventRepo,
+  jwtService,
+);
+const getCurrentExpertApplicantProfileUsecase =
+  new GetCurrentExpertApplicantProfile(userRepo, expertApplicationRepo);
+const rejectExpertApplicationUsecase = new RejectExpertApplication(
+  expertApplicationRepo,
+  userRepo,
+  outboxEventRepo,
+  unitOfWork,
+);
+
 // Controllers
 export const authController = new AuthController(
   registerUserUsecase,
@@ -231,6 +284,7 @@ export const authController = new AuthController(
   verifyUserUsecase,
   generateAccessTokenUsecase,
   createAdminUsecase,
+  registerExpertUsecase,
 );
 export const userController = new UserController(
   getUsersUsecase,
@@ -249,6 +303,7 @@ export const currentUserProfileController = new CurrentUserProfileController(
   generatePresignedUploadUrlUsecase,
   getCurrentAdminProfileUsecase,
   updateUserProfileUsecase,
+  getCurrentExpertApplicantProfileUsecase,
 );
 export const connectionController = new ConnectionController(
   sendConnectionRequestUsecase,
@@ -258,6 +313,13 @@ export const connectionController = new ConnectionController(
   getAllConnectedUserIdsUsecase,
   getConnectedUsersUsecase,
   getConnectedUsersCountUsecase,
+);
+export const expertController = new ExpertApplicationsController(
+  submitExpertApplicationUsecase,
+  getExpertApplicationsUsecase,
+  getExpertApplicationDetailsUsecase,
+  approveExpertApplicationUsecase,
+  rejectExpertApplicationUsecase,
 );
 
 // Internal Usecases

@@ -53,10 +53,13 @@ export class RegisterUser implements IRegisterUser {
       const profile = new UserProfile(uuidv7(), savedUser.id, false);
       await this._userProfileRepo.create(profile, tx);
 
+      const token = this._jwtService.generateEmailVerificationJwt({ email });
+
       const eventName: EventName = "user.registered";
       const payload: EventPayload<typeof eventName> = {
         id: savedUser.id,
         email: savedUser.email,
+        token,
       };
 
       await this._outboxRepo.create(
