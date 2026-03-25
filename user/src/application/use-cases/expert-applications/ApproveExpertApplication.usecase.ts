@@ -93,11 +93,30 @@ export class ApproveExpertApplication implements IApproveExpertApplication {
         teachingExperienceDesc: updatedApplication.teachingExperienceDesc ?? "",
       };
 
+      const approvalEventName: EventName = "expert.application.approved";
+      const approvalPayload: EventPayload<typeof approvalEventName> = {
+        expertId: updatedApplicant.id,
+        email: updatedApplicant.email,
+        approvedAt: reviewedAt,
+      };
+
       await this._outboxRepo.create(
         {
           id: uuidv7(),
           name: eventName,
           payload,
+          status: "PENDING",
+          createdAt: reviewedAt,
+          processedAt: undefined,
+        },
+        tx,
+      );
+
+      await this._outboxRepo.create(
+        {
+          id: uuidv7(),
+          name: approvalEventName,
+          payload: approvalPayload,
           status: "PENDING",
           createdAt: reviewedAt,
           processedAt: undefined,
