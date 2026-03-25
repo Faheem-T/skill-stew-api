@@ -7,6 +7,7 @@ import { IRejectExpertApplication } from "../../interfaces/expert-applications/I
 import { IUnitOfWork } from "../../ports/IUnitOfWork";
 import { IUserRepository } from "../../../domain/repositories/IUserRepository";
 import { OutboxEvent } from "../../../domain/entities/OutboxEvent";
+import { RejectExpertApplicationDTO } from "../../dtos/expert/RejectExpertApplication.dto";
 
 export class RejectExpertApplication implements IRejectExpertApplication {
   constructor(
@@ -15,11 +16,9 @@ export class RejectExpertApplication implements IRejectExpertApplication {
     private _outboxRepo: IOutboxEventRepository,
     private _unitOfWork: IUnitOfWork,
   ) {}
-  exec = async (
-    applicationId: string,
-    adminId: string,
-    rejectionReason?: string,
-  ): Promise<boolean> => {
+  exec = async (dto: RejectExpertApplicationDTO): Promise<boolean> => {
+    const { adminId, applicationId, rejectionReason } = dto;
+
     const application =
       await this._expertApplicationRepo.findById(applicationId);
 

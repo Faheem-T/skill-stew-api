@@ -8,6 +8,7 @@ import { IApproveExpertApplication } from "../../application/interfaces/expert-a
 import { ISubmitExpertApplication } from "../../application/interfaces/expert-applications/ISubmitExpertApplication";
 import { HttpStatus } from "../../constants/HttpStatus";
 import { IRejectExpertApplication } from "../../application/interfaces/expert-applications/IRejectExpertApplication";
+import { rejectExpertApplicationSchema } from "../../application/dtos/expert/RejectExpertApplication.dto";
 
 export class ExpertApplicationsController {
   constructor(
@@ -131,17 +132,19 @@ export class ExpertApplicationsController {
   };
 
   rejectApplication = async (
-    req: Request<{ applicationId: string }>,
+    req: Request<{ applicationId: string }, any, { rejectionReason?: string }>,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
       const adminId = req.headers["x-user-id"] as string;
-
-      await this._rejectExpertApplication.exec(
-        req.params.applicationId,
+      const dto = rejectExpertApplicationSchema.parse({
+        rejectionReason: req.body.rejectionReason,
         adminId,
-      );
+        applicationId: req.params.applicationId,
+      });
+
+      await this._rejectExpertApplication.exec(dto);
 
       res.status(HttpStatus.OK).json({
         success: true,
