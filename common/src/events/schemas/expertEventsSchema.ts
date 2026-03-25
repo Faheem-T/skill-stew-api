@@ -27,6 +27,15 @@ export const expertApplicationApprovedSchema = z.object({
   approvedAt: z.coerce.date(),
 });
 
+export const expertApplicationSubmittedSchema = z.object({
+  applicationId: z.uuid(),
+  expertId: z.uuid(),
+  expertUsername: z.string().optional(),
+  expertEmail: z.email(),
+  adminRecipientIds: z.array(z.uuid()),
+  submittedAt: z.coerce.date(),
+});
+
 export const expertApplicationRejectedSchema = z.object({
   expertId: z.uuid(),
   email: z.email(),
@@ -38,6 +47,7 @@ export const ExpertEventSchemas = {
   "expert.registered": expertRegisteredSchema,
   "expert.onboarded": newExpertOnboardedSchema,
   "expert.verified": expertVerifiedSchema,
+  "expert.application.submitted": expertApplicationSubmittedSchema,
   "expert.application.approved": expertApplicationApprovedSchema,
   "expert.application.rejected": expertApplicationRejectedSchema,
 } as const;
