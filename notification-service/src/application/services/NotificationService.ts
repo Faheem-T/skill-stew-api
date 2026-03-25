@@ -136,6 +136,19 @@ export class NotificationService implements INotificationService {
           title: "Connection Declined",
           message: `${data.rejecterUsername ?? "User" + data.rejecterId} declined your connection request`,
         };
+      case NotificationType.EXPERT_APPLICATION_APPROVED:
+        return {
+          title: "Expert Application Approved",
+          message:
+            "Your expert application has been approved. You can now continue as an expert on Skill Stew.",
+        };
+      case NotificationType.EXPERT_APPLICATION_REJECTED:
+        return {
+          title: "Expert Application Rejected",
+          message: data.rejectionReason
+            ? `Your expert application was rejected. Reason: ${data.rejectionReason}`
+            : "Your expert application was rejected.",
+        };
     }
   }
 }
