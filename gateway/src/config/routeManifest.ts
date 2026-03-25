@@ -117,7 +117,10 @@ export const routeGroups: RouteGroup[] = [
   {
     prefix: "/api/v1/notifications",
     service: "notification",
-    auth: { required: true, roles: ["USER", "EXPERT", "ADMIN"] },
+    auth: {
+      required: true,
+      roles: ["USER", "EXPERT", "ADMIN", "EXPERT_APPLICANT"],
+    },
   },
   {
     prefix: "/api/v1/experts",
