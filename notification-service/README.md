@@ -25,12 +25,17 @@ The service subscribes to the following RabbitMQ events and creates notification
 | `connection.requested` | Recipient                | `CONNECTION_REQUEST`  |
 | `connection.accepted`  | Original requester       | `CONNECTION_ACCEPTED` |
 | `connection.rejected`  | Original requester       | `CONNECTION_REJECTED` |
+| `expert.application.submitted` | Admin reviewers | `EXPERT_APPLICATION_SUBMITTED` |
+| `expert.application.approved`   | Applicant        | `EXPERT_APPLICATION_APPROVED` |
+| `expert.application.rejected`   | Applicant        | `EXPERT_APPLICATION_REJECTED` |
 
 Each handler:
 
 1. Creates a notification record in MongoDB
 2. Increments the recipient's unread count (in MongoDB + Redis cache)
 3. Emits the notification in real-time via the Socket.io Redis emitter
+
+The service also sends account-related emails for user registration, expert registration, verification link resends, and expert application decisions through its email adapters.
 
 ## Data Models
 
@@ -58,6 +63,13 @@ This means the notification service can push real-time events to users without m
 | `RABBIT_MQ_EXCHANGE_NAME`     | RabbitMQ exchange name (`stew_exchange`)                          |
 | `RABBIT_MQ_QUEUE_NAME`        | Queue name for this service's consumer                            |
 | `REDIS_URI`                   | Redis connection URL (for Socket.io emitter + unread count cache) |
+| `RESEND_API_KEY`              | Resend API key for outbound email delivery                        |
+| `EMAIL_VERIFICATION_REDIRECT_URL` | Redirect URL used in verification emails                      |
+| `NODE_MAILER_HOST`            | SMTP host for fallback email delivery                             |
+| `NODE_MAILER_PORT`            | SMTP port for fallback email delivery                             |
+| `NODE_MAILER_GMAIL`           | Gmail address for fallback email delivery                         |
+| `NODE_MAILER_GMAIL_APP_PASSWORD` | Gmail app password for fallback email delivery                |
+| `BASE_FRONTEND_URL`           | Base frontend URL for email links                                 |
 
 ## Key Design Decisions
 

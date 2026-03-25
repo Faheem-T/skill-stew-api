@@ -78,12 +78,17 @@ The gateway preserves the original request path when proxying, so:
 | `/api/v1/search`        | ES Proxy        | Public       |
 | `/api/v1/notifications` | Notification    | Protected    |
 | `/api/v1/payments`      | Payments        | Public       |
+| `/api/v1/expert-applications` | User      | Admin + applicant override |
 
 Some prefixes have overrides. Example:
 
 - `/api/v1/users` is public by default
 - `GET /api/v1/users` is restricted to `ADMIN`
 - `PATCH /api/v1/users/onboarding/profile` is restricted to `USER`
+- `/api/v1/me` allows `EXPERT_APPLICANT` in addition to the existing authenticated roles
+- `POST /api/v1/auth/experts/register` is public
+- `/api/v1/expert-applications` admin review routes are restricted to `ADMIN`
+- `POST /api/v1/expert-applications/apply` is restricted to `EXPERT_APPLICANT`
 
 ## Adding a New Feature Route
 

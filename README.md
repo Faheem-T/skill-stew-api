@@ -44,6 +44,7 @@ This repository contains the backend — a microservices system that I am buildi
 - Real-time notifications via WebSocket
 - User search and recommendations via Elasticsearch
 - Admin user management
+- Expert applications with applicant-to-expert promotion
 
 ### What's Planned
 
@@ -51,7 +52,6 @@ This repository contains the backend — a microservices system that I am buildi
 - Cohort enrollment and live session streaming
 - Session recordings and playback
 - Peer-to-peer skill exchange scheduling
-- Expert application and verification flow
 - Payment processing and revenue management
 
 ## Architecture
@@ -62,9 +62,9 @@ This repository contains the backend — a microservices system that I am buildi
 
 | Service              | Responsibility                                                                                                        | Runtime       | Database           | README                                                |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ | ----------------------------------------------------- |
-| User service         | Auth, profiles, connections                                                                                           | Node.js (tsx) | PostgreSQL         | [README](user/README.md)                              |
+| User service         | Auth, profiles, connections, expert applications                                                                      | Node.js (tsx) | PostgreSQL         | [README](user/README.md)                              |
 | Skill service        | Skill taxonomy, user skill profiles                                                                                   | Bun           | MongoDB            | [README](skill/README.md)                             |
-| Notification service | Notification persistence, real-time WebSocket delivery, unread notification count                                     | Bun           | MongoDB            | [README](notification-service/README.md)              |
+| Notification service | Notification persistence, real-time WebSocket delivery, unread notification count, account emails                    | Bun           | MongoDB            | [README](notification-service/README.md)              |
 | ES Proxy service     | Proxy between clients and Elasticsearch, read replica for user profiles and skill taxonomy, search, recommended users | Node.js (tsx) | -                  | [README](es-proxy/README.md)                          |
 | Payments service     | Handles payment processing (currently WIP / empty shell)                                                              | Node.js (tsx) | PostgreSQL         | [README](payments/README.md)                          |
 | API Gateway          | JWT authentication, request routing, role-based access control                                                        | Node.js (tsx) | -                  | [README](gateway/README.md)                           |
@@ -119,6 +119,12 @@ These are the events currently in the system.
 | `connection.requested` | User service  | Notification service   |
 | `connection.accepted`  | User service  | Notification service   |
 | `connection.rejected`  | User service  | Notification service   |
+| `expert.registered`    | User service  | Notification service   |
+| `expert.onboarded`     | User service  | ES Proxy               |
+| `expert.verified`      | User service  | ES Proxy               |
+| `expert.application.submitted` | User service | Notification service |
+| `expert.application.approved`   | User service | Notification service |
+| `expert.application.rejected`   | User service | Notification service |
 
 ## Tech Stack
 
