@@ -25,4 +25,35 @@ export class ResendEmailService implements IEmailService {
       throw err;
     }
   };
+
+  sendExpertApplicationApprovedMail = async (
+    email: string,
+  ): Promise<boolean> => {
+    await this._client.emails.send({
+      from: "onboarding@resend.dev",
+      to: email,
+      subject: "Expert Application Approved | Skill Stew",
+      html: "<p>Your expert application has been approved. You can now continue as an expert on Skill Stew.</p>",
+    });
+
+    return true;
+  };
+
+  sendExpertApplicationRejectedMail = async (
+    email: string,
+    rejectionReason?: string,
+  ): Promise<boolean> => {
+    const reasonHtml = rejectionReason
+      ? `<p>Reason: ${rejectionReason}</p>`
+      : "";
+
+    await this._client.emails.send({
+      from: "onboarding@resend.dev",
+      to: email,
+      subject: "Expert Application Update | Skill Stew",
+      html: `<p>Your expert application was rejected.</p>${reasonHtml}`,
+    });
+
+    return true;
+  };
 }
