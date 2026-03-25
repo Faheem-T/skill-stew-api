@@ -3,6 +3,55 @@ import { NotificationService } from "../../../application/services/NotificationS
 import { NotificationType } from "../../../domain/entities/NotificationType.enum";
 
 describe("NotificationService", () => {
+  it("builds admin expert application submission notification content", async () => {
+    const service = new NotificationService(
+      {
+        create: mock((_notification) =>
+          Promise.resolve({
+            id: "notif-0",
+            recipientId: "admin-1",
+            type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+            title: "New Expert Application",
+            message: "janeexpert submitted a new expert application.",
+            data: {
+              type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+              applicationId: "app-1",
+              expertId: "expert-1",
+              expertUsername: "janeexpert",
+              submittedAt: new Date("2026-03-24T10:00:00.000Z"),
+            },
+            isRead: false,
+            createdAt: new Date("2026-03-24T10:00:00.000Z"),
+          }),
+        ),
+      } as any,
+      {
+        incrementByUserId: mock(() => Promise.resolve()),
+      } as any,
+      {
+        incrementByUserId: mock(() => Promise.resolve()),
+      } as any,
+      {
+        transact: mock((work: (tx: unknown) => Promise<unknown>) => work({})),
+      } as any,
+    );
+
+    const result = await service.createNotification({
+      recipientId: "admin-1",
+      type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+      data: {
+        type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+        applicationId: "app-1",
+        expertId: "expert-1",
+        expertUsername: "janeexpert",
+        submittedAt: new Date("2026-03-24T10:00:00.000Z"),
+      },
+    });
+
+    expect(result.title).toBe("New Expert Application");
+    expect(result.message).toBe("janeexpert submitted a new expert application.");
+  });
+
   it("builds approval notification content", async () => {
     const service = new NotificationService(
       {

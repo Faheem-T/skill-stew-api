@@ -1,9 +1,100 @@
 import { describe, expect, it, mock } from "bun:test";
 import { expertApplicationApprovedHandler } from "../../../consumers/handlers/expertApplicationApproved.handler";
 import { expertApplicationRejectedHandler } from "../../../consumers/handlers/expertApplicationRejected.handler";
+import { expertApplicationSubmittedHandler } from "../../../consumers/handlers/expertApplicationSubmitted.handler";
 import { NotificationType } from "../../../domain/entities/NotificationType.enum";
 
 describe("expert application decision handlers", () => {
+  it("creates notifications for each admin when an expert application is submitted", async () => {
+    const savedNotifications = [
+      {
+        id: "notif-1",
+        recipientId: "admin-1",
+        type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+        title: "New Expert Application",
+        message: "submitted",
+        data: {
+          type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+          applicationId: "app-1",
+          expertId: "expert-1",
+          expertUsername: "janeexpert",
+          submittedAt: new Date("2026-03-24T10:00:00.000Z"),
+        },
+        isRead: false,
+        createdAt: new Date("2026-03-24T10:00:00.000Z"),
+      },
+      {
+        id: "notif-2",
+        recipientId: "admin-2",
+        type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+        title: "New Expert Application",
+        message: "submitted",
+        data: {
+          type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+          applicationId: "app-1",
+          expertId: "expert-1",
+          expertUsername: "janeexpert",
+          submittedAt: new Date("2026-03-24T10:00:00.000Z"),
+        },
+        isRead: false,
+        createdAt: new Date("2026-03-24T10:00:00.000Z"),
+      },
+    ];
+
+    const notificationService = {
+      createNotification: mock(() =>
+        Promise.resolve(savedNotifications.shift()!),
+      ),
+    };
+    const realtimeEventPublisher = {
+      emitToRecipient: mock(() => true),
+    };
+    const logger = {
+      info: mock(() => true),
+    };
+
+    const handler = expertApplicationSubmittedHandler(
+      notificationService as any,
+      realtimeEventPublisher as any,
+      logger as any,
+    );
+
+    await handler({
+      data: {
+        applicationId: "app-1",
+        expertId: "expert-1",
+        expertUsername: "janeexpert",
+        expertEmail: "expert@example.com",
+        adminRecipientIds: ["admin-1", "admin-2"],
+        submittedAt: new Date("2026-03-24T10:00:00.000Z"),
+      },
+    } as any);
+
+    expect(notificationService.createNotification).toHaveBeenNthCalledWith(1, {
+      recipientId: "admin-1",
+      type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+      data: {
+        type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+        applicationId: "app-1",
+        expertId: "expert-1",
+        expertUsername: "janeexpert",
+        submittedAt: new Date("2026-03-24T10:00:00.000Z"),
+      },
+    });
+    expect(notificationService.createNotification).toHaveBeenNthCalledWith(2, {
+      recipientId: "admin-2",
+      type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+      data: {
+        type: NotificationType.EXPERT_APPLICATION_SUBMITTED,
+        applicationId: "app-1",
+        expertId: "expert-1",
+        expertUsername: "janeexpert",
+        submittedAt: new Date("2026-03-24T10:00:00.000Z"),
+      },
+    });
+    expect(realtimeEventPublisher.emitToRecipient).toHaveBeenCalledTimes(2);
+  });
+
   it("creates a realtime notification and sends an approval email", async () => {
     const savedNotification = {
       id: "notif-1",

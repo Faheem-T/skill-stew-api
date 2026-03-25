@@ -8,6 +8,7 @@ import { connectionRejectedHandler } from "./handlers/connectionRejected.handler
 import { connectionRequestedHandler } from "./handlers/connectionRequested.handler";
 import { expertApplicationApprovedHandler } from "./handlers/expertApplicationApproved.handler";
 import { expertApplicationRejectedHandler } from "./handlers/expertApplicationRejected.handler";
+import { expertApplicationSubmittedHandler } from "./handlers/expertApplicationSubmitted.handler";
 import { expertRegisteredHandler } from "./handlers/expertRegistered.handler";
 import { resendVerificationLinkRequestedHandler } from "./handlers/resendVerificationLinkRequested.handler";
 import { userRegisteredHandler } from "./handlers/userRegistered.handler";
@@ -34,6 +35,14 @@ export async function setupEventHandlers(
   await eventConsumer.registerHandler(
     "connection.rejected",
     connectionRejectedHandler(notificationService, realtimeEventPublisher),
+  );
+  await eventConsumer.registerHandler(
+    "expert.application.submitted",
+    expertApplicationSubmittedHandler(
+      notificationService,
+      realtimeEventPublisher,
+      logger,
+    ),
   );
   await eventConsumer.registerHandler(
     "expert.application.approved",

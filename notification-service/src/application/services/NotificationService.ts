@@ -142,6 +142,11 @@ export class NotificationService implements INotificationService {
           message:
             "Your expert application has been approved. You can now continue as an expert on Skill Stew.",
         };
+      case NotificationType.EXPERT_APPLICATION_SUBMITTED:
+        return {
+          title: "New Expert Application",
+          message: `${data.expertUsername ?? "An expert applicant"} submitted a new expert application.`,
+        };
       case NotificationType.EXPERT_APPLICATION_REJECTED:
         return {
           title: "Expert Application Rejected",
