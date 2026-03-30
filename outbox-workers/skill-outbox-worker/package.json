@@ -14,7 +14,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@skillstew/common": "1.0.47",
+    "@skillstew/common": "1.0.48",
     "amqplib": "^0.10.9",
     "mongoose": "^8.22.0",
     "winston": "^3.19.0"
