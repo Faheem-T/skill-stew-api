@@ -6,3 +6,5 @@ export { DuplicateSkillInProfileError } from "./DuplicateSkillInProfileError";
 export { UnauthorizedAccessError } from "./UnauthorizedAccessError";
 export { ForbiddenOperationError } from "./ForbiddenOperationError";
 export { WorkshopDraftRequiredError } from "./WorkshopDraftRequiredError";
+export { WorkshopAlreadyPublishedError } from "./WorkshopAlreadyPublishedError";
+export { WorkshopNotReadyToPublishError } from "./WorkshopNotReadyToPublishError";

@@ -10,4 +10,16 @@ export const workshopRouter = Router().post(
   "/:id",
   requireRole("EXPERT"),
   workshopController.updateWorkshop,
+).post(
+  "/:id/sessions",
+  requireRole("EXPERT"),
+  workshopController.replaceWorkshopSessions,
+).patch(
+  "/:id/sessions/:sessionId",
+  requireRole("EXPERT"),
+  workshopController.updateWorkshopSession,
+).post(
+  "/:id/publish",
+  requireRole("EXPERT"),
+  workshopController.publishWorkshop,
 );

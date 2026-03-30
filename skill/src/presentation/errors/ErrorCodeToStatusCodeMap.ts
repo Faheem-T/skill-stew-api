@@ -11,6 +11,9 @@ export const ErrorCodeToStatusCodeMap: Record<AllErrorCodes, number> = {
   [DomainErrorCodes.FORBIDDEN_OPERATION]: HttpStatus.FORBIDDEN,
   [DomainErrorCodes.ALREADY_EXISTS]: HttpStatus.CONFLICT,
   [DomainErrorCodes.WORKSHOP_DRAFT_REQUIRED]: HttpStatus.CONFLICT,
+  [DomainErrorCodes.WORKSHOP_ALREADY_PUBLISHED]: HttpStatus.CONFLICT,
+  [DomainErrorCodes.WORKSHOP_NOT_READY_TO_PUBLISH]:
+    HttpStatus.UNPROCESSABLE_ENTITY,
 
   // App Error Codes
   [AppErrorCodes.INTERNAL_SERVER_ERROR]: HttpStatus.INTERNAL_SERVER_ERROR,

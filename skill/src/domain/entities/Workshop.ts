@@ -66,6 +66,42 @@ export class Workshop {
     this.updatedAt = updatedAt;
   }
 
+  replaceSchedule({
+    timezone,
+    sessions,
+  }: {
+    timezone: string;
+    sessions: Array<
+      Omit<WorkshopSession, "id" | "title" | "description"> & {
+        title?: string | null;
+        description?: string | null;
+      }
+    >;
+  }): Workshop {
+    return new Workshop({
+      id: this.id,
+      expertId: this.expertId,
+      title: this.title,
+      description: this.description,
+      targetAudience: this.targetAudience,
+      bannerImageKey: this.bannerImageKey,
+      maxCohortSize: this.maxCohortSize,
+      status: this.status,
+      sessions: sessions.map((session) => ({
+        id: uuidv7(),
+        weekNumber: session.weekNumber,
+        dayOfWeek: session.dayOfWeek,
+        sessionOrder: session.sessionOrder,
+        startTime: session.startTime,
+        title: session.title ?? null,
+        description: session.description ?? null,
+      })),
+      timezone,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    });
+  }
+
   updateBasics({
     title,
     description,
@@ -90,6 +126,63 @@ export class Workshop {
         bannerImageKey === undefined ? this.bannerImageKey : bannerImageKey,
       maxCohortSize: maxCohortSize ?? this.maxCohortSize,
       status: this.status,
+      sessions: this.sessions,
+      timezone: this.timezone,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    });
+  }
+
+  updateSession(
+    sessionId: string,
+    {
+      title,
+      description,
+      startTime,
+    }: {
+      title?: string;
+      description?: string | null;
+      startTime?: string;
+    },
+  ): Workshop {
+    return new Workshop({
+      id: this.id,
+      expertId: this.expertId,
+      title: this.title,
+      description: this.description,
+      targetAudience: this.targetAudience,
+      bannerImageKey: this.bannerImageKey,
+      maxCohortSize: this.maxCohortSize,
+      status: this.status,
+      sessions: this.sessions.map((session) =>
+        session.id === sessionId
+          ? {
+              ...session,
+              title: title ?? session.title ?? null,
+              description:
+                description === undefined
+                  ? session.description ?? null
+                  : description,
+              startTime: startTime ?? session.startTime,
+            }
+          : session,
+      ),
+      timezone: this.timezone,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    });
+  }
+
+  publish(): Workshop {
+    return new Workshop({
+      id: this.id,
+      expertId: this.expertId,
+      title: this.title,
+      description: this.description,
+      targetAudience: this.targetAudience,
+      bannerImageKey: this.bannerImageKey,
+      maxCohortSize: this.maxCohortSize,
+      status: "published",
       sessions: this.sessions,
       timezone: this.timezone,
       createdAt: this.createdAt,
