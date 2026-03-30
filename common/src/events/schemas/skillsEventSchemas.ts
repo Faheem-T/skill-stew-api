@@ -20,9 +20,35 @@ export const skillProfileUpdatedSchema = z
   })
   .strict();
 
+export const workshopPublishedSchema = z
+  .object({
+    id: z.uuid(),
+    expertId: z.string(),
+    title: z.string(),
+    description: z.string().nullable(),
+    targetAudience: z.string().nullable(),
+    bannerImageKey: z.string().nullable(),
+    maxCohortSize: z.number(),
+    timezone: z.string(),
+    publishedAt: z.iso.datetime(),
+    sessions: z.array(
+      z.object({
+        id: z.uuid(),
+        weekNumber: z.number().int(),
+        dayOfWeek: z.number().int(),
+        sessionOrder: z.number().int(),
+        title: z.string().nullable(),
+        description: z.string().nullable(),
+        startTime: z.string(),
+      }),
+    ),
+  })
+  .strict();
+
 export const SkillsEventSchemas = {
   "skill.created": skillCreatedSchema,
   "skill.profileUpdated": skillProfileUpdatedSchema,
   "skill.updated": skillUpdatedSchema,
   "skill.deleted": skillDeletedSchema,
+  "workshop.published": workshopPublishedSchema,
 } as const;
