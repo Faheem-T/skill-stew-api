@@ -61,6 +61,7 @@ The seed script is idempotent — if skills already exist in the database, it sk
 | `PORT`                        | Service port              |
 | `DATABASE_URL`                | MongoDB connection string |
 | `RABBIT_MQ_CONNECTION_STRING` | RabbitMQ connection URL   |
+| `CDN_DOMAIN_NAME`             | CDN domain for image URLs |
 
 ## Key Design Decisions
 

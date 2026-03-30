@@ -2,6 +2,7 @@ const envVars = [
   "PORT",
   "DATABASE_URL",
   "RABBIT_MQ_CONNECTION_STRING",
+  "CDN_DOMAIN_NAME",
 ] as const;
 
 export function generateEnvVars() {

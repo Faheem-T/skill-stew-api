@@ -163,6 +163,7 @@ export const workshopResponseDTO = z.object({
   description: z.string().nullable(),
   targetAudience: z.string().nullable(),
   bannerImageKey: z.string().nullable(),
+  bannerImageUrl: z.string().nullable(),
   maxCohortSize: z.number(),
   status: z.enum(WorkshopStatus),
   sessions: z.array(workshopSessionResponseDTO),

@@ -1,5 +1,6 @@
 import { Workshop } from "../../domain/entities/Workshop";
 import type { IWorkshopRepository } from "../../domain/repositories/IWorkshopRepository";
+import type { IStorageService } from "../ports/IStorageService";
 import {
   ForbiddenOperationError,
   NotFoundError,
@@ -19,7 +20,10 @@ import type {
 import type { IWorkshopService } from "../interfaces/IWorkshopService";
 
 export class WorkshopService implements IWorkshopService {
-  constructor(private workshopRepo: IWorkshopRepository) {}
+  constructor(
+    private workshopRepo: IWorkshopRepository,
+    private storageService: IStorageService,
+  ) {}
 
   createWorkshop = async ({
     expertId,
@@ -207,6 +211,9 @@ export class WorkshopService implements IWorkshopService {
       description: workshop.description,
       targetAudience: workshop.targetAudience,
       bannerImageKey: workshop.bannerImageKey,
+      bannerImageUrl: workshop.bannerImageKey
+        ? this.storageService.getPublicUrl(workshop.bannerImageKey)
+        : null,
       maxCohortSize: workshop.maxCohortSize,
       status: workshop.status,
       sessions: workshop.sessions,
