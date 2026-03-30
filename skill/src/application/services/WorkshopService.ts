@@ -208,18 +208,15 @@ export class WorkshopService implements IWorkshopService {
         description: saved.description,
         targetAudience: saved.targetAudience,
         bannerImageKey: saved.bannerImageKey,
-        maxCohortSize: saved.maxCohortSize,
-        timezone: saved.timezone ?? "",
         publishedAt: publishedAt.toISOString(),
-        sessions: saved.sessions.map((session) => ({
-          id: session.id,
-          weekNumber: session.weekNumber,
-          dayOfWeek: session.dayOfWeek,
-          sessionOrder: session.sessionOrder,
-          title: session.title ?? null,
-          description: session.description ?? null,
-          startTime: session.startTime,
-        })),
+        sessionTitles: saved.sessions
+          .map((session) => session.title)
+          .filter((title): title is string => Boolean(title?.trim())),
+        sessionDescriptions: saved.sessions
+          .map((session) => session.description)
+          .filter(
+            (description): description is string => Boolean(description?.trim()),
+          ),
       };
 
       await this.outboxEventRepo.create(
