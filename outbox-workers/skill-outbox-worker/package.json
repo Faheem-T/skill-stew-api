@@ -1,5 +1,5 @@
 {
-  "name": "user-outbox-worker",
+  "name": "skill-outbox-worker",
   "module": "index.ts",
   "type": "module",
   "scripts": {
@@ -8,8 +8,7 @@
   "private": true,
   "devDependencies": {
     "@types/amqplib": "^0.10.8",
-    "@types/bun": "latest",
-    "@types/pg": "^8.16.0"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
@@ -17,8 +16,7 @@
   "dependencies": {
     "@skillstew/common": "1.0.47",
     "amqplib": "^0.10.9",
-    "drizzle-orm": "^0.45.1",
-    "pg": "^8.18.0",
+    "mongoose": "^8.22.0",
     "winston": "^3.19.0"
   }
 }
