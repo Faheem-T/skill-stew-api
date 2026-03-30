@@ -1,6 +1,7 @@
 import { GeneratePresignedUploadUrlDTO } from "../../dtos/common/GeneratePresignedUploadUrl.dto";
 import { IGeneratePresignedUploadUrl } from "../../interfaces/common/IGeneratePresignedUploadUrl";
 import { IStorageService } from "../../ports/IStorageService";
+import { v7 as uuidv7 } from "uuid";
 
 export class GeneratePresignedUploadUrl implements IGeneratePresignedUploadUrl {
   constructor(private _storageService: IStorageService) {}
@@ -20,8 +21,10 @@ export class GeneratePresignedUploadUrl implements IGeneratePresignedUploadUrl {
     }
 
     const extension = mimetype.split("/")[1];
-
-    const filename = `${folder}/${userId}/${type}.${extension}`;
+    const filename =
+      type === "workshopBanner"
+        ? `${folder}/${userId}/workshops/${uuidv7()}/banner.${extension}`
+        : `${folder}/${userId}/${type}.${extension}`;
 
     const url = await this._storageService.generatePresignedUrl({
       filename,
