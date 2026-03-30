@@ -1,12 +1,14 @@
 import { ExpertService } from "../application/services/ExpertService";
 import { SkillService } from "../application/services/SkillService";
 import { UserService } from "../application/services/UserService";
+import { WorkshopService } from "../application/services/WorkshopService";
 import { S3StorageService } from "../infrastructure/adapters/S3StorageService";
 import { UserConnectionService } from "../infrastructure/adapters/UserConnectionService";
 import { es } from "../infrastructure/config/esConnection";
 import { ExpertRepository } from "../infrastructure/database/repositories/ExpertRepository";
 import { SkillRepository } from "../infrastructure/database/repositories/SkillRepository";
 import { UserRepository } from "../infrastructure/database/repositories/UserRepository";
+import { WorkshopRepository } from "../infrastructure/database/repositories/WorkshopRepository";
 import { SkillController } from "../presentation/controllers/SkillController";
 import { UserController } from "../presentation/controllers/UserController";
 
@@ -25,5 +27,8 @@ export const expertService = new ExpertService(expertRepo);
 const skillRepo = new SkillRepository(es);
 export const skillService = new SkillService(skillRepo);
 export const skillController = new SkillController(skillService);
+
+const workshopRepo = new WorkshopRepository(es);
+export const workshopService = new WorkshopService(workshopRepo);
 
 export const userController = new UserController(userService);
