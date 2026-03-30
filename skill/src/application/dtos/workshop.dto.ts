@@ -17,6 +17,31 @@ export const createWorkshopDTO = z.object({
 
 export type CreateWorkshopDTO = z.infer<typeof createWorkshopDTO>;
 
+export const updateWorkshopParamsDTO = z.object({
+  id: z.string().trim().min(1, "Workshop ID is required"),
+  expertId: z.string().trim().min(1, "Expert ID is required"),
+});
+
+export type UpdateWorkshopParamsDTO = z.infer<typeof updateWorkshopParamsDTO>;
+
+export const updateWorkshopBodyDTO = z
+  .object({
+    title: z.string().trim().min(1, "Title is required").optional(),
+    description: optionalNullableString,
+    targetAudience: optionalNullableString,
+    maxCohortSize: z
+      .number()
+      .int("Max cohort size must be an integer")
+      .positive("Max cohort size must be greater than 0")
+      .optional(),
+    bannerImageKey: optionalNullableString,
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  });
+
+export type UpdateWorkshopBodyDTO = z.infer<typeof updateWorkshopBodyDTO>;
+
 export const workshopResponseDTO = z.object({
   id: z.string(),
   expertId: z.string(),

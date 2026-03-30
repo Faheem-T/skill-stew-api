@@ -1,4 +1,5 @@
 import { Workshop } from "../../domain/entities/Workshop";
+import { NotFoundError } from "../../domain/errors";
 import type { IWorkshopRepository } from "../../domain/repositories/IWorkshopRepository";
 import {
   type WorkshopAttr,
@@ -15,6 +16,43 @@ export class WorkshopRepository implements IWorkshopRepository {
       const savedWorkshop = await newWorkshop.save();
       return this.toDomain(savedWorkshop);
     } catch (error) {
+      throw mapMongooseError(error);
+    }
+  };
+
+  getById = async (id: string): Promise<Workshop> => {
+    try {
+      const doc = await WorkshopModel.findById(id);
+      if (!doc) {
+        throw new NotFoundError("Workshop");
+      }
+      return this.toDomain(doc);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      throw mapMongooseError(error);
+    }
+  };
+
+  update = async (workshop: Workshop): Promise<Workshop> => {
+    try {
+      const attrs = this.toPersistence(workshop);
+      const updatedWorkshop = await WorkshopModel.findByIdAndUpdate(
+        workshop.id,
+        attrs,
+        { new: true, runValidators: true },
+      );
+
+      if (!updatedWorkshop) {
+        throw new NotFoundError("Workshop");
+      }
+
+      return this.toDomain(updatedWorkshop);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
       throw mapMongooseError(error);
     }
   };

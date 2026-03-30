@@ -65,4 +65,35 @@ export class Workshop {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
+
+  updateBasics({
+    title,
+    description,
+    targetAudience,
+    bannerImageKey,
+    maxCohortSize,
+  }: {
+    title?: string;
+    description?: string | null;
+    targetAudience?: string | null;
+    bannerImageKey?: string | null;
+    maxCohortSize?: number;
+  }): Workshop {
+    return new Workshop({
+      id: this.id,
+      expertId: this.expertId,
+      title: title ?? this.title,
+      description: description === undefined ? this.description : description,
+      targetAudience:
+        targetAudience === undefined ? this.targetAudience : targetAudience,
+      bannerImageKey:
+        bannerImageKey === undefined ? this.bannerImageKey : bannerImageKey,
+      maxCohortSize: maxCohortSize ?? this.maxCohortSize,
+      status: this.status,
+      sessions: this.sessions,
+      timezone: this.timezone,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    });
+  }
 }

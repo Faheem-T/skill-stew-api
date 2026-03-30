@@ -1,7 +1,12 @@
 import { Workshop } from "../../domain/entities/Workshop";
 import type { IWorkshopRepository } from "../../domain/repositories/IWorkshopRepository";
+import {
+  ForbiddenOperationError,
+  WorkshopDraftRequiredError,
+} from "../../domain/errors";
 import type {
   CreateWorkshopDTO,
+  UpdateWorkshopBodyDTO,
   WorkshopResponseDTO,
 } from "../dtos/workshop.dto";
 import type { IWorkshopService } from "../interfaces/IWorkshopService";
@@ -32,18 +37,47 @@ export class WorkshopService implements IWorkshopService {
     const savedWorkshop = await this.workshopRepo.create(workshop);
 
     return {
-      id: savedWorkshop.id,
-      expertId: savedWorkshop.expertId,
-      title: savedWorkshop.title,
-      description: savedWorkshop.description,
-      targetAudience: savedWorkshop.targetAudience,
-      bannerImageKey: savedWorkshop.bannerImageKey,
-      maxCohortSize: savedWorkshop.maxCohortSize,
-      status: savedWorkshop.status,
-      sessions: savedWorkshop.sessions,
-      timezone: savedWorkshop.timezone,
-      createdAt: savedWorkshop.createdAt ?? new Date(),
-      updatedAt: savedWorkshop.updatedAt ?? new Date(),
+      ...this.toResponse(savedWorkshop),
+    };
+  };
+
+  updateWorkshop = async (
+    workshopId: string,
+    expertId: string,
+    data: UpdateWorkshopBodyDTO,
+  ): Promise<WorkshopResponseDTO> => {
+    const existingWorkshop = await this.workshopRepo.getById(workshopId);
+
+    if (existingWorkshop.expertId !== expertId) {
+      throw new ForbiddenOperationError(
+        "You do not have permission to update this workshop.",
+      );
+    }
+
+    if (existingWorkshop.status !== "draft") {
+      throw new WorkshopDraftRequiredError();
+    }
+
+    const updatedWorkshop = existingWorkshop.updateBasics(data);
+    const savedWorkshop = await this.workshopRepo.update(updatedWorkshop);
+
+    return this.toResponse(savedWorkshop);
+  };
+
+  private toResponse = (workshop: Workshop): WorkshopResponseDTO => {
+    return {
+      id: workshop.id,
+      expertId: workshop.expertId,
+      title: workshop.title,
+      description: workshop.description,
+      targetAudience: workshop.targetAudience,
+      bannerImageKey: workshop.bannerImageKey,
+      maxCohortSize: workshop.maxCohortSize,
+      status: workshop.status,
+      sessions: workshop.sessions,
+      timezone: workshop.timezone,
+      createdAt: workshop.createdAt ?? new Date(),
+      updatedAt: workshop.updatedAt ?? new Date(),
     };
   };
 }

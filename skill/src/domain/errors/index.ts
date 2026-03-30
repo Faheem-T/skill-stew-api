@@ -4,3 +4,5 @@ export { NotFoundError } from "./NotFoundError";
 export { AlreadyExistsError } from "./AlreadyExistsError";
 export { DuplicateSkillInProfileError } from "./DuplicateSkillInProfileError";
 export { UnauthorizedAccessError } from "./UnauthorizedAccessError";
+export { ForbiddenOperationError } from "./ForbiddenOperationError";
+export { WorkshopDraftRequiredError } from "./WorkshopDraftRequiredError";

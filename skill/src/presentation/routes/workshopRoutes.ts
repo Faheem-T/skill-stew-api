@@ -6,4 +6,8 @@ export const workshopRouter = Router().post(
   "/",
   requireRole("EXPERT"),
   workshopController.createWorkshop,
+).patch(
+  "/:id",
+  requireRole("EXPERT"),
+  workshopController.updateWorkshop,
 );
