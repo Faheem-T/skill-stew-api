@@ -28,20 +28,9 @@ export const workshopPublishedSchema = z
     description: z.string().nullable(),
     targetAudience: z.string().nullable(),
     bannerImageKey: z.string().nullable(),
-    maxCohortSize: z.number(),
-    timezone: z.string(),
     publishedAt: z.iso.datetime(),
-    sessions: z.array(
-      z.object({
-        id: z.uuid(),
-        weekNumber: z.number().int(),
-        dayOfWeek: z.number().int(),
-        sessionOrder: z.number().int(),
-        title: z.string().nullable(),
-        description: z.string().nullable(),
-        startTime: z.string(),
-      }),
-    ),
+    sessionTitles: z.array(z.string()),
+    sessionDescriptions: z.array(z.string()),
   })
   .strict();
 
