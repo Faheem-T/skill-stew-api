@@ -2,6 +2,8 @@ import { SkillProfileService } from "../application/services/SkillProfileService
 import { SkillService } from "../application/services/SkillService";
 import { WorkshopService } from "../application/services/WorkshopService";
 import { MessageProducer } from "../infrastructure/adapters/MessageProducer";
+import { UnitOfWork } from "../infrastructure/persistence/UnitOfWork";
+import { OutboxEventRepository } from "../infrastructure/repositories/OutboxEventRepository";
 import { SkillProfileRepository } from "../infrastructure/repositories/SkillProfileRepository";
 import { SkillRepository } from "../infrastructure/repositories/SkillRepository";
 import { WorkshopRepository } from "../infrastructure/repositories/WorkshopRepository";
@@ -26,13 +28,20 @@ const queue = await channel.assertQueue(QUEUE_NAME, {
 
 export const messageProducer = new MessageProducer(channel, EXCHANGE_NAME);
 const storageService = new S3StorageService();
+const unitOfWork = new UnitOfWork();
+const outboxEventRepo = new OutboxEventRepository();
 
 const skillRepo = new SkillRepository();
 const skillService = new SkillService(skillRepo, messageProducer);
 export const skillController = new SkillController(skillService);
 
 const workshopRepo = new WorkshopRepository();
-const workshopService = new WorkshopService(workshopRepo, storageService);
+const workshopService = new WorkshopService(
+  workshopRepo,
+  storageService,
+  outboxEventRepo,
+  unitOfWork,
+);
 export const workshopController = new WorkshopController(workshopService);
 
 const skillProfileRepo = new SkillProfileRepository();

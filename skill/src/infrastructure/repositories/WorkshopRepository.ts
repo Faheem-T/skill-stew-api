@@ -1,6 +1,7 @@
 import { Workshop } from "../../domain/entities/Workshop";
 import { NotFoundError } from "../../domain/errors";
 import type { IWorkshopRepository } from "../../domain/repositories/IWorkshopRepository";
+import type { TransactionContext } from "../../types/TransactionContext";
 import {
   type WorkshopAttr,
   type WorkshopDoc,
@@ -9,20 +10,23 @@ import {
 import { mapMongooseError } from "../mappers/ErrorMapper";
 
 export class WorkshopRepository implements IWorkshopRepository {
-  create = async (workshop: Workshop): Promise<Workshop> => {
+  create = async (
+    workshop: Workshop,
+    tx?: TransactionContext,
+  ): Promise<Workshop> => {
     try {
       const attrs = this.toPersistence(workshop);
       const newWorkshop = WorkshopModel.build(attrs);
-      const savedWorkshop = await newWorkshop.save();
+      const savedWorkshop = await newWorkshop.save({ session: tx });
       return this.toDomain(savedWorkshop);
     } catch (error) {
       throw mapMongooseError(error);
     }
   };
 
-  getById = async (id: string): Promise<Workshop> => {
+  getById = async (id: string, tx?: TransactionContext): Promise<Workshop> => {
     try {
-      const doc = await WorkshopModel.findById(id);
+      const doc = await WorkshopModel.findById(id).session(tx ?? null);
       if (!doc) {
         throw new NotFoundError("Workshop");
       }
@@ -35,13 +39,16 @@ export class WorkshopRepository implements IWorkshopRepository {
     }
   };
 
-  update = async (workshop: Workshop): Promise<Workshop> => {
+  update = async (
+    workshop: Workshop,
+    tx?: TransactionContext,
+  ): Promise<Workshop> => {
     try {
       const attrs = this.toPersistence(workshop);
       const updatedWorkshop = await WorkshopModel.findByIdAndUpdate(
         workshop.id,
         attrs,
-        { new: true, runValidators: true },
+        { new: true, runValidators: true, session: tx },
       );
 
       if (!updatedWorkshop) {

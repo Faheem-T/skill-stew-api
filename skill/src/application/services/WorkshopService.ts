@@ -1,6 +1,11 @@
+import type { EventName } from "@skillstew/common";
+import { v7 as uuidv7 } from "uuid";
+import { OutboxEvent } from "../../domain/entities/OutboxEvent";
 import { Workshop } from "../../domain/entities/Workshop";
 import type { IWorkshopRepository } from "../../domain/repositories/IWorkshopRepository";
+import type { IOutboxEventRepository } from "../../domain/repositories/IOutboxEventRepository";
 import type { IStorageService } from "../ports/IStorageService";
+import type { IUnitOfWork } from "../ports/IUnitOfWork";
 import {
   ForbiddenOperationError,
   NotFoundError,
@@ -23,6 +28,8 @@ export class WorkshopService implements IWorkshopService {
   constructor(
     private workshopRepo: IWorkshopRepository,
     private storageService: IStorageService,
+    private outboxEventRepo: IOutboxEventRepository,
+    private unitOfWork: IUnitOfWork,
   ) {}
 
   createWorkshop = async ({
@@ -128,11 +135,20 @@ export class WorkshopService implements IWorkshopService {
     id,
     expertId,
   }: PublishWorkshopParamsDTO): Promise<WorkshopResponseDTO> => {
-    // const workshop = await this.workshopRepo.getById(id);
-    const workshop = await this.getOwnedDraftWorkshop(id, expertId, "publish");
+    const workshop = await this.workshopRepo.getById(id);
+
+    if (workshop.expertId !== expertId) {
+      throw new ForbiddenOperationError(
+        "You do not have permission to publish this workshop.",
+      );
+    }
 
     if (workshop.status === "published") {
       throw new WorkshopAlreadyPublishedError();
+    }
+
+    if (workshop.status !== "draft") {
+      throw new WorkshopDraftRequiredError();
     }
 
     const validationErrors: Array<{ message: string; field?: string }> = [];
@@ -179,7 +195,47 @@ export class WorkshopService implements IWorkshopService {
       throw new WorkshopNotReadyToPublishError(validationErrors);
     }
 
-    const savedWorkshop = await this.workshopRepo.update(workshop.publish());
+    const publishedAt = new Date();
+    const savedWorkshop = await this.unitOfWork.transact(async (tx) => {
+      const publishedWorkshop = workshop.publish();
+      const saved = await this.workshopRepo.update(publishedWorkshop, tx);
+
+      const eventName = "workshop.published" as EventName;
+      const payload = {
+        id: saved.id,
+        expertId: saved.expertId,
+        title: saved.title,
+        description: saved.description,
+        targetAudience: saved.targetAudience,
+        bannerImageKey: saved.bannerImageKey,
+        maxCohortSize: saved.maxCohortSize,
+        timezone: saved.timezone ?? "",
+        publishedAt: publishedAt.toISOString(),
+        sessions: saved.sessions.map((session) => ({
+          id: session.id,
+          weekNumber: session.weekNumber,
+          dayOfWeek: session.dayOfWeek,
+          sessionOrder: session.sessionOrder,
+          title: session.title ?? null,
+          description: session.description ?? null,
+          startTime: session.startTime,
+        })),
+      };
+
+      await this.outboxEventRepo.create(
+        new OutboxEvent(
+          uuidv7(),
+          eventName,
+          payload,
+          "PENDING",
+          publishedAt,
+          undefined,
+        ),
+        tx,
+      );
+
+      return saved;
+    });
     return this.toResponse(savedWorkshop);
   };
 

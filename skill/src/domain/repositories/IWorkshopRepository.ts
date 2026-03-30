@@ -1,7 +1,8 @@
 import type { Workshop } from "../entities/Workshop";
+import type { TransactionContext } from "../../types/TransactionContext";
 
 export interface IWorkshopRepository {
-  create(workshop: Workshop): Promise<Workshop>;
-  getById(id: string): Promise<Workshop>;
-  update(workshop: Workshop): Promise<Workshop>;
+  create(workshop: Workshop, tx?: TransactionContext): Promise<Workshop>;
+  getById(id: string, tx?: TransactionContext): Promise<Workshop>;
+  update(workshop: Workshop, tx?: TransactionContext): Promise<Workshop>;
 }
