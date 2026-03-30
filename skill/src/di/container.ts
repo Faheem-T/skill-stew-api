@@ -1,10 +1,13 @@
 import { SkillProfileService } from "../application/services/SkillProfileService";
 import { SkillService } from "../application/services/SkillService";
+import { WorkshopService } from "../application/services/WorkshopService";
 import { MessageProducer } from "../infrastructure/adapters/MessageProducer";
 import { SkillProfileRepository } from "../infrastructure/repositories/SkillProfileRepository";
 import { SkillRepository } from "../infrastructure/repositories/SkillRepository";
+import { WorkshopRepository } from "../infrastructure/repositories/WorkshopRepository";
 import { SkillController } from "../presentation/controllers/SkillController";
 import { SkillProfileController } from "../presentation/controllers/SkillProfileController";
+import { WorkshopController } from "../presentation/controllers/WorkshopController";
 import { ENV } from "../utils/dotenv";
 import amqp from "amqplib";
 
@@ -25,6 +28,10 @@ export const messageProducer = new MessageProducer(channel, EXCHANGE_NAME);
 const skillRepo = new SkillRepository();
 const skillService = new SkillService(skillRepo, messageProducer);
 export const skillController = new SkillController(skillService);
+
+const workshopRepo = new WorkshopRepository();
+const workshopService = new WorkshopService(workshopRepo);
+export const workshopController = new WorkshopController(workshopService);
 
 const skillProfileRepo = new SkillProfileRepository();
 const skillProfileService = new SkillProfileService(

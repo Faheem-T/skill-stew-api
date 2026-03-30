@@ -158,4 +158,36 @@ describe("authMiddleware", () => {
       code: "INVALID_TOKEN_ERROR",
     });
   });
+
+  it("requires an expert token for workshop routes", async () => {
+    const env = createTestEnv();
+    const middleware = authMiddleware(getGroup("/api/v1/workshops")!, env);
+    const accessToken = createAccessToken(env, {
+      userId: "user-123",
+      email: "user@example.com",
+      role: "USER",
+    });
+    const req: {
+      method: string;
+      originalUrl: string;
+      headers: Record<string, string>;
+      user?: unknown;
+    } = {
+      method: "POST",
+      originalUrl: "/api/v1/workshops",
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    };
+    const res = createResponseMock();
+
+    const result = await runMiddleware(middleware, req, res);
+
+    expect(result.nextCalled).toBe(false);
+    expect(res.statusCode).toBe(403);
+    expect(res.body).toEqual({
+      success: false,
+      errors: [{ message: "You do not have the permission to access this." }],
+    });
+  });
 });

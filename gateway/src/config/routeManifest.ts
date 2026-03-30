@@ -103,6 +103,11 @@ export const routeGroups: RouteGroup[] = [
     ],
   },
   {
+    prefix: "/api/v1/workshops",
+    service: "skill",
+    auth: { required: true, roles: ["EXPERT"] },
+  },
+  {
     prefix: "/api/v1/search",
     service: "search",
     auth: { required: false },
