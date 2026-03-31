@@ -10,7 +10,7 @@ INFISICAL_DOMAIN="https://app.infisical.com"
 INFISICAL_PATH="/user-service-outbox-worker"
 
 echo "=========================================="
-echo "User Service - Starting..."
+echo "User Service Outbox Worker - Starting..."
 echo "=========================================="
 
 # Validate required environment variables
