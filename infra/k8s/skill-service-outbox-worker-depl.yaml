@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skill-service-outbox-worker-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skill-service-outbox-worker
+  template:
+    metadata:
+      labels:
+        app: skill-service-outbox-worker
+    spec:
+      containers:
+        - name: skill-service-outbox-worker
+          image: faheem222/skill-service-outbox-worker
+          envFrom:
+            - secretRef:
+                name: infisical-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: skill-service-outbox-worker-srv
+spec:
+  selector:
+    app: skill-service-outbox-worker
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
