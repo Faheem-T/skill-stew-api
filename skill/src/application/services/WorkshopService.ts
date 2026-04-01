@@ -15,12 +15,14 @@ import {
 } from "../../domain/errors";
 import type {
   CreateWorkshopDTO,
+  GetWorkshopsQueryDTO,
   PublishWorkshopParamsDTO,
   ReplaceWorkshopSessionsBodyDTO,
   UpdateWorkshopBodyDTO,
   UpdateWorkshopSessionBodyDTO,
   WorkshopResponseDTO,
   WorkshopSessionResponseDTO,
+  WorkshopSummaryResponseDTO,
 } from "../dtos/workshop.dto";
 import type { IWorkshopService } from "../interfaces/IWorkshopService";
 
@@ -57,6 +59,29 @@ export class WorkshopService implements IWorkshopService {
     return {
       ...this.toResponse(savedWorkshop),
     };
+  };
+
+  getWorkshops = async ({
+    expertId,
+    status,
+  }: GetWorkshopsQueryDTO): Promise<WorkshopSummaryResponseDTO[]> => {
+    const workshops = await this.workshopRepo.findByExpertId(expertId, status);
+    return workshops.map((workshop) => this.toSummaryResponse(workshop));
+  };
+
+  getWorkshopById = async (
+    workshopId: string,
+    expertId: string,
+  ): Promise<WorkshopResponseDTO> => {
+    const workshop = await this.workshopRepo.getById(workshopId);
+
+    if (workshop.expertId !== expertId) {
+      throw new ForbiddenOperationError(
+        "You do not have permission to access this workshop.",
+      );
+    }
+
+    return this.toResponse(workshop);
   };
 
   updateWorkshop = async (
@@ -273,6 +298,24 @@ export class WorkshopService implements IWorkshopService {
       timezone: workshop.timezone,
       createdAt: workshop.createdAt ?? new Date(),
       updatedAt: workshop.updatedAt ?? new Date(),
+    };
+  };
+
+  private toSummaryResponse = (
+    workshop: Workshop,
+  ): WorkshopSummaryResponseDTO => {
+    return {
+      id: workshop.id,
+      title: workshop.title,
+      description: workshop.description,
+      bannerImageKey: workshop.bannerImageKey,
+      bannerImageUrl: workshop.bannerImageKey
+        ? this.storageService.getPublicUrl(workshop.bannerImageKey)
+        : null,
+      status: workshop.status,
+      timezone: workshop.timezone,
+      updatedAt: workshop.updatedAt ?? new Date(),
+      sessionCount: workshop.sessions.length,
     };
   };
 

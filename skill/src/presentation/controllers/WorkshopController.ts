@@ -2,6 +2,8 @@ import type { NextFunction, Request, Response } from "express";
 import type { IWorkshopService } from "../../application/interfaces/IWorkshopService";
 import {
   createWorkshopDTO,
+  getWorkshopParamsDTO,
+  getWorkshopsQueryDTO,
   publishWorkshopParamsDTO,
   replaceWorkshopSessionsBodyDTO,
   replaceWorkshopSessionsParamsDTO,
@@ -14,6 +16,53 @@ import { HttpStatus } from "../../constants/HttpStatusCodes";
 
 export class WorkshopController {
   constructor(private workshopService: IWorkshopService) {}
+
+  getWorkshops = async (
+    req: Request<{}, unknown, unknown, { status?: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const dto = getWorkshopsQueryDTO.parse({
+        expertId: req.headers["x-user-id"],
+        status: req.query.status,
+      });
+
+      const workshops = await this.workshopService.getWorkshops(dto);
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: workshops,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getWorkshopById = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const params = getWorkshopParamsDTO.parse({
+        id: req.params.id,
+        expertId: req.headers["x-user-id"],
+      });
+
+      const workshop = await this.workshopService.getWorkshopById(
+        params.id,
+        params.expertId,
+      );
+
+      res.status(HttpStatus.OK).json({
+        success: true,
+        data: workshop,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
 
   createWorkshop = async (
     req: Request,

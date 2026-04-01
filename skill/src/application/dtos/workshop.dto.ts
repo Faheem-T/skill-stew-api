@@ -27,6 +27,20 @@ export const createWorkshopDTO = z.object({
 
 export type CreateWorkshopDTO = z.infer<typeof createWorkshopDTO>;
 
+export const getWorkshopsQueryDTO = z.object({
+  expertId: z.string().trim().min(1, "Expert ID is required"),
+  status: z.enum(WorkshopStatus).optional(),
+});
+
+export type GetWorkshopsQueryDTO = z.infer<typeof getWorkshopsQueryDTO>;
+
+export const getWorkshopParamsDTO = z.object({
+  id: z.string().trim().min(1, "Workshop ID is required"),
+  expertId: z.string().trim().min(1, "Expert ID is required"),
+});
+
+export type GetWorkshopParamsDTO = z.infer<typeof getWorkshopParamsDTO>;
+
 export const updateWorkshopParamsDTO = z.object({
   id: z.string().trim().min(1, "Workshop ID is required"),
   expertId: z.string().trim().min(1, "Expert ID is required"),
@@ -64,6 +78,22 @@ export const workshopSessionResponseDTO = z.object({
 
 export type WorkshopSessionResponseDTO = z.infer<
   typeof workshopSessionResponseDTO
+>;
+
+export const workshopSummaryResponseDTO = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().nullable(),
+  bannerImageKey: z.string().nullable(),
+  bannerImageUrl: z.string().nullable(),
+  status: z.enum(WorkshopStatus),
+  timezone: z.string().nullable(),
+  updatedAt: z.date(),
+  sessionCount: z.number(),
+});
+
+export type WorkshopSummaryResponseDTO = z.infer<
+  typeof workshopSummaryResponseDTO
 >;
 
 const scheduleSessionInputDTO = z.object({

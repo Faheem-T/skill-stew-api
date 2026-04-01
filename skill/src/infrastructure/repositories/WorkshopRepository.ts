@@ -39,6 +39,26 @@ export class WorkshopRepository implements IWorkshopRepository {
     }
   };
 
+  findByExpertId = async (
+    expertId: string,
+    status?: Workshop["status"],
+    tx?: TransactionContext,
+  ): Promise<Workshop[]> => {
+    try {
+      const query = status
+        ? { expertId, status }
+        : { expertId };
+
+      const docs = await WorkshopModel.find(query)
+        .sort({ updatedAt: -1 })
+        .session(tx ?? null);
+
+      return docs.map((doc) => this.toDomain(doc));
+    } catch (error) {
+      throw mapMongooseError(error);
+    }
+  };
+
   update = async (
     workshop: Workshop,
     tx?: TransactionContext,
