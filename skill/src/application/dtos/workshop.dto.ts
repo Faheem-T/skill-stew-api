@@ -103,9 +103,11 @@ export const replaceWorkshopSessionsBodyDTO = z
   })
   .superRefine((data, ctx) => {
     const seen = new Set<string>();
+    const groupedSessionOrders = new Map<string, number[]>();
 
     data.sessions.forEach((session, index) => {
       const key = `${session.weekNumber}:${session.dayOfWeek}:${session.sessionOrder}`;
+      const groupKey = `${session.weekNumber}:${session.dayOfWeek}`;
       if (seen.has(key)) {
         ctx.addIssue({
           code: "custom",
@@ -115,7 +117,29 @@ export const replaceWorkshopSessionsBodyDTO = z
         });
       }
       seen.add(key);
+
+      const orders = groupedSessionOrders.get(groupKey) ?? [];
+      orders.push(session.sessionOrder);
+      groupedSessionOrders.set(groupKey, orders);
     });
+
+    for (const [groupKey, orders] of groupedSessionOrders.entries()) {
+      const sortedOrders = [...orders].sort((a, b) => a - b);
+      for (let i = 0; i < sortedOrders.length; i++) {
+        const expectedOrder = i + 1;
+        const actualOrder = sortedOrders[i];
+
+        if (actualOrder !== expectedOrder) {
+          const [weekNumber, dayOfWeek] = groupKey.split(":");
+          ctx.addIssue({
+            code: "custom",
+            message: `Session order must be contiguous starting at 1 for week ${weekNumber}, day ${dayOfWeek}.`,
+            path: ["sessions"],
+          });
+          break;
+        }
+      }
+    }
   });
 
 export type ReplaceWorkshopSessionsBodyDTO = z.infer<
