@@ -3,6 +3,7 @@ export { DomainErrorCodes } from "./DomainErrorCodes";
 export { OutboxEvent } from "../entities/OutboxEvent";
 export { NotFoundError } from "./NotFoundError";
 export { AlreadyExistsError } from "./AlreadyExistsError";
+export { ConflictError } from "./ConflictError";
 export { DuplicateSkillInProfileError } from "./DuplicateSkillInProfileError";
 export { UnauthorizedAccessError } from "./UnauthorizedAccessError";
 export { ForbiddenOperationError } from "./ForbiddenOperationError";

@@ -3,10 +3,12 @@ import { v7 as uuidv7 } from "uuid";
 import { OutboxEvent } from "../../domain/entities/OutboxEvent";
 import { Workshop } from "../../domain/entities/Workshop";
 import type { IWorkshopRepository } from "../../domain/repositories/IWorkshopRepository";
+import type { ICohortRepository } from "../../domain/repositories/ICohortRepository";
 import type { IOutboxEventRepository } from "../../domain/repositories/IOutboxEventRepository";
 import type { IStorageService } from "../ports/IStorageService";
 import type { IUnitOfWork } from "../ports/IUnitOfWork";
 import {
+  ConflictError,
   ForbiddenOperationError,
   NotFoundError,
   WorkshopAlreadyPublishedError,
@@ -29,6 +31,7 @@ import type { IWorkshopService } from "../interfaces/IWorkshopService";
 export class WorkshopService implements IWorkshopService {
   constructor(
     private workshopRepo: IWorkshopRepository,
+    private cohortRepo: ICohortRepository,
     private storageService: IStorageService,
     private outboxEventRepo: IOutboxEventRepository,
     private unitOfWork: IUnitOfWork,
@@ -89,6 +92,7 @@ export class WorkshopService implements IWorkshopService {
     expertId: string,
     data: UpdateWorkshopBodyDTO,
   ): Promise<WorkshopResponseDTO> => {
+    await this.ensureWorkshopIsNotFrozen(workshopId);
     const existingWorkshop = await this.getOwnedDraftWorkshop(
       workshopId,
       expertId,
@@ -106,6 +110,7 @@ export class WorkshopService implements IWorkshopService {
     expertId: string,
     data: ReplaceWorkshopSessionsBodyDTO,
   ): Promise<WorkshopSessionResponseDTO[]> => {
+    await this.ensureWorkshopIsNotFrozen(workshopId);
     const workshop = await this.getOwnedDraftWorkshop(
       workshopId,
       expertId,
@@ -129,6 +134,7 @@ export class WorkshopService implements IWorkshopService {
     expertId: string,
     data: UpdateWorkshopSessionBodyDTO,
   ): Promise<WorkshopSessionResponseDTO> => {
+    await this.ensureWorkshopIsNotFrozen(workshopId);
     const workshop = await this.getOwnedDraftWorkshop(
       workshopId,
       expertId,
@@ -279,6 +285,15 @@ export class WorkshopService implements IWorkshopService {
     }
 
     return workshop;
+  };
+
+  private ensureWorkshopIsNotFrozen = async (workshopId: string) => {
+    const hasCohorts = await this.cohortRepo.existsByWorkshopId(workshopId);
+    if (hasCohorts) {
+      throw new ConflictError(
+        "Workshops with cohorts are frozen and can no longer be modified.",
+      );
+    }
   };
 
   private toResponse = (workshop: Workshop): WorkshopResponseDTO => {

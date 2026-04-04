@@ -190,4 +190,36 @@ describe("authMiddleware", () => {
       errors: [{ message: "You do not have the permission to access this." }],
     });
   });
+
+  it("requires a user token for cohort enrollment routes", async () => {
+    const env = createTestEnv();
+    const middleware = authMiddleware(getGroup("/api/v1/cohorts")!, env);
+    const accessToken = createAccessToken(env, {
+      userId: "expert-123",
+      email: "expert@example.com",
+      role: "EXPERT",
+    });
+    const req: {
+      method: string;
+      originalUrl: string;
+      headers: Record<string, string>;
+      user?: unknown;
+    } = {
+      method: "POST",
+      originalUrl: "/api/v1/cohorts/cohort-123/enrollments",
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    };
+    const res = createResponseMock();
+
+    const result = await runMiddleware(middleware, req, res);
+
+    expect(result.nextCalled).toBe(false);
+    expect(res.statusCode).toBe(403);
+    expect(res.body).toEqual({
+      success: false,
+      errors: [{ message: "You do not have the permission to access this." }],
+    });
+  });
 });
