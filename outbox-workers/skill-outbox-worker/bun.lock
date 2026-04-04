@@ -5,7 +5,7 @@
     "": {
       "name": "skill-outbox-worker",
       "dependencies": {
-        "@skillstew/common": "1.0.48",
+        "@skillstew/common": "1.0.49",
         "amqplib": "^0.10.9",
         "mongoose": "^8.22.0",
         "winston": "^3.19.0",
@@ -34,7 +34,7 @@
 
     "@sindresorhus/merge-streams": ["@sindresorhus/merge-streams@2.3.0", "", {}, "sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg=="],
 
-    "@skillstew/common": ["@skillstew/common@1.0.48", "", { "dependencies": { "@types/express": "^5.0.3", "@types/jsonwebtoken": "^9.0.10", "amqplib": "^0.10.8", "del-cli": "^6.0.0", "express": "^5.1.0", "jsonwebtoken": "^9.0.2", "zod": "^4.0.10" } }, "sha512-nBnVzwtTtp/rkGur5Y77/E3A+9k7YYOWRqW4hSva65cGUVPYK29NjfTOREH6Rk0RzuuHvZQdAUoQSeIIpUKiww=="],
+    "@skillstew/common": ["@skillstew/common@1.0.49", "", { "dependencies": { "@types/express": "^5.0.3", "@types/jsonwebtoken": "^9.0.10", "amqplib": "^0.10.8", "del-cli": "^6.0.0", "express": "^5.1.0", "jsonwebtoken": "^9.0.2", "zod": "^4.0.10" } }, "sha512-p1NdpPlJETWroKFHiJy0VDH5YzwzxTw2C2yUjp8yAmwHC8zBvIJFCgRd7CITDNmuqk/A/0xN1IICn4VinMv99A=="],
 
     "@so-ric/colorspace": ["@so-ric/colorspace@1.1.6", "", { "dependencies": { "color": "^5.0.2", "text-hex": "1.0.x" } }, "sha512-/KiKkpHNOBgkFJwu9sh48LkHSMYGyuTcSFK/qMBdnOAlrRJzRSXAOFB5qwzaVQuDl8wAvHVMkaASQDReTahxuw=="],
 
