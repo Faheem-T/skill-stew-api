@@ -108,6 +108,11 @@ export const routeGroups: RouteGroup[] = [
     auth: { required: true, roles: ["EXPERT"] },
   },
   {
+    prefix: "/api/v1/public/workshops",
+    service: "skill",
+    auth: { required: false },
+  },
+  {
     prefix: "/api/v1/cohorts",
     service: "skill",
     auth: { required: true, roles: ["EXPERT"] },
@@ -118,6 +123,11 @@ export const routeGroups: RouteGroup[] = [
         auth: { required: true, roles: ["USER"] },
       },
     ],
+  },
+  {
+    prefix: "/api/v1/public/cohorts",
+    service: "skill",
+    auth: { required: false },
   },
   {
     prefix: "/api/v1/search",
