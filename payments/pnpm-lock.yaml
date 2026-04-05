@@ -27,8 +27,8 @@ importers:
         specifier: ^1.9.10
         version: 1.9.10
       amqplib:
-        specifier: ^0.10.9
-        version: 0.10.9
+        specifier: ^1.0.3
+        version: 1.0.3
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
@@ -463,6 +463,10 @@ packages:
   amqplib@0.10.9:
     resolution: {integrity: sha512-jwSftI4QjS3mizvnSnOrPGYiUnm1vI2OP1iXeOUz5pb74Ua0nbf6nPyyTzuiCLEE3fMpaJORXh2K/TQ08H5xGA==}
     engines: {node: '>=10'}
+
+  amqplib@1.0.3:
+    resolution: {integrity: sha512-nsrXa59tvX4HPjPPW8JJGuBb/Db0MOq3DOhGdSbIY7bTsQDMV2fmF9c3i74g/8Gt9+QWyrxfEPppOOoV9lK1uQ==}
+    engines: {node: '>=18'}
 
   async@3.2.6:
     resolution: {integrity: sha512-htCUDlxyyCLMgaM3xXg0C0LW2xqfuQ6p05pCEIsXuyQ+a1koYKTuBMzRNwmybfLgvJDMd0r1LTn4+E0Ti6C2AA==}
@@ -1491,6 +1495,10 @@ snapshots:
     dependencies:
       buffer-more-ints: 1.0.0
       url-parse: 1.5.10
+
+  amqplib@1.0.3:
+    dependencies:
+      buffer-more-ints: 1.0.0
 
   async@3.2.6: {}
 

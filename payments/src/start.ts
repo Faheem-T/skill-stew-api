@@ -3,6 +3,7 @@ import { app } from "./app";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import { logger } from "./presentation/logger";
+import { initializePaymentsDependencies } from "./di";
 
 const { Pool } = pg;
 
@@ -12,6 +13,7 @@ export const db = drizzle({
 
 async function start() {
   try {
+    await initializePaymentsDependencies();
     logger.info("Attempting to ping database...");
     await db.execute("select 1");
     logger.info("Successfully pinged database");
