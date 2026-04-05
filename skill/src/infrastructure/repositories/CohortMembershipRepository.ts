@@ -1,5 +1,6 @@
 import { CohortMembership } from "../../domain/entities/CohortMembership";
 import type { CohortMembershipStatus } from "../../domain/entities/CohortMembershipStatus.enum";
+import { NotFoundError } from "../../domain/errors";
 import { mapMongooseError } from "../mappers/ErrorMapper";
 import type { ICohortMembershipRepository } from "../../domain/repositories/ICohortMembershipRepository";
 import type { TransactionContext } from "../../types/TransactionContext";
@@ -24,6 +25,47 @@ export class CohortMembershipRepository implements ICohortMembershipRepository {
     }
   };
 
+  getById = async (
+    id: string,
+    tx?: TransactionContext,
+  ): Promise<CohortMembership> => {
+    try {
+      const doc = await CohortMembershipModel.findById(id).session(tx ?? null);
+      if (!doc) {
+        throw new NotFoundError("Cohort membership");
+      }
+      return this.toDomain(doc);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      throw mapMongooseError(error);
+    }
+  };
+
+  update = async (
+    membership: CohortMembership,
+    tx?: TransactionContext,
+  ): Promise<CohortMembership> => {
+    try {
+      const attrs = this.toPersistence(membership);
+      const updated = await CohortMembershipModel.findByIdAndUpdate(
+        membership.id,
+        attrs,
+        { new: true, runValidators: true, session: tx },
+      );
+      if (!updated) {
+        throw new NotFoundError("Cohort membership");
+      }
+      return this.toDomain(updated);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      throw mapMongooseError(error);
+    }
+  };
+
   findByCohortIdAndStatus = async (
     cohortId: string,
     status: CohortMembershipStatus,
@@ -32,6 +74,24 @@ export class CohortMembershipRepository implements ICohortMembershipRepository {
     try {
       const docs = await CohortMembershipModel.find({ cohortId, status })
         .sort({ joinedAt: 1, createdAt: 1 })
+        .session(tx ?? null);
+      return docs.map((doc) => this.toDomain(doc));
+    } catch (error) {
+      throw mapMongooseError(error);
+    }
+  };
+
+  findByCohortIdAndStatuses = async (
+    cohortId: string,
+    statuses: CohortMembershipStatus[],
+    tx?: TransactionContext,
+  ): Promise<CohortMembership[]> => {
+    try {
+      const docs = await CohortMembershipModel.find({
+        cohortId,
+        status: { $in: statuses },
+      })
+        .sort({ createdAt: -1 })
         .session(tx ?? null);
       return docs.map((doc) => this.toDomain(doc));
     } catch (error) {
@@ -49,6 +109,32 @@ export class CohortMembershipRepository implements ICohortMembershipRepository {
         userId,
         status: { $in: statuses },
       }).session(tx ?? null);
+      return docs.map((doc) => this.toDomain(doc));
+    } catch (error) {
+      throw mapMongooseError(error);
+    }
+  };
+
+  findByUserIdAndCohortIds = async (
+    userId: string,
+    cohortIds: string[],
+    statuses?: CohortMembershipStatus[],
+    tx?: TransactionContext,
+  ): Promise<CohortMembership[]> => {
+    try {
+      if (cohortIds.length === 0) {
+        return [];
+      }
+      const query: Record<string, unknown> = {
+        userId,
+        cohortId: { $in: cohortIds },
+      };
+      if (statuses?.length) {
+        query.status = { $in: statuses };
+      }
+      const docs = await CohortMembershipModel.find(query)
+        .sort({ createdAt: -1 })
+        .session(tx ?? null);
       return docs.map((doc) => this.toDomain(doc));
     } catch (error) {
       throw mapMongooseError(error);
@@ -93,6 +179,8 @@ export class CohortMembershipRepository implements ICohortMembershipRepository {
       paymentId: membership.paymentId,
       status: membership.status,
       joinedAt: membership.joinedAt,
+      expiresAt: membership.expiresAt,
+      lastPaymentEventAt: membership.lastPaymentEventAt,
     };
   };
 
@@ -104,6 +192,8 @@ export class CohortMembershipRepository implements ICohortMembershipRepository {
       paymentId: doc.paymentId ?? null,
       status: doc.status,
       joinedAt: doc.joinedAt ?? null,
+      expiresAt: doc.expiresAt ?? null,
+      lastPaymentEventAt: doc.lastPaymentEventAt ?? null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     });

@@ -7,14 +7,30 @@ export interface ICohortMembershipRepository {
     membership: CohortMembership,
     tx?: TransactionContext,
   ): Promise<CohortMembership>;
+  getById(id: string, tx?: TransactionContext): Promise<CohortMembership>;
+  update(
+    membership: CohortMembership,
+    tx?: TransactionContext,
+  ): Promise<CohortMembership>;
   findByCohortIdAndStatus(
     cohortId: string,
     status: CohortMembershipStatus,
     tx?: TransactionContext,
   ): Promise<CohortMembership[]>;
+  findByCohortIdAndStatuses(
+    cohortId: string,
+    statuses: CohortMembershipStatus[],
+    tx?: TransactionContext,
+  ): Promise<CohortMembership[]>;
   findByUserIdAndStatuses(
     userId: string,
     statuses: CohortMembershipStatus[],
+    tx?: TransactionContext,
+  ): Promise<CohortMembership[]>;
+  findByUserIdAndCohortIds(
+    userId: string,
+    cohortIds: string[],
+    statuses?: CohortMembershipStatus[],
     tx?: TransactionContext,
   ): Promise<CohortMembership[]>;
   countByCohortId(

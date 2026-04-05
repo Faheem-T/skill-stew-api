@@ -10,8 +10,10 @@ import { OutboxEventRepository } from "../infrastructure/repositories/OutboxEven
 import { SkillProfileRepository } from "../infrastructure/repositories/SkillProfileRepository";
 import { SkillRepository } from "../infrastructure/repositories/SkillRepository";
 import { WorkshopRepository } from "../infrastructure/repositories/WorkshopRepository";
+import { PaymentsClient } from "../infrastructure/services/PaymentsClient";
 import { S3StorageService } from "../infrastructure/services/S3StorageService";
 import { CohortController } from "../presentation/controllers/CohortController";
+import { PublicWorkshopController } from "../presentation/controllers/PublicWorkshopController";
 import { SkillController } from "../presentation/controllers/SkillController";
 import { SkillProfileController } from "../presentation/controllers/SkillProfileController";
 import { WorkshopController } from "../presentation/controllers/WorkshopController";
@@ -32,6 +34,7 @@ const queue = await channel.assertQueue(QUEUE_NAME, {
 
 export const messageProducer = new MessageProducer(channel, EXCHANGE_NAME);
 const storageService = new S3StorageService();
+const paymentsClient = new PaymentsClient(ENV.PAYMENTS_SERVICE_URL);
 const unitOfWork = new UnitOfWork();
 const outboxEventRepo = new OutboxEventRepository();
 const cohortRepo = new CohortRepository();
@@ -51,13 +54,18 @@ const workshopService = new WorkshopService(
 );
 export const workshopController = new WorkshopController(workshopService);
 
-const cohortService = new CohortService(
+export const cohortService = new CohortService(
   cohortRepo,
   cohortMembershipRepo,
   workshopRepo,
   storageService,
+  unitOfWork,
+  paymentsClient,
 );
 export const cohortController = new CohortController(cohortService);
+export const publicWorkshopController = new PublicWorkshopController(
+  cohortService,
+);
 
 const skillProfileRepo = new SkillProfileRepository();
 const skillProfileService = new SkillProfileService(

@@ -48,6 +48,20 @@ export class CohortRepository implements ICohortRepository {
     }
   };
 
+  findByWorkshopId = async (
+    workshopId: string,
+    tx?: TransactionContext,
+  ): Promise<Cohort[]> => {
+    try {
+      const docs = await CohortModel.find({ workshopId })
+        .sort({ firstSessionStartsAt: 1 })
+        .session(tx ?? null);
+      return docs.map((doc) => this.toDomain(doc));
+    } catch (error) {
+      throw mapMongooseError(error);
+    }
+  };
+
   findByExpertId = async (
     expertId: string,
     workshopId?: string,

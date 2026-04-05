@@ -6,6 +6,10 @@ import type {
   CreateCohortDTO,
   GetCohortParamsDTO,
   GetCohortsQueryDTO,
+  PublicCohortParamsDTO,
+  PublicCohortResponseDTO,
+  PublicWorkshopParamsDTO,
+  PublicWorkshopResponseDTO,
   UpdateCohortBodyDTO,
 } from "../dtos/cohort.dto";
 
@@ -23,8 +27,32 @@ export interface ICohortService {
     cohortId: string,
     expertId: string,
   ): Promise<CohortMemberResponseDTO[]>;
+  getPublicWorkshopById(
+    params: PublicWorkshopParamsDTO,
+  ): Promise<PublicWorkshopResponseDTO>;
+  getPublicCohortById(
+    params: PublicCohortParamsDTO,
+  ): Promise<PublicCohortResponseDTO>;
   enrollInCohort(
     cohortId: string,
     userId: string,
   ): Promise<CohortEnrollmentResponseDTO>;
+  handlePaymentSucceeded(data: {
+    membershipId: string;
+    paymentId: string;
+    userId?: string;
+    occurredAt: string;
+  }): Promise<void>;
+  handlePaymentFailed(data: {
+    membershipId: string;
+    paymentId: string;
+    userId?: string;
+    occurredAt: string;
+  }): Promise<void>;
+  handlePaymentRefunded(data: {
+    membershipId: string;
+    paymentId: string;
+    userId?: string;
+    occurredAt: string;
+  }): Promise<void>;
 }

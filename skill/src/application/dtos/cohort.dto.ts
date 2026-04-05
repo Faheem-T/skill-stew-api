@@ -1,6 +1,7 @@
 import z from "zod";
 import { CohortStatus } from "../../domain/entities/CohortStatus.enum";
 import { CohortMembershipStatus } from "../../domain/entities/CohortMembershipStatus.enum";
+import { workshopSessionResponseDTO } from "./workshop.dto";
 
 const dateOnlyRegex = /^\d{4}-\d{2}-\d{2}$/;
 const currencyCodeRegex = /^[A-Z]{3}$/;
@@ -143,8 +144,70 @@ export const cohortEnrollmentResponseDTO = z.object({
   joinedAt: z.date().nullable(),
   expiresAt: z.date().nullable(),
   requiresPayment: z.boolean(),
+  paymentId: z.string().nullable(),
+  checkoutSessionId: z.string().nullable(),
+  checkoutUrl: z.string().nullable(),
 });
 
 export type CohortEnrollmentResponseDTO = z.infer<
   typeof cohortEnrollmentResponseDTO
 >;
+
+export const publicWorkshopParamsDTO = z.object({
+  id: z.string().trim().min(1, "Workshop ID is required"),
+  userId: z.string().trim().min(1).optional(),
+});
+
+export type PublicWorkshopParamsDTO = z.infer<typeof publicWorkshopParamsDTO>;
+
+export const publicCohortParamsDTO = z.object({
+  id: z.string().trim().min(1, "Cohort ID is required"),
+  userId: z.string().trim().min(1).optional(),
+});
+
+export type PublicCohortParamsDTO = z.infer<typeof publicCohortParamsDTO>;
+
+export const publicEnrollmentContextDTO = z.object({
+  membershipId: z.string(),
+  cohortId: z.string(),
+  status: z.enum(CohortMembershipStatus),
+});
+
+export type PublicEnrollmentContextDTO = z.infer<
+  typeof publicEnrollmentContextDTO
+>;
+
+export const publicCohortSummaryResponseDTO = cohortSummaryResponseDTO.extend({
+  isEnrollable: z.boolean(),
+  myEnrollment: publicEnrollmentContextDTO.nullable(),
+  hasEnrollmentInAnotherCohort: z.boolean(),
+});
+
+export type PublicCohortSummaryResponseDTO = z.infer<
+  typeof publicCohortSummaryResponseDTO
+>;
+
+export const publicWorkshopResponseDTO = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().nullable(),
+  targetAudience: z.string().nullable(),
+  bannerImageKey: z.string().nullable(),
+  bannerImageUrl: z.string().nullable(),
+  timezone: z.string().nullable(),
+  sessions: z.array(workshopSessionResponseDTO),
+  myEnrollment: publicEnrollmentContextDTO.nullable(),
+  cohorts: z.array(publicCohortSummaryResponseDTO),
+});
+
+export type PublicWorkshopResponseDTO = z.infer<
+  typeof publicWorkshopResponseDTO
+>;
+
+export const publicCohortResponseDTO = cohortResponseDTO.extend({
+  isEnrollable: z.boolean(),
+  myEnrollment: publicEnrollmentContextDTO.nullable(),
+  hasEnrollmentInAnotherCohort: z.boolean(),
+});
+
+export type PublicCohortResponseDTO = z.infer<typeof publicCohortResponseDTO>;

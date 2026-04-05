@@ -3,6 +3,7 @@ const envVars = [
   "DATABASE_URL",
   "RABBIT_MQ_CONNECTION_STRING",
   "CDN_DOMAIN_NAME",
+  "PAYMENTS_SERVICE_URL",
 ] as const;
 
 export function generateEnvVars() {

@@ -5,6 +5,7 @@ export interface ICohortRepository {
   create(cohort: Cohort, tx?: TransactionContext): Promise<Cohort>;
   getById(id: string, tx?: TransactionContext): Promise<Cohort>;
   getByIds(ids: string[], tx?: TransactionContext): Promise<Cohort[]>;
+  findByWorkshopId(workshopId: string, tx?: TransactionContext): Promise<Cohort[]>;
   findByExpertId(
     expertId: string,
     workshopId?: string,

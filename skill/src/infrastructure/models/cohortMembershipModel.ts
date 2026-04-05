@@ -9,6 +9,8 @@ export interface CohortMembershipAttr {
   paymentId?: string | null;
   status: (typeof CohortMembershipStatus)[number];
   joinedAt?: Date | null;
+  expiresAt?: Date | null;
+  lastPaymentEventAt?: Date | null;
 }
 
 export type CohortMembershipDoc = CohortMembershipAttr &
@@ -48,6 +50,14 @@ const cohortMembershipSchema = new mongoose.Schema<CohortMembershipDoc>(
       index: true,
     },
     joinedAt: {
+      type: Date,
+      default: null,
+    },
+    expiresAt: {
+      type: Date,
+      default: null,
+    },
+    lastPaymentEventAt: {
       type: Date,
       default: null,
     },

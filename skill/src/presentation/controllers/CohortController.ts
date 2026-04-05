@@ -5,6 +5,7 @@ import {
   enrollInCohortParamsDTO,
   getCohortParamsDTO,
   getCohortsQueryDTO,
+  publicCohortParamsDTO,
   updateCohortBodyDTO,
   updateCohortParamsDTO,
 } from "../../application/dtos/cohort.dto";
@@ -142,6 +143,28 @@ export class CohortController {
         params.userId,
       );
       res.status(HttpStatus.CREATED).json({ success: true, data: enrollment });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getPublicCohortById = async (
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const params = publicCohortParamsDTO.parse({
+        id: req.params.id,
+        userId:
+          typeof req.headers["x-user-role"] === "string" &&
+          req.headers["x-user-role"] === "USER"
+            ? req.headers["x-user-id"]
+            : undefined,
+      });
+
+      const cohort = await this.cohortService.getPublicCohortById(params);
+      res.status(HttpStatus.OK).json({ success: true, data: cohort });
     } catch (error) {
       next(error);
     }
