@@ -36,6 +36,38 @@ describe("authMiddleware", () => {
     expect(req.user).toBeUndefined();
   });
 
+  it("attaches req.user on public routes when a valid token is present", async () => {
+    const env = createTestEnv();
+    const middleware = authMiddleware(getGroup("/api/v1/public/workshops")!, env);
+    const accessToken = createAccessToken(env, {
+      userId: "user-123",
+      email: "user@example.com",
+      role: "USER",
+    });
+    const req: {
+      method: string;
+      originalUrl: string;
+      headers: Record<string, string>;
+      user?: unknown;
+    } = {
+      method: "GET",
+      originalUrl: "/api/v1/public/workshops/workshop-123",
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    };
+    const res = createResponseMock();
+
+    const result = await runMiddleware(middleware, req, res);
+
+    expect(result.nextCalled).toBe(true);
+    expect(req.user).toEqual({
+      id: "user-123",
+      email: "user@example.com",
+      role: "USER",
+    });
+  });
+
   it("rejects missing tokens for protected routes", async () => {
     const env = createTestEnv();
     const middleware = authMiddleware(getGroup("/api/v1/connections")!, env);

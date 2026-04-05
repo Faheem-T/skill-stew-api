@@ -47,14 +47,14 @@ export function authMiddleware(group: RouteGroup, env: Env): RequestHandler {
     const path = req.originalUrl.split("?")[0];
     const policy = resolveAuthPolicy(path, method, group);
 
-    if (!policy.required) {
-      next();
-      return;
-    }
-
     try {
       const token = req.headers.authorization?.split(" ")[1];
       if (!token) {
+        if (!policy.required) {
+          next();
+          return;
+        }
+
         logger.warn("Blocking access due to missing token", {
           method,
           path,
@@ -71,7 +71,7 @@ export function authMiddleware(group: RouteGroup, env: Env): RequestHandler {
         role: payload.role,
       };
 
-      if (!policy.roles.includes(payload.role)) {
+      if (policy.required && !policy.roles.includes(payload.role)) {
         logger.warn("Blocking access due to role mismatch", {
           method,
           path,
