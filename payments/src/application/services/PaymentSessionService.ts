@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { Channel } from "amqplib";
 import type {
   CreateCheckoutSessionDTO,
   PublishPaymentOutcomeDTO,
@@ -19,7 +20,7 @@ export class PaymentSessionService implements IPaymentSessionService {
   private sessionsByMembershipId = new Map<string, StoredPayment>();
 
   constructor(
-    private channel: { publish: (...args: unknown[]) => boolean },
+    private channel: Channel,
     private exchangeName: string,
   ) {}
 
