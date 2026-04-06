@@ -1,6 +1,6 @@
 # Skill Service
 
-The skill service manages the skill taxonomy and user skill profiles. It stores the master list of available skills and tracks each user's offered and wanted skills with proficiency levels.
+The skill service manages the skill taxonomy, user skill profiles, and workshops. It stores the master list of available skills, tracks each user's offered and wanted skills with proficiency levels, and handles the full workshop lifecycle — from draft creation through session setup and publishing — along with cohort management and enrollment.
 
 **Runtime:** Bun  
 **Database:** MongoDB (Mongoose)  
@@ -24,6 +24,37 @@ All routes are prefixed with `/api/v1` and routed through the API Gateway.
 | PUT    | `/`        | Update current user's skill profile (offered/wanted) | Yes           |
 | GET    | `/me`      | Get current user's skill profile                     | Yes           |
 | GET    | `/:userId` | Get a user's public skill profile                    | No            |
+
+### Workshops (`/workshops`) — EXPERT only
+
+| Method | Path                       | Description                                       |
+| ------ | -------------------------- | ------------------------------------------------- |
+| GET    | `/`                        | List all workshops for the authenticated expert   |
+| POST   | `/`                        | Create a new workshop draft                       |
+| GET    | `/:id`                     | Get workshop details                              |
+| PATCH  | `/:id`                     | Update workshop details                           |
+| POST   | `/:id/sessions`            | Replace all sessions for a workshop               |
+| PATCH  | `/:id/sessions/:sessionId` | Update a specific session's details               |
+| POST   | `/:id/publish`             | Publish the workshop (emits `workshop.published`) |
+
+### Cohorts (`/cohorts`)
+
+| Method | Path               | Description                               | Role   |
+| ------ | ------------------ | ----------------------------------------- | ------ |
+| GET    | `/`                | List cohorts for the authenticated expert | EXPERT |
+| POST   | `/`                | Create a new cohort                       | EXPERT |
+| GET    | `/:id`             | Get cohort details                        | EXPERT |
+| PATCH  | `/:id`             | Update cohort                             | EXPERT |
+| DELETE | `/:id`             | Delete cohort                             | EXPERT |
+| GET    | `/:id/members`     | List cohort members                       | EXPERT |
+| POST   | `/:id/enrollments` | Enroll current user in a cohort           | USER   |
+
+### Public Routes (no authentication required)
+
+| Method | Path                    | Description                 |
+| ------ | ----------------------- | --------------------------- |
+| GET    | `/public/workshops/:id` | Get public workshop details |
+| GET    | `/public/cohorts/:id`   | Get public cohort details   |
 
 ## Data Models
 
@@ -54,6 +85,14 @@ This reads from [`skillSeedData.json`](src/infrastructure/config/skillSeedData.j
 
 The seed script is idempotent — if skills already exist in the database, it skips seeding.
 
+## Event Consumers
+
+The skill service consumes one event from RabbitMQ:
+
+| Event               | Action                                              |
+| ------------------- | --------------------------------------------------- |
+| `payment.succeeded` | Enrolls the user in the purchased cohort membership |
+
 ## Environment Variables
 
 | Variable                      | Description               |
@@ -62,6 +101,7 @@ The seed script is idempotent — if skills already exist in the database, it sk
 | `DATABASE_URL`                | MongoDB connection string |
 | `RABBIT_MQ_CONNECTION_STRING` | RabbitMQ connection URL   |
 | `CDN_DOMAIN_NAME`             | CDN domain for image URLs |
+| `PAYMENTS_SERVICE_URL`        | payment service url       |
 
 ## Key Design Decisions
 
