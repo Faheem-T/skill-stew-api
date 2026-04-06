@@ -73,6 +73,14 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: faheem222/skill-service-outbox-worker
+      context: ./outbox-workers/skill-outbox-worker
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
     - image: faheem222/notification
       context: ./notification-service
       docker:

@@ -1,7 +1,12 @@
 import amqp from "amqplib";
 import { ENV } from "../utils/dotenv";
 import { logger } from "../utils/logger";
-import { expertService, skillService, userService } from "../di/container";
+import {
+  expertService,
+  skillService,
+  userService,
+  workshopService,
+} from "../di/container";
 import { MessageConsumer } from "../infrastructure/adapters/MessageConsumer";
 
 export async function startConsumer() {
@@ -97,6 +102,13 @@ export async function startConsumer() {
   await consumer.registerHandler("skill.deleted", async (event) => {
     logger.info(`Handling ${event.eventName}`);
     await skillService.delete(event.data.id);
+    return { success: true };
+  });
+
+  await consumer.registerHandler("workshop.published" as any, async (event) => {
+    logger.info(`Handling ${event.eventName}`);
+    await workshopService.upsert(event.data as any);
+    logger.info(`Handled ${event.eventName} successfully`);
     return { success: true };
   });
 

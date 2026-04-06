@@ -4,7 +4,7 @@ import { USER_ROLES } from "../../../domain/entities/UserRoles";
 export const generatePresignedUploadUrlSchema = z.object({
   userId: z.string().nonempty(),
   userRole: z.enum(USER_ROLES),
-  type: z.enum(["avatar", "banner"]),
+  type: z.enum(["avatar", "banner", "workshopBanner"]),
   mimetype: z.enum(["image/png", "image/jpeg", "image/webp"]),
 });
 

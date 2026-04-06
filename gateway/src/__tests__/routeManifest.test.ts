@@ -35,4 +35,18 @@ describe("routeManifest", () => {
 
     expect(policy).toEqual({ required: false });
   });
+
+  it("matches the cohort enrollment override to the user role", () => {
+    const group = getMatchingRouteGroup("/api/v1/cohorts/cohort-123/enrollments");
+
+    expect(group).toBeDefined();
+
+    const policy = resolveAuthPolicy(
+      "/api/v1/cohorts/cohort-123/enrollments",
+      "POST",
+      group!,
+    );
+
+    expect(policy).toEqual({ required: true, roles: ["USER"] });
+  });
 });

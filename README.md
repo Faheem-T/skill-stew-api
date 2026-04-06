@@ -45,14 +45,17 @@ This repository contains the backend — a microservices system that I am buildi
 - User search and recommendations via Elasticsearch
 - Admin user management
 - Expert applications with applicant-to-expert promotion
+- Workshop creation, session management, and publishing (experts)
+- Cohort creation and management (experts), user enrollment
+- Workshop indexing in Elasticsearch via the outbox-backed event system
+- Payments service stub (checkout session and payment outcome endpoints)
 
 ### What's Planned
 
-- Workshop creation and scheduling
-- Cohort enrollment and live session streaming
-- Session recordings and playback
+- Live session streaming and recordings
 - Peer-to-peer skill exchange scheduling
-- Payment processing and revenue management
+- Payment processing with a real payment provider
+- Revenue management
 
 ## Architecture
 
@@ -63,10 +66,10 @@ This repository contains the backend — a microservices system that I am buildi
 | Service              | Responsibility                                                                                                        | Runtime       | Database           | README                                                |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ | ----------------------------------------------------- |
 | User service         | Auth, profiles, connections, expert applications                                                                      | Node.js (tsx) | PostgreSQL         | [README](user/README.md)                              |
-| Skill service        | Skill taxonomy, user skill profiles                                                                                   | Bun           | MongoDB            | [README](skill/README.md)                             |
+| Skill service        | Skill taxonomy, user skill profiles, workshop lifecycle, cohort management                                            | Bun           | MongoDB            | [README](skill/README.md)                             |
 | Notification service | Notification persistence, real-time WebSocket delivery, unread notification count, account emails                    | Bun           | MongoDB            | [README](notification-service/README.md)              |
-| ES Proxy service     | Proxy between clients and Elasticsearch, read replica for user profiles and skill taxonomy, search, recommended users | Node.js (tsx) | -                  | [README](es-proxy/README.md)                          |
-| Payments service     | Handles payment processing (currently WIP / empty shell)                                                              | Node.js (tsx) | PostgreSQL         | [README](payments/README.md)                          |
+| ES Proxy service     | Proxy between clients and Elasticsearch, read replica for user profiles, skill taxonomy, and workshops                | Node.js (tsx) | -                  | [README](es-proxy/README.md)                          |
+| Payments service     | Handles payment processing (stub endpoints; no real provider integrated yet)                                          | Node.js (tsx) | PostgreSQL         | [README](payments/README.md)                          |
 | API Gateway          | JWT authentication, request routing, role-based access control                                                        | Node.js (tsx) | -                  | [README](gateway/README.md)                           |
 | WebSocket Gateway    | Handles client WebSocket connections                                                                                  | Bun           | -                  | [README](websocket-gateway/README.md)                 |
 | Outbox workers       | Polls respective outbox tables / collections and publishes to RabbitMQ                                                | Bun / Node.js | Depends on service | [README](outbox-workers/user-outbox-worker/README.md) |
@@ -123,8 +126,12 @@ These are the events currently in the system.
 | `expert.onboarded`     | User service  | ES Proxy               |
 | `expert.verified`      | User service  | ES Proxy               |
 | `expert.application.submitted` | User service | Notification service |
-| `expert.application.approved`   | User service | Notification service |
-| `expert.application.rejected`   | User service | Notification service |
+| `expert.application.approved`  | User service | Notification service |
+| `expert.application.rejected`  | User service | Notification service |
+| `workshop.published`   | Skill service (via outbox worker) | ES Proxy  |
+| `payment.succeeded`    | Payments service | Skill service        |
+| `payment.failed`       | Payments service | _(future consumers)_ |
+| `payment.refunded`     | Payments service | _(future consumers)_ |
 
 ## Tech Stack
 
@@ -223,14 +230,15 @@ skill-stew-api/
 │       ├── types/                 # Shared TypeScript types
 │       └── constants/             # Shared constants
 ├── user/                          # User service
-├── skill/                         # Skill service
+├── skill/                         # Skill service (workshop + cohort management)
 ├── payments/                      # Payments service
 ├── gateway/                       # API Gateway
 ├── es-proxy/                      # Elasticsearch Proxy service
 ├── websocket-gateway/             # WebSocket Gateway
 ├── notification-service/          # Notification service
 ├── outbox-workers/
-│   └── user-outbox-worker/        # User service outbox worker
+│   ├── user-outbox-worker/        # User service outbox worker (PostgreSQL)
+│   └── skill-outbox-worker/       # Skill service outbox worker (MongoDB)
 ├── infra/
 │   ├── k8s/                       # Kubernetes deployment manifests
 │   ├── self-managed/              # Self-hosted infra (Elasticsearch, etc.)
@@ -279,12 +287,13 @@ Each service has its own `Dockerfile` and is deployed as a separate Kubernetes D
 
 ### Features
 
-- [ ] Workshop creation and scheduling
-- [ ] Cohort enrollment and live session streaming
+- [x] Workshop creation and scheduling
+- [x] Cohort creation and enrollment
+- [ ] Live session streaming
 - [ ] Session recordings and playback
 - [ ] Peer-to-peer skill exchange scheduling
-- [ ] Expert application and verification flow
-- [ ] Payment processing and revenue management
+- [ ] Payment processing with a real payment provider
+- [ ] Revenue management
 
 ### Infrastructure
 

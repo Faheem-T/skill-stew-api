@@ -4,6 +4,7 @@ import { SkillsEventSchemas } from "./schemas/skillsEventSchemas";
 import { ConnectionEventSchemas } from "./schemas/userConnectionEventSchemas";
 import { ExpertEventSchemas } from "./schemas/expertEventsSchema";
 import { AuthEventSchemas } from "./schemas/authEventSchemas";
+import { PaymentEventSchemas } from "./schemas/paymentEventSchemas";
 
 // Union of all app event schemas
 
@@ -13,6 +14,7 @@ export const EventSchemas = {
   ...ConnectionEventSchemas,
   ...ExpertEventSchemas,
   ...AuthEventSchemas,
+  ...PaymentEventSchemas,
 } as const;
 
 // Array of all event names

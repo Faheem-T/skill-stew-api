@@ -37,11 +37,12 @@ The service subscribes to events from other services and updates its Elasticsear
 
 ### Skill Events
 
-| Event           | Action                           |
-| --------------- | -------------------------------- |
-| `skill.created` | Indexes a new skill for search   |
-| `skill.updated` | Updates the skill document       |
-| `skill.deleted` | Removes the skill from the index |
+| Event                | Action                           |
+| -------------------- | -------------------------------- |
+| `skill.created`      | Indexes a new skill for search   |
+| `skill.updated`      | Updates the skill document       |
+| `skill.deleted`      | Removes the skill from the index |
+| `workshop.published` | Indexes a published workshop     |
 
 ## How It Works
 

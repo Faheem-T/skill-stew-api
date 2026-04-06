@@ -222,6 +222,7 @@ retry_dependency_update "payments" "$ROOT_DIR/payments" pnpm add "$COMMON_PACKAG
 retry_dependency_update "skill" "$ROOT_DIR/skill" bun add "$COMMON_PACKAGE_NAME@$TARGET_VERSION"
 retry_dependency_update "notification-service" "$ROOT_DIR/notification-service" bun add "$COMMON_PACKAGE_NAME@$TARGET_VERSION"
 retry_dependency_update "user-outbox-worker" "$ROOT_DIR/outbox-workers/user-outbox-worker" bun add "$COMMON_PACKAGE_NAME@$TARGET_VERSION"
+retry_dependency_update "skill-outbox-worker" "$ROOT_DIR/outbox-workers/skill-outbox-worker" bun add "$COMMON_PACKAGE_NAME@$TARGET_VERSION"
 
 CONSUMER_PATHS=(
   user/package.json
@@ -236,6 +237,8 @@ CONSUMER_PATHS=(
   notification-service/bun.lock
   outbox-workers/user-outbox-worker/package.json
   outbox-workers/user-outbox-worker/bun.lock
+  outbox-workers/skill-outbox-worker/package.json
+  outbox-workers/skill-outbox-worker/bun.lock
 )
 
 # Second commit: dependency sync across consumer services.

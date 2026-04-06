@@ -1,6 +1,6 @@
 {
   "name": "@skillstew/common",
-  "version": "1.0.46",
+  "version": "1.0.49",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "scripts": {

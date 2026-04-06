@@ -3,7 +3,7 @@
 The payments service handles payment processing and billing for the platform.
 
 > [!NOTE]
-> This service is currently a work in progress. Previously it contained logic for subscription plans, but the subscription model has been removed from the platform. It currently exists as an empty shell waiting for a new payment model to be implemented.
+> This service is a work in progress. It currently has stub endpoints that simulate checkout session creation and publish payment outcome events to RabbitMQ. No real payment provider is integrated yet.
 
 **Runtime:** Node.js (tsx)  
 **Database:** PostgreSQL (Drizzle ORM) - _Tables TBA_  
@@ -11,7 +11,19 @@ The payments service handles payment processing and billing for the platform.
 
 ## API Endpoints
 
-_None currently. Future endpoints will be prefixed with `/api/v1/payments/`._
+All routes are prefixed with `/api/v1/payments` and routed through the API Gateway.
+
+| Method | Path                | Description                                                              |
+| ------ | ------------------- | ------------------------------------------------------------------------ |
+| POST   | `/checkout-sessions`| Create a dummy payment checkout session                                  |
+| POST   | `/outcomes`         | Publish a payment outcome event (`payment.succeeded` / `payment.failed`) |
+
+## Published Events
+
+| Event Name          | Trigger                           |
+| ------------------- | --------------------------------- |
+| `payment.succeeded` | Outcome endpoint reports success  |
+| `payment.failed`    | Outcome endpoint reports failure  |
 
 ## Environment Variables
 

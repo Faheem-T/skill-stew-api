@@ -103,6 +103,33 @@ export const routeGroups: RouteGroup[] = [
     ],
   },
   {
+    prefix: "/api/v1/workshops",
+    service: "skill",
+    auth: { required: true, roles: ["EXPERT"] },
+  },
+  {
+    prefix: "/api/v1/public/workshops",
+    service: "skill",
+    auth: { required: false },
+  },
+  {
+    prefix: "/api/v1/cohorts",
+    service: "skill",
+    auth: { required: true, roles: ["EXPERT"] },
+    overrides: [
+      {
+        method: "POST",
+        path: "/api/v1/cohorts/:id/enrollments",
+        auth: { required: true, roles: ["USER"] },
+      },
+    ],
+  },
+  {
+    prefix: "/api/v1/public/cohorts",
+    service: "skill",
+    auth: { required: false },
+  },
+  {
     prefix: "/api/v1/search",
     service: "search",
     auth: { required: false },

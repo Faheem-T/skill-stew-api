@@ -36,6 +36,38 @@ describe("authMiddleware", () => {
     expect(req.user).toBeUndefined();
   });
 
+  it("attaches req.user on public routes when a valid token is present", async () => {
+    const env = createTestEnv();
+    const middleware = authMiddleware(getGroup("/api/v1/public/workshops")!, env);
+    const accessToken = createAccessToken(env, {
+      userId: "user-123",
+      email: "user@example.com",
+      role: "USER",
+    });
+    const req: {
+      method: string;
+      originalUrl: string;
+      headers: Record<string, string>;
+      user?: unknown;
+    } = {
+      method: "GET",
+      originalUrl: "/api/v1/public/workshops/workshop-123",
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    };
+    const res = createResponseMock();
+
+    const result = await runMiddleware(middleware, req, res);
+
+    expect(result.nextCalled).toBe(true);
+    expect(req.user).toEqual({
+      id: "user-123",
+      email: "user@example.com",
+      role: "USER",
+    });
+  });
+
   it("rejects missing tokens for protected routes", async () => {
     const env = createTestEnv();
     const middleware = authMiddleware(getGroup("/api/v1/connections")!, env);
@@ -156,6 +188,70 @@ describe("authMiddleware", () => {
       success: false,
       errors: [{ message: "Invalid token" }],
       code: "INVALID_TOKEN_ERROR",
+    });
+  });
+
+  it("requires an expert token for workshop routes", async () => {
+    const env = createTestEnv();
+    const middleware = authMiddleware(getGroup("/api/v1/workshops")!, env);
+    const accessToken = createAccessToken(env, {
+      userId: "user-123",
+      email: "user@example.com",
+      role: "USER",
+    });
+    const req: {
+      method: string;
+      originalUrl: string;
+      headers: Record<string, string>;
+      user?: unknown;
+    } = {
+      method: "POST",
+      originalUrl: "/api/v1/workshops",
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    };
+    const res = createResponseMock();
+
+    const result = await runMiddleware(middleware, req, res);
+
+    expect(result.nextCalled).toBe(false);
+    expect(res.statusCode).toBe(403);
+    expect(res.body).toEqual({
+      success: false,
+      errors: [{ message: "You do not have the permission to access this." }],
+    });
+  });
+
+  it("requires a user token for cohort enrollment routes", async () => {
+    const env = createTestEnv();
+    const middleware = authMiddleware(getGroup("/api/v1/cohorts")!, env);
+    const accessToken = createAccessToken(env, {
+      userId: "expert-123",
+      email: "expert@example.com",
+      role: "EXPERT",
+    });
+    const req: {
+      method: string;
+      originalUrl: string;
+      headers: Record<string, string>;
+      user?: unknown;
+    } = {
+      method: "POST",
+      originalUrl: "/api/v1/cohorts/cohort-123/enrollments",
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    };
+    const res = createResponseMock();
+
+    const result = await runMiddleware(middleware, req, res);
+
+    expect(result.nextCalled).toBe(false);
+    expect(res.statusCode).toBe(403);
+    expect(res.body).toEqual({
+      success: false,
+      errors: [{ message: "You do not have the permission to access this." }],
     });
   });
 });

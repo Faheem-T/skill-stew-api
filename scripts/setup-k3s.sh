@@ -65,7 +65,7 @@ main() {
   require_cmd helm
 
   log "Installing K3s with Docker runtime and Traefik disabled."
-  curl -sfL https://get.k3s.io | sh -s - --docker --disable=traefik
+  curl -sfL https://get.k3s.io | sh -s - --docker --disable=traefik --flannel-iface=wlan0
 
   if [[ ! -f "$K3S_CONFIG_FILE" ]]; then
     fail "Expected K3s config file not found at ${K3S_CONFIG_FILE}."

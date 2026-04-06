@@ -39,17 +39,17 @@ For a request like `POST /api/v1/connections/:userId`:
 
 Use **base service URLs**, not route-specific URLs:
 
-| Variable                      | Description                            |
-| ----------------------------- | -------------------------------------- |
-| `PORT`                        | Gateway port                           |
-| `USER_SERVICE_URL`            | Base URL of the user service           |
-| `SKILL_SERVICE_URL`           | Base URL of the skill service          |
-| `SEARCH_SERVICE_URL`          | Base URL of the ES proxy service       |
-| `NOTIFICATION_SERVICE_URL`    | Base URL of the notification service   |
-| `PAYMENTS_SERVICE_URL`        | Base URL of the payments service       |
-| `USER_ACCESS_TOKEN_SECRET`    | JWT access token secret (USER role)    |
-| `EXPERT_ACCESS_TOKEN_SECRET`  | JWT access token secret (EXPERT role)  |
-| `ADMIN_ACCESS_TOKEN_SECRET`   | JWT access token secret (ADMIN role)   |
+| Variable                     | Description                           |
+| ---------------------------- | ------------------------------------- |
+| `PORT`                       | Gateway port                          |
+| `USER_SERVICE_URL`           | Base URL of the user service          |
+| `SKILL_SERVICE_URL`          | Base URL of the skill service         |
+| `SEARCH_SERVICE_URL`         | Base URL of the ES proxy service      |
+| `NOTIFICATION_SERVICE_URL`   | Base URL of the notification service  |
+| `PAYMENTS_SERVICE_URL`       | Base URL of the payments service      |
+| `USER_ACCESS_TOKEN_SECRET`   | JWT access token secret (USER role)   |
+| `EXPERT_ACCESS_TOKEN_SECRET` | JWT access token secret (EXPERT role) |
+| `ADMIN_ACCESS_TOKEN_SECRET`  | JWT access token secret (ADMIN role)  |
 
 Example:
 
@@ -68,17 +68,21 @@ The gateway preserves the original request path when proxying, so:
 
 ## Current Prefix Map
 
-| Prefix                  | Backend Service | Default Auth |
-| ----------------------- | --------------- | ------------ |
-| `/api/v1/auth`          | User            | Public       |
-| `/api/v1/me`            | User            | Protected    |
-| `/api/v1/users`         | User            | Public       |
-| `/api/v1/connections`   | User            | Protected    |
-| `/api/v1/skills`        | Skill           | Public       |
-| `/api/v1/search`        | ES Proxy        | Public       |
-| `/api/v1/notifications` | Notification    | Protected    |
-| `/api/v1/payments`      | Payments        | Public       |
-| `/api/v1/expert-applications` | User      | Admin + applicant override |
+| Prefix                        | Backend Service | Default Auth               |
+| ----------------------------- | --------------- | -------------------------- |
+| `/api/v1/auth`                | User            | Public                     |
+| `/api/v1/me`                  | User            | Protected                  |
+| `/api/v1/users`               | User            | Public                     |
+| `/api/v1/connections`         | User            | Protected                  |
+| `/api/v1/skills`              | Skill           | Public                     |
+| `/api/v1/workshops`           | Skill           | Protected (EXPERT)         |
+| `/api/v1/cohorts`             | Skill           | Protected                  |
+| `/api/v1/public/workshops`    | Skill           | Public                     |
+| `/api/v1/public/cohorts`      | Skill           | Public                     |
+| `/api/v1/search`              | ES Proxy        | Public                     |
+| `/api/v1/notifications`       | Notification    | Protected                  |
+| `/api/v1/payments`            | Payments        | Public                     |
+| `/api/v1/expert-applications` | User            | Admin + applicant override |
 
 Some prefixes have overrides. Example:
 
@@ -89,6 +93,10 @@ Some prefixes have overrides. Example:
 - `POST /api/v1/auth/experts/register` is public
 - `/api/v1/expert-applications` admin review routes are restricted to `ADMIN`
 - `POST /api/v1/expert-applications/apply` is restricted to `EXPERT_APPLICANT`
+
+### Optional Auth on Public Routes
+
+Public routes that could benefit from knowing the requesting user (e.g., workshop detail pages personalizing enrollment state) receive `x-user-id` and `x-user-role` headers when the request carries a **valid** access token, even though authentication is not required. If no token is present or the token is invalid, the headers are simply omitted and the request proceeds normally.
 
 ## Adding a New Feature Route
 

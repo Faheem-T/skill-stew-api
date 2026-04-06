@@ -62,6 +62,20 @@ Derived types — `EventName` is the union of all event name strings, and `Event
 | `connection.accepted`  | `connectionId`, `accepterId`, `accepterUsername?`, `requesterId`, `requesterUsername?`, `timestamp`   |
 | `connection.rejected`  | `connectionId`, `rejecterId`, `rejecterUsername?`, `requesterId`, `requesterUsername?`, `timestamp`   |
 
+### Workshop Events
+
+| Event Name           | Payload Fields                                                                                                                      |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `workshop.published` | `id`, `expertId`, `title`, `description`, `targetAudience`, `bannerImageKey`, `publishedAt`, `sessionTitles`, `sessionDescriptions` |
+
+### Payment Events
+
+| Event Name          | Payload Fields                                      |
+| ------------------- | --------------------------------------------------- |
+| `payment.succeeded` | `membershipId`, `paymentId`, `userId`, `occurredAt` |
+| `payment.failed`    | `membershipId`, `paymentId`, `userId`, `occurredAt` |
+| `payment.refunded`  | `membershipId`, `paymentId`, `userId`, `occurredAt` |
+
 ## Adding a New Event
 
 1. Create or update a Zod schema in `src/events/schemas/`

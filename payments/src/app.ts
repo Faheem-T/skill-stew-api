@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./presentation/middlewares/errorHandler";
 import { httpLogger } from "./presentation/middlewares/httpLogger";
+import { internalPaymentRouter } from "./presentation/routes/internalPaymentRoutes";
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(cookieParser());
 app.use(httpLogger);
 
 app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
+
+app.use("/internal/payments", internalPaymentRouter);
 
 // Error handler
 app.use(errorHandler);
