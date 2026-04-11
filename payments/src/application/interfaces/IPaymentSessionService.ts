@@ -1,6 +1,6 @@
 import type {
   CreateCheckoutSessionDTO,
-  PublishPaymentOutcomeDTO,
+  StripeWebhookDTO,
 } from "../dtos/payment.dto";
 
 export interface IPaymentSessionService {
@@ -9,7 +9,5 @@ export interface IPaymentSessionService {
     checkoutSessionId: string;
     checkoutUrl: string;
   }>;
-  publishOutcome(
-    input: PublishPaymentOutcomeDTO,
-  ): Promise<{ published: true }>;
+  handleStripeWebhook(input: StripeWebhookDTO): Promise<{ received: true }>;
 }
