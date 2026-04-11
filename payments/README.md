@@ -1,9 +1,6 @@
-# Payments Service (WIP)
+# Payments Service
 
-The payments service handles payment processing and billing for the platform.
-
-> [!NOTE]
-> This service is a work in progress. It currently has stub endpoints that simulate checkout session creation and publish payment outcome events to RabbitMQ. No real payment provider is integrated yet.
+The payments service handles Stripe-backed payment session creation and webhook processing for paid cohort enrollment.
 
 **Runtime:** Node.js (tsx)  
 **Database:** PostgreSQL (Drizzle ORM) - _Tables TBA_  
@@ -11,39 +8,47 @@ The payments service handles payment processing and billing for the platform.
 
 ## API Endpoints
 
-All routes are prefixed with `/api/v1/payments` and routed through the API Gateway.
+Public routes are prefixed with `/api/v1/payments` and routed through the API Gateway. Internal service-to-service routes stay under `/internal/payments`.
 
 | Method | Path                | Description                                                              |
 | ------ | ------------------- | ------------------------------------------------------------------------ |
-| POST   | `/checkout-sessions`| Create a dummy payment checkout session                                  |
-| POST   | `/outcomes`         | Publish a payment outcome event (`payment.succeeded` / `payment.failed`) |
+| POST   | `/webhooks/stripe`  | Receive Stripe webhook events                                            |
+
+### Internal Routes
+
+| Method | Path                 | Description                      |
+| ------ | -------------------- | -------------------------------- |
+| POST   | `/checkout-sessions` | Create a Stripe Checkout Session |
 
 ## Published Events
 
-| Event Name          | Trigger                           |
-| ------------------- | --------------------------------- |
-| `payment.succeeded` | Outcome endpoint reports success  |
-| `payment.failed`    | Outcome endpoint reports failure  |
+Payment events are written to the transactional outbox first and published by the separate `payment-outbox-worker`.
+
+| Event Name          | Trigger                              |
+| ------------------- | ------------------------------------ |
+| `payment.succeeded` | Stripe marks a checkout payment paid |
+| `payment.failed`    | Stripe checkout expires or fails     |
+| `payment.refunded`  | Stripe reports a refund              |
 
 ## Environment Variables
 
-| Variable                      | Description                  |
-| ----------------------------- | ---------------------------- |
-| `PORT`                        | Service port                 |
-| `DATABASE_URL`                | PostgreSQL connection string |
-| `RABBIT_MQ_CONNECTION_STRING` | RabbitMQ connection string   |
+| Variable                      | Description                                          |
+| ----------------------------- | ---------------------------------------------------- |
+| `PORT`                        | Service port                                         |
+| `DATABASE_URL`                | PostgreSQL connection string                         |
+| `STRIPE_SECRET_KEY`           | Stripe server-side API key                           |
+| `STRIPE_WEBHOOK_SECRET`       | Stripe webhook signing secret                        |
+| `FRONTEND_PAYMENT_RETURN_URL` | Frontend return URL used for Checkout success/cancel |
 
 ## Directory Structure
 
 ```
 payments/src/
-├── domain/                  # Entities, domain errors, repository interfaces
-├── application/             # Use cases, DTOs, interfaces
-├── infrastructure/          # DB repositories, Drizzle schemas, implementations
+├── domain/                  # Entities, status enums, repository interfaces
+├── application/             # Services, DTOs, interfaces, ports
+├── infrastructure/          # DB schemas, repositories, unit of work
 ├── presentation/            # Express controllers, routers, middlewares
 ├── constants/               # HttpStatus, HttpMessages
 ├── di/                      # Dependency injection container
-├── errors/                  # Shared application errors
-├── types/                   # Shared types
-└── utils/                   # Logger, env vars
+└── types/                   # Shared types
 ```
