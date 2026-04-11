@@ -449,6 +449,8 @@ export class CohortService implements ICohortService {
         throw new ConflictError("This cohort is sold out.");
       }
 
+      const workshop = await this.workshopRepo.getById(cohort.workshopId, tx);
+
       if (cohort.spotPriceAmount === 0) {
         const membership = new CohortMembership({
           cohortId: cohort.id,
@@ -474,6 +476,7 @@ export class CohortService implements ICohortService {
         membershipId: savedReservation.id,
         cohortId: cohort.id,
         workshopId: cohort.workshopId,
+        workshopTitle: workshop.title,
         expertId: cohort.expertId,
         userId,
         amount: cohort.spotPriceAmount,
