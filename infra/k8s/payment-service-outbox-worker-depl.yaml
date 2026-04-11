@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service-outbox-worker-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service-outbox-worker
+  template:
+    metadata:
+      labels:
+        app: payment-service-outbox-worker
+    spec:
+      containers:
+        - name: payment-service-outbox-worker
+          image: faheem222/payment-service-outbox-worker
+          envFrom:
+            - secretRef:
+                name: infisical-secrets
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service-outbox-worker-srv
+spec:
+  selector:
+    app: payment-service-outbox-worker
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000

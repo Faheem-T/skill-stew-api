@@ -81,6 +81,14 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: faheem222/payment-service-outbox-worker
+      context: ./outbox-workers/payment-outbox-worker
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
     - image: faheem222/notification
       context: ./notification-service
       docker:
