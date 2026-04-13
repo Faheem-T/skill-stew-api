@@ -8,6 +8,8 @@ import { internalPaymentRouter } from "./presentation/routes/internalPaymentRout
 
 const app = express();
 
+app.use(httpLogger);
+
 app.post(
   "/api/v1/payments/webhooks/stripe",
   express.raw({ type: "application/json" }),
@@ -18,7 +20,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(httpLogger);
 app.use(cors({ origin: ["http://localhost:5173"], credentials: true }));
 
 app.use("/internal/payments", internalPaymentRouter);
