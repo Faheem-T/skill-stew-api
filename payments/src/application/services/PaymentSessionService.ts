@@ -248,11 +248,10 @@ export class PaymentSessionService implements IPaymentSessionService {
     status: "success" | "cancelled",
     sessionId?: string,
   ): string {
-    const url = new URL(this.checkoutReturnUrl);
+    const url = new URL(this.checkoutReturnUrl + `/${payment.cohortId}`);
     url.searchParams.set("paymentStatus", status);
     url.searchParams.set("paymentId", payment.paymentId);
     url.searchParams.set("membershipId", payment.membershipId);
-    url.searchParams.set("cohortId", payment.cohortId);
     url.searchParams.set("workshopId", payment.workshopId);
     if (sessionId) {
       url.searchParams.set("session_id", sessionId);
