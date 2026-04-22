@@ -2,6 +2,7 @@ export interface CreateCheckoutSessionInput {
   membershipId: string;
   cohortId: string;
   workshopId: string;
+  workshopTitle: string;
   expertId: string;
   userId: string;
   amount: number;

@@ -416,12 +416,24 @@ export class CohortService implements ICohortService {
         (entry) => entry.id === cohort.id,
       );
 
+      const workshop = await this.workshopRepo.getById(cohort.workshopId, tx);
+
       if (sameCohortEntry) {
         const sameMembership = liveMemberships.find(
           (membership) => membership.cohortId === sameCohortEntry.id,
         );
         if (sameMembership?.status === "pending_payment") {
-          return this.toEnrollmentResponse(sameMembership);
+          const checkout = await this.paymentsClient.createCheckoutSession({
+            membershipId: sameMembership.id,
+            cohortId: cohort.id,
+            workshopId: cohort.workshopId,
+            workshopTitle: workshop.title,
+            expertId: cohort.expertId,
+            userId,
+            amount: cohort.spotPriceAmount,
+            currency: cohort.currency,
+          });
+          return this.toEnrollmentResponse(sameMembership, checkout);
         }
         if (sameMembership?.status === "active") {
           throw new ConflictError(
@@ -474,6 +486,7 @@ export class CohortService implements ICohortService {
         membershipId: savedReservation.id,
         cohortId: cohort.id,
         workshopId: cohort.workshopId,
+        workshopTitle: workshop.title,
         expertId: cohort.expertId,
         userId,
         amount: cohort.spotPriceAmount,

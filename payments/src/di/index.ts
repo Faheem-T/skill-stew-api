@@ -1,15 +1,27 @@
-import amqp from "amqplib";
+import Stripe from "stripe";
+import { ENV } from "../config/dotenv";
 import { PaymentSessionService } from "../application/services/PaymentSessionService";
 import { PaymentSessionController } from "../presentation/controllers/PaymentSessionController";
-import { ENV } from "../config/dotenv";
+import { PaymentRepository } from "../infrastructure/repositories/PaymentRepository";
+import { OutboxEventRepository } from "../infrastructure/repositories/OutboxEventRepository";
+import { UnitOfWork } from "../infrastructure/persistence/UnitOfWork";
 
-const EXCHANGE_NAME = "stew_exchange";
+const paymentRepo = new PaymentRepository();
+const outboxRepo = new OutboxEventRepository();
+const unitOfWork = new UnitOfWork();
+const stripe = new Stripe(ENV.STRIPE_SECRET_KEY, {
+  apiVersion: "2026-03-25.dahlia" as never,
+});
 
-const connection = await amqp.connect(ENV.RABBIT_MQ_CONNECTION_STRING);
-const channel = await connection.createChannel();
-await channel.assertExchange(EXCHANGE_NAME, "topic", { durable: true });
+const paymentSessionService = new PaymentSessionService(
+  paymentRepo,
+  outboxRepo,
+  unitOfWork,
+  stripe,
+  ENV.STRIPE_WEBHOOK_SECRET,
+  ENV.FRONTEND_PAYMENT_RETURN_URL,
+);
 
-const paymentSessionService = new PaymentSessionService(channel, EXCHANGE_NAME);
 export const paymentSessionController = new PaymentSessionController(
   paymentSessionService,
 );
